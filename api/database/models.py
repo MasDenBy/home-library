@@ -33,7 +33,7 @@ class Book(db.Model):
     __tablename__ = "books"
     id = Column(Integer, primary_key=True)
     title = Column(String)
-    goodreads_id = Column(Integer)
+    external_id = Column(String)
     description = Column(String)
     authors = Column(String)
     file = relationship("File", uselist=False)

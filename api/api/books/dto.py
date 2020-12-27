@@ -15,7 +15,7 @@ class BookDto:
     book = api.model('book', {
         'id': fields.Integer(),
         'title': fields.String(),
-        'goodreads_id': fields.Integer,
+        'external_id': fields.String,
         'description': fields.String(),
         'authors': fields.String(),
         'file': fields.Nested(file)
