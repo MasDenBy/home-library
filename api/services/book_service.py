@@ -4,7 +4,8 @@ import requests
 import base64
 from urllib.parse import urlparse
 
-from .goodreads import SearchBooks, Book
+# from .goodreads import SearchBooks, Book
+from .external_book_service import SearchBooks, Book
 from database.repositories import BookRepository
 
 
@@ -18,8 +19,9 @@ class BookService:
         try:
             self._logger.info("Add book {path}".format(path=path))
             dir, file_name, title, ext = self._split_path(path)
-            gr_book = self._search_book(title)
+            ext_book = self._search_book(title)
             params = self._create_book_params(
+                ext_book,
                 file_name=file_name,
                 full_path=path,
                 path=dir,
@@ -56,12 +58,13 @@ class BookService:
             self._logger.info("Move book from {from_path} to {to_path}".format(from_path=from_path, to_path=to_path))
             dir, file_name, title, ext = self._split_path(to_path)
             book = self._book_repository.get_by_path(from_path)
-            goodreads_id = book.goodreads_id
-            if goodreads_id is None:
-                gr_book = self._search_book(title)
+            external_id = book.external_id
+            if external_id is None:
+                ext_book = self._search_book(title)
             else:
                 title = None
             params = self._create_book_params(
+                ext_book,
                 file_name=file_name,
                 full_path=to_path,
                 path=dir,
@@ -82,7 +85,7 @@ class BookService:
             title=book.title,
             description=book.description,
             authors=book.authors,
-            goodreads_id=book.goodreads_id)
+            external_id=book.external_id)
         self._book_repository.update(book.id, **params)
 
 
@@ -90,9 +93,9 @@ class BookService:
         self._logger.info("Index book {id}".format(id=id))
         book = self._book_repository.get_by_id(id)
 
-        if book.goodreads_id is not None:
-            gr_book = Book(book.goodreads_id)
-            params = self._create_book_params(gr_book)
+        if book.external_id is not None:
+            ext_book = Book(book.external_id)
+            params = self._create_book_params(ext_book)
             self._book_repository.update(book.id, **params)
 
 
@@ -107,7 +110,7 @@ class BookService:
         return gr_books[0] if len(gr_books) > 0 else None
 
 
-    def _create_book_params(self, gr_book, **kwargs):
+    def _create_book_params(self, external_book, **kwargs):
         """
         :param str file_name: The name of the book file
         :param str full_path: The full path to the book file
@@ -116,15 +119,15 @@ class BookService:
         :param str title: The title of the book
         :param str description: The book description
         :param str authors: The authors of the book
-        :param int goodreads_id: The identifier from goodreads.com
+        :param int external_id: The identifier from external service
         """
 
-        if gr_book:
-            kwargs["title"] = gr_book.title()
-            kwargs["goodreads_id"] = gr_book.id
-            kwargs["description"] = gr_book.description()
-            kwargs["authors"] = ', '.join(map(lambda x: x.name(), gr_book.authors()))
-            kwargs["image"] = self._download_image(gr_book.image_url())
+        if external_book:
+            kwargs["title"] = external_book.title()
+            kwargs["external_id"] = external_book.id
+            kwargs["description"] = external_book.description()
+            kwargs["authors"] = ', '.join(map(lambda x: x.name(), external_book.authors()))
+            kwargs["image"] = self._download_image(external_book.image_url())
 
         return kwargs
 

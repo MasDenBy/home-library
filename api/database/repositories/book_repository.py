@@ -46,7 +46,7 @@ class BookRepository:
             raise Exception("The book with id {id} doesn't find.".format(id=id))
         if book_data.title is not None:
             book.title = book_data.title
-        book.goodreads_id = book_data.goodreads_id
+        book.external_id = book_data.external_id
         book.description = book_data.description
         book.authors = book_data.authors
 
@@ -90,8 +90,8 @@ class BookRepository:
                     library_id = params.get("library_id", None),
                     image = params.get("image", None))
         book = Book(title = params["title"],
-                    goodreads_id = params.get("goodreads_id", None),
-                    description = params["description"],
-                    authors = params["authors"],
+                    external_id = params.get("external_id", None),
+                    description = params.get("description", None),
+                    authors = params.get("authors", None),
                     file = file)
         return file, book
