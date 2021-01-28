@@ -353,3 +353,4 @@ MigrationBackup/
 /api/.venv35/
 /set_env.py
 /api/goodreads_auth.txt
+dist
