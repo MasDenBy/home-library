@@ -9,7 +9,7 @@
     "types": [
       "reflect-metadata"
     ],
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "inlineSourceMap": true,
     "experimentalDecorators": true,

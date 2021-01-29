@@ -8,10 +8,11 @@ import cors from 'cors';
 import debug from 'debug';
 
 import './books/controllers/books.controller';
+import './libraries/controllers/libraries.controller';
 
 import { container } from './inversify.config';
+import { Config } from './config';
 
-const port: Number = 11000;
 const debugLog: debug.IDebugger = debug('app');
 
 let server = new InversifyExpressServer(container);
@@ -33,4 +34,4 @@ server.setConfig(app => {
 });
 
 let app = server.build();
-app.listen(port);
+app.listen(new Config().port);

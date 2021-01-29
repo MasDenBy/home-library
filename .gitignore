@@ -348,9 +348,5 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-/api/library.db
-/api/.venv/
-/api/.venv35/
-/set_env.py
-/api/goodreads_auth.txt
 dist
+**/.env
