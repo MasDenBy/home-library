@@ -9,13 +9,13 @@
     "sourceMap": true,
     "types": [
       "reflect-metadata",
-      "jasmine"
+      "jest"
     ],
     "strict": false,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
   },
   "include": [
     "./src/**/*"
