@@ -1,4 +1,3 @@
-import nanoid from 'nanoid';
 import debug from 'debug';
 import { injectable } from 'inversify';
 
@@ -15,7 +14,7 @@ export class BooksDao {
     }
 
     async addBook(book: BookDto) {
-        book.id = nanoid.nanoid();
+        //book.id = nanoid.nanoid();
         this.books.push(book);
         return book.id;
     }

@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 
 @injectable()
 export class Config {
-    port: Number = +process.env.port;
+    port: Number = +(process.env.port ?? 0);
     database: DatabaseConfig = new DatabaseConfig();
 }
 

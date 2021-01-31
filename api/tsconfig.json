@@ -4,15 +4,25 @@
     "lib": [
       "es6"
     ],
-    "module": "commonjs",
+    "module": "esnext",
     "outDir": "./dist",
+    "sourceMap": true,
     "types": [
-      "reflect-metadata"
+      "reflect-metadata",
+      "jasmine"
     ],
     "strict": false,
     "esModuleInterop": true,
-    "inlineSourceMap": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-  }
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "node"
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "tests",
+    "node_modules"
+  ],
+  "typeRoots": ["node_modules/@types"]
 }
