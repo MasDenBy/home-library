@@ -3,7 +3,7 @@ const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
 
 module.exports = {
   watch: false,
-  entry: './src/app.ts',
+  entry: './src/index.ts',
   devtool: 'inline-source-map',
   mode: 'development',
   target: 'node',
@@ -19,7 +19,7 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   output: {
-    filename: 'app.js',
+    filename: 'index.js',
     path: path.resolve(__dirname, './dist'),
   },
   plugins: [

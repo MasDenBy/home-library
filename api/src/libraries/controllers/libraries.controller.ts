@@ -12,26 +12,26 @@ export class LibrariesController implements interfaces.Controller {
     constructor(private libraryService: LibraryService) { }
 
     @httpGet('/')
-    public async list(req: express.Request, res: express.Response) {
+    public async list(request: express.Request, response: express.Response) {
         const libraries = await this.libraryService.list();
-        res.status(200).send(libraries);
+        response.status(200).send(libraries);
     }
 
     @httpGet('/:id')
-    public async getById(@requestParam('id') id: number, @response() res: express.Response) {
+    public async getById(@requestParam('id') id: number, @response() response: express.Response) {
         const library = await this.libraryService.getById(id);
-        res.status(200).send(library);
+        response.status(200).send(library);
     }
 
     @httpPost('/')
-    public async create(req: express.Request, res: express.Response) {
-        const id = await this.libraryService.save(req.body);
-        res.status(201).send({id: id});
+    public async create(request: express.Request, response: express.Response) {
+        const id = await this.libraryService.save(request.body);
+        response.status(201).send({id: id});
     }
 
     @httpDelete('/:id')
-    public async delete(@requestParam('id') id: number, @response() res: express.Response) {
+    public async delete(@requestParam('id') id: number, @response() response: express.Response) {
         await this.libraryService.deleteById(id);
-        res.status(204).send(``);
+        response.status(204).send();
     }
 }

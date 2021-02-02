@@ -10,13 +10,12 @@ import debug from 'debug';
 import './books/controllers/books.controller';
 import './libraries/controllers/libraries.controller';
 
-import { container } from './inversify.config';
 import { Config } from './config';
 import { Container } from "inversify";
 
 const debugLog: debug.IDebugger = debug('app');
 
-export class ApiApp {
+export class App {
     private server: InversifyExpressServer;
 
     constructor(private container: Container) {
@@ -46,6 +45,3 @@ export class ApiApp {
         return app;
     }
 }
-
-const app = new ApiApp(container).run();
-export { app };

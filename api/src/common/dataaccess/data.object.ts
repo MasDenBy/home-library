@@ -4,6 +4,10 @@ import { Config } from "../../config";
 import { BaseEntity } from './base.entity';
 import { Library } from "../../libraries/dataaccess/library.entity";
 
+import debug from "debug";
+
+const debugLog: debug.IDebugger = debug('app: data.object');
+
 @injectable()
 export abstract class DataObject {
     constructor(private config: Config) { }
