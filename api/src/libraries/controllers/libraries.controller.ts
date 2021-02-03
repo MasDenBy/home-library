@@ -1,37 +1,44 @@
 import express from 'express';
 import debug from 'debug';
-import { interfaces, controller, httpGet, httpPost, httpDelete, response, requestParam } from "inversify-express-utils";
+import { controller, httpGet, httpPost, httpDelete, requestParam } from "inversify-express-utils";
 
 import { LibraryService } from '../services/library.service';
+import { ApiController } from '../../common';
 
 const log: debug.IDebugger = debug('app:libraries-controller');
 
 @controller("/libraries")
-export class LibrariesController implements interfaces.Controller {
+export class LibrariesController extends ApiController {
 
-    constructor(private libraryService: LibraryService) { }
+    constructor(private libraryService: LibraryService) {
+        super();
+     }
 
     @httpGet('/')
-    public async list(request: express.Request, response: express.Response) {
+    public async list() {
         const libraries = await this.libraryService.list();
-        response.status(200).send(libraries);
+
+        return this.json(libraries);
     }
 
     @httpGet('/:id')
-    public async getById(@requestParam('id') id: number, @response() response: express.Response) {
+    public async getById(@requestParam('id') id: number) {
         const library = await this.libraryService.getById(id);
-        response.status(200).send(library);
+        
+        return this.json(library);
     }
 
     @httpPost('/')
-    public async create(request: express.Request, response: express.Response) {
+    public async create(request: express.Request) {
         const id = await this.libraryService.save(request.body);
-        response.status(201).send({id: id});
+
+        return this.created('/libraries', {id: id});
     }
 
     @httpDelete('/:id')
-    public async delete(@requestParam('id') id: number, @response() response: express.Response) {
+    public async delete(@requestParam('id') id: number) {
         await this.libraryService.deleteById(id);
-        response.status(204).send();
+        
+        return this.noContent();
     }
 }

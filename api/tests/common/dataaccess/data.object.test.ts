@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import { BaseEntity, DatabaseWrapper, DataObject } from '../../../src/common';
 import { mock, instance, when, verify, objectContaining } from 'ts-mockito';
 import { resolvableInstance } from '../../../__helpers__/ts-mockito.helper';

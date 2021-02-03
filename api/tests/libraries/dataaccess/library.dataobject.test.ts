@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import { Repository } from 'typeorm';
 import { mock, instance, when, verify, deepEqual } from 'ts-mockito';
 

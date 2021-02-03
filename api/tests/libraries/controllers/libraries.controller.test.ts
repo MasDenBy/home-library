@@ -1,5 +1,7 @@
-import { Request, Response } from 'express';
-import { mock, instance, when, verify, deepEqual } from 'ts-mockito';
+import "reflect-metadata";
+
+import { Request } from 'express';
+import { mock, instance, when, verify } from 'ts-mockito';
 
 import { LibraryService } from '../../../src/libraries/services/library.service';
 import { LibrariesController } from '../../../src/libraries/controllers/libraries.controller';
@@ -10,13 +12,9 @@ describe('/libraries', () => {
 
     let controller: LibrariesController;
     let libraryServiceMock: LibraryService;
-    let responseMock: Response;
-    let requestMock: Request;
 
     beforeEach(() => {
         libraryServiceMock = mock(LibraryService);
-        responseMock = mock<Response>();
-        requestMock = mock<Request>();
 
         controller = new LibrariesController(instance(libraryServiceMock));
     });
@@ -24,17 +22,15 @@ describe('/libraries', () => {
     test('list', async () => {
         // Arrange
         const responseBody = [new Library()];
+
         when(libraryServiceMock.list()).thenResolve(responseBody);
-        
-        when(responseMock.status(200)).thenReturn(instance(responseMock));
-        when(responseMock.send()).thenReturn();
 
         // Act
-        await controller.list(instance(requestMock), instance(responseMock));
+        const result = await controller.list();
 
         // Assert
-        verify(responseMock.status(200)).once();
-        verify(responseMock.send(deepEqual(responseBody))).once();
+        expect(result.statusCode).toBe(200);
+        expect(result.json).toEqual(responseBody);
     });
 
     test('getById', async () => {
@@ -44,15 +40,12 @@ describe('/libraries', () => {
 
         when(libraryServiceMock.getById(testId)).thenResolve(dto);
 
-        when(responseMock.status(200)).thenReturn(instance(responseMock));
-        when(responseMock.send(dto)).thenReturn();
-
         // Act
-        await controller.getById(testId, instance(responseMock));
+        var result = await controller.getById(testId);
 
         // Assert
-        verify(responseMock.status(200)).once();
-        verify(responseMock.send(deepEqual(dto))).once();
+        expect(result.statusCode).toBe(200);
+        expect(result.json).toEqual(dto);
     });
 
     test('create', async () => {
@@ -61,19 +54,17 @@ describe('/libraries', () => {
         const dto = <LibraryDto>{ path: 'lib' };
         const responseDto = {id: testId};
 
+        const requestMock: Request = mock<Request>();
         when(requestMock.body).thenReturn(dto);
 
         when(libraryServiceMock.save(dto)).thenResolve(testId);
 
-        when(responseMock.status(201)).thenReturn(instance(responseMock));
-        when(responseMock.send(responseDto)).thenReturn();
-
         // Act
-        await controller.create(instance(requestMock), instance(responseMock));
+        var result = await controller.create(instance(requestMock)) as any;
 
         // Assert
-        verify(responseMock.status(201)).once();
-        verify(responseMock.send(deepEqual(responseDto))).once();
+        expect(result.location).toBe('/libraries');
+        expect(result.content).toEqual(responseDto);
     });
 
     test('delete', async () => {
@@ -82,14 +73,12 @@ describe('/libraries', () => {
 
         when(libraryServiceMock.deleteById(testId));
 
-        when(responseMock.status(204)).thenReturn(instance(responseMock));
-        when(responseMock.send()).thenReturn();
-
         // Act
-        await controller.delete(testId, instance(responseMock));
+        const result = await controller.delete(testId);
 
         // Assert
-        verify(responseMock.status(204)).once();
-        verify(responseMock.send()).once();
+        expect(result.statusCode).toBe(204);
+
+        verify(libraryServiceMock.deleteById(testId)).once();
     });
 });
