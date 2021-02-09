@@ -3,7 +3,7 @@ import debug from 'debug';
 import { controller, httpGet, httpPost, httpDelete, requestParam } from "inversify-express-utils";
 
 import { LibraryService } from '../services/library.service';
-import { ApiController } from '../../common';
+import { ApiController } from '../../common/controllers/api.controller';
 
 const log: debug.IDebugger = debug('app:libraries-controller');
 
@@ -40,5 +40,12 @@ export class LibrariesController extends ApiController {
         await this.libraryService.deleteById(id);
         
         return this.noContent();
+    }
+
+    @httpPost('/index')
+    public async index(request: express.Request) {
+        await this.libraryService.index(request.body);
+
+        return this.ok();
     }
 }

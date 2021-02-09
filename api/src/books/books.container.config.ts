@@ -1,10 +1,10 @@
 import { Container } from "inversify";
-import { BooksDao } from "./dao/books.dao";
-import { BooksService } from "./services/books.service";
+import { BookDataObject } from "./dataaccess/book.dataobject";
+import { BookService } from "./services/book.service";
 
 export class BooksContainerConfig {
     static configure(container: Container): void {
-        container.bind<BooksDao>(BooksDao).toSelf();
-        container.bind<BooksService>(BooksService).toSelf();
+        container.bind<BookDataObject>(BookDataObject).toSelf();
+        container.bind<BookService>(BookService).toSelf();
     }
 }

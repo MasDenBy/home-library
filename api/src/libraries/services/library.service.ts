@@ -1,11 +1,12 @@
 import { injectable } from "inversify";
 import { LibraryDataObject } from "../dataaccess/library.dataobject";
-import { Library } from "../dataaccess/library.entity";
+import { Library } from "../../common/dataaccess/entities/library.entity";
+import { IndexerService } from "../../common/services/indexer.service";
 import { LibraryDto } from "../dto/library.dto";
 
 @injectable()
 export class LibraryService {
-    constructor(private libraryDataObject: LibraryDataObject) { }
+    constructor(private libraryDataObject: LibraryDataObject, private indexer: IndexerService) { }
 
     public list(): Promise<Library[]> {
         return this.libraryDataObject.list(Library);
@@ -25,6 +26,14 @@ export class LibraryService {
 
     public async deleteById(id: number): Promise<any> {
         return await this.libraryDataObject.deleteById(Library, id);
+    }
+
+    public async index(ids: number[]): Promise<any> {
+        const libs = await this.libraryDataObject.getByIds(ids);
+
+        if(libs) {
+            await this.indexer.index(libs);
+        }
     }
 
     private static toDto(entity: Library): LibraryDto {

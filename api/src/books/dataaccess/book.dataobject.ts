@@ -1,22 +1,26 @@
 import debug from 'debug';
 import { injectable } from 'inversify';
+import { DatabaseWrapper } from '../../common/dataaccess/db.wrapper';
+import { DataObject } from '../../common/dataaccess/data.object';
 
 import { BookDto } from "../dto/books.model";
+import { Book } from '../../common/dataaccess/entities/book.entity';
 
 const log: debug.IDebugger = debug('app:in-memory-dao');
 
 @injectable()
-export class BooksDao {
+export class BookDataObject extends DataObject {
     books: Array<BookDto> = [];
 
-    constructor() {
-        log('Created new instance of BooksDao');
+    constructor(public database: DatabaseWrapper) {
+        super(database);
     }
 
-    async addBook(book: BookDto) {
-        //book.id = nanoid.nanoid();
-        this.books.push(book);
-        return book.id;
+    public async addBook(book: Book): Promise<number> {
+        const repository = await this.database.getRepository(Book);
+        const newEntity = await repository.save(book);
+
+        return newEntity.id;
     }
 
     async getBooks() {
@@ -31,20 +35,6 @@ export class BooksDao {
         const objIndex = this.books.findIndex((obj: { id: string; }) => obj.id === book.id);
         this.books.splice(objIndex, 1, book);
         return `${book.id} updated via put`;
-    }
-    
-    async patchBookById(book: BookDto) {
-        const objIndex = this.books.findIndex((obj: { id: string; }) => obj.id === book.id);
-        let currentBook = this.books[objIndex];
-        const allowedPatchFields = ["title", "description", "authors"];
-        for (let field of allowedPatchFields) {
-            if (field in book) {
-                // @ts-ignore
-                currentBook[field] = book[field];
-            }
-        }
-        this.books.splice(objIndex, 1, currentBook);
-        return `${book.id} patched`;
     }
 
     async removeBookById(bookId: string) {

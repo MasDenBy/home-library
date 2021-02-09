@@ -2,8 +2,12 @@ import { injectable } from "inversify";
 import { Connection, EntityTarget, getConnectionManager, Repository } from "typeorm";
 
 import { Config } from "../../config";
-import { Library } from "../../libraries/dataaccess/library.entity";
-import { BaseEntity } from './base.entity';
+import { BaseEntity } from './entities/base.entity';
+
+// Entities
+import { Book } from "./entities/book.entity";
+import { File } from "./entities/file.entity";
+import { Library } from "./entities/library.entity";
 
 @injectable()
 export class DatabaseWrapper {
@@ -24,6 +28,8 @@ export class DatabaseWrapper {
                 password: this.config.database.password,
                 database: this.config.database.name,
                 entities: [
+                    Book,  
+                    File,
                     Library
                 ],
                 synchronize: true

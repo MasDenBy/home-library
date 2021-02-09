@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import { EntityTarget, DeleteResult } from "typeorm";
-import { BaseEntity } from './base.entity';
+import { BaseEntity } from './entities/base.entity';
 
 import debug from "debug";
 import { DatabaseWrapper } from "./db.wrapper";

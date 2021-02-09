@@ -1,5 +1,6 @@
 const path = require('path');
 const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
+const CircularDependencyPlugin = require('circular-dependency-plugin')
 
 module.exports = {
   watch: false,
@@ -25,6 +26,12 @@ module.exports = {
   plugins: [
     new FilterWarningsPlugin({
       exclude: [/typeorm/, /app-root-path/, /express/, /inversify/]
+    }),
+    new CircularDependencyPlugin({
+      exclude: /a\.js|node_modules/,
+      failOnError: false,
+      allowAsyncCycles: false,
+      cwd: process.cwd(),
     })
   ]
 };
