@@ -1,8 +1,11 @@
 import 'reflect-metadata';
 
+import { Request } from 'express';
+
 import { mock, instance, when, verify } from 'ts-mockito';
 
 import { BooksController } from '../../../src/books/controllers/books.controller';
+import { BookSearchDto } from '../../../src/books/dto/book.search.dto';
 import { BookService } from '../../../src/books/services/book.service';
 import { Book } from '../../../src/common/dataaccess/entities/book.entity';
 
@@ -30,5 +33,24 @@ describe('BooksController', () => {
         expect(result.json).toBeTruthy();
 
         verify(bookServiceMock.list(offset, count)).once();
+    });
+
+    test('search', async () => {
+        // Arrange
+        const dto = <BookSearchDto> { pattern: 'book', offset: 0, count: 10 };
+
+        when(bookServiceMock.search(dto)).thenResolve([new Book()]);
+
+        const requestMock: Request = mock<Request>();
+        when(requestMock.body).thenReturn(dto);
+
+        // Act
+        const result = await controller.search(instance(requestMock));
+
+        // Assert
+        expect(result.statusCode).toBe(200);
+        expect(result.json).toBeTruthy();
+
+        verify(bookServiceMock.search(dto)).once();
     });
 });

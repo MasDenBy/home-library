@@ -22,6 +22,13 @@ export class BooksController extends ApiController {
         return this.json(books);
     }
 
+    @httpPost('/search')
+    public async search(request: express.Request) {
+        const books = await this.bookService.search(request.body);
+        
+        return this.json(books);
+    }
+
     @httpGet('/:id')
     public async getBookById(@requestParam('id') id: string, res: express.Response) {
         const book = await this.bookService.getById(id);

@@ -6,6 +6,7 @@ import { FileSystemWrapper } from "../../common/services/fs.wrapper";
 
 import { BookDataObject } from '../dataaccess/book.dataobject';
 import { BookDto } from "../dto/book.dto";
+import { BookSearchDto } from "../dto/book.search.dto";
 
 @injectable()
 export class BookService {
@@ -23,6 +24,10 @@ export class BookService {
 
     public async list(offset: number, count: number) {
         return await this.dataObject.getBooks(offset, count);
+    }
+
+    public async search(dto: BookSearchDto) {
+        return await this.dataObject.searchBooks(dto.pattern, dto.offset, dto.count);
     }
 
     public async getById(resourceId: string) {

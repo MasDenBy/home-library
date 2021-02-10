@@ -32,6 +32,19 @@ export class BookDataObject extends DataObject {
             .take(count)
             .getMany()
     }
+
+    public async searchBooks(pattern: string, offset: number, count: number): Promise<Book[]> {
+        const repository = await this.database.getRepository(Book) as Repository<Book>;
+
+        return await repository
+            .createQueryBuilder(this.alias)
+            .where(`${this.alias}.title LIKE :title`, {title: `%${pattern}%`})
+            .orWhere(`${this.alias}.description LIKE :description`, {description: `%${pattern}%`})
+            .orWhere(`${this.alias}.authors LIKE :authors`, {authors: `%${pattern}%`})
+            .skip(offset)
+            .take(count)
+            .getMany()
+    }
     
     async getBookById(bookId: string) {
         return this.books.find((book: { id: string; }) => book.id === bookId);

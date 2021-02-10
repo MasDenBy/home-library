@@ -1,6 +1,7 @@
 import { mock, instance, verify, when, anyOfClass } from 'ts-mockito';
 
 import { BookDataObject } from '../../../src/books/dataaccess/book.dataobject';
+import { BookSearchDto } from '../../../src/books/dto/book.search.dto';
 import { BookService } from '../../../src/books/services/book.service';
 import { Book } from '../../../src/common/dataaccess/entities/book.entity';
 import { Library } from '../../../src/common/dataaccess/entities/library.entity';
@@ -41,5 +42,16 @@ describe('BookService', () => {
 
         // Assert
         verify(dataObjectMock.getBooks(offset, count)).once();
+    });
+
+    test('search', async () => {
+        // Arrange
+        const dto = <BookSearchDto> { pattern: 'book', offset: 0, count: 10 };
+
+        // Act
+        await service.search(dto);
+
+        // Assert
+        verify(dataObjectMock.searchBooks(dto.pattern, dto.offset, dto.count)).once();
     });
 });
