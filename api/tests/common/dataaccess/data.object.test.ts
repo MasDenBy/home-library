@@ -1,8 +1,10 @@
 import "reflect-metadata";
 
-import { BaseEntity, DatabaseWrapper, DataObject } from '../../../src/common';
+import { BaseEntity } from '../../../src/common/dataaccess/entities/base.entity';
+import { DatabaseWrapper } from '../../../src/common/dataaccess/db.wrapper';
+import { DataObject } from '../../../src/common/dataaccess/data.object';
 import { mock, instance, when, verify, objectContaining } from 'ts-mockito';
-import { resolvableInstance } from '../../../__helpers__/ts-mockito.helper';
+import { resolvableInstance } from '../../__helpers__/ts-mockito.helper';
 import { Repository, Connection, SelectQueryBuilder, DeleteQueryBuilder, DeleteResult } from 'typeorm';
 
 describe('DataObject', () => {

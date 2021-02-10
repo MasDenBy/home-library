@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { ApiController } from '../../../src/common';
+import { ApiController } from '../../../src/common/controllers/api.controller';
 
 describe('ApiController', () => {
     test('noContent', () => {

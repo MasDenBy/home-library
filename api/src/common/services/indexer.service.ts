@@ -10,13 +10,13 @@ const debugLog: debug.IDebugger = debug('app:library.indexer.service');
 export class IndexerService {
     constructor(private fs: FileSystemWrapper, private bookService: BookService) {}
 
-    public async index(libs: Library[]): Promise<any> {
+    public async index(libs: Library[]): Promise<void> {
         for (const index in libs) {
             await this.processLibrary(libs[index]);
         }
     }
 
-    private async processLibrary(library: Library) {
+    private async processLibrary(library: Library): Promise<void> {
         const files = await this.fs.readFiles(library.path);
 
         for (const index in files) {

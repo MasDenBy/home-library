@@ -1,19 +1,23 @@
 import { DeleteResult } from 'typeorm';
-import { mock, instance, when, verify, anyOfClass } from 'ts-mockito';
+import { mock, instance, when, verify, anyOfClass, anything } from 'ts-mockito';
 
 import { LibraryDataObject } from '../../../src/libraries/dataaccess/library.dataobject';
-import { Library } from '../../../src/libraries/dataaccess/library.entity';
+import { Library } from '../../../src/common/dataaccess/entities/library.entity';
 import { LibraryService } from '../../../src/libraries/services/library.service';
 import { LibraryDto } from '../../../src/libraries/dto/library.dto';
+import { IndexerService } from '../../../src/common/services/indexer.service';
 
 describe('LibraryService', () => {
 
     let service: LibraryService;
     let dataObjectMock: LibraryDataObject;
+    let indexerMock: IndexerService;
 
     beforeEach(() => {
         dataObjectMock = mock(LibraryDataObject);
-        service = new LibraryService(instance(dataObjectMock));
+        indexerMock = mock(IndexerService);
+
+        service = new LibraryService(instance(dataObjectMock), instance(indexerMock));
     });
 
     test('list', async () => {
@@ -70,5 +74,34 @@ describe('LibraryService', () => {
 
         // Assert
         verify(dataObjectMock.deleteById(Library, id)).once();
+    });
+
+    describe('index', () => {
+        test('libraries exist, then index', async () => {
+            // Arrange
+            const ids = [2];
+            const libs = [<Library>{ id: 1 }];
+    
+            when(dataObjectMock.getByIds(ids)).thenResolve(libs);
+            
+            // Act
+            await service.index(ids);
+    
+            // Assert
+            verify(indexerMock.index(libs)).once();
+        });
+
+        test('libraries do not exist, then index does not fire', async () => {
+            // Arrange
+            const ids = [2];
+    
+            when(dataObjectMock.getByIds(ids)).thenResolve(null);
+            
+            // Act
+            await service.index(ids);
+    
+            // Assert
+            verify(indexerMock.index(anything())).never();
+        });
     });
 });

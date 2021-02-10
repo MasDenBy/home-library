@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import { mock, instance, when, verify, deepEqual } from 'ts-mockito';
 
 import { LibraryDataObject } from '../../../src/libraries/dataaccess/library.dataobject';
-import { Library } from '../../../src/libraries/dataaccess/library.entity';
+import { Library } from '../../../src/common/dataaccess/entities/library.entity';
 import { DatabaseWrapper } from '../../../src/common/dataaccess/db.wrapper';
-import { resolvableInstance } from '../../../__helpers__/ts-mockito.helper';
+import { resolvableInstance } from '../../__helpers__/ts-mockito.helper';
 
 describe('LibraryDataObject', () => {
 
