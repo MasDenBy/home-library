@@ -4,20 +4,22 @@ import { interfaces, controller, httpGet, httpPost, httpDelete, request, queryPa
 import { BookService } from '../services/book.service';
 
 import debug from 'debug';
+import { ApiController } from '../../common/controllers/api.controller';
 
 const log: debug.IDebugger = debug('app:books-controller');
 
 @controller("/books")
-export class BooksController implements interfaces.Controller {
+export class BooksController extends ApiController {
 
-    constructor(private bookService: BookService) { }
+    constructor(private bookService: BookService) {
+        super()
+    }
 
-    @httpGet('/')
-    public async listBooks(req: express.Request, res: express.Response) {
-        log('listBooks');
-        log(this.bookService);
-        const books = await this.bookService.list(100, 0);
-        res.status(200).send(books);
+    @httpGet('/:offset/:count')
+    public async list(@requestParam('offset') offset: number, @requestParam('count') count: number) {
+        const books = await this.bookService.list(offset, count);
+        
+        return this.json(books);
     }
 
     @httpGet('/:id')

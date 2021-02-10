@@ -30,4 +30,16 @@ describe('BookService', () => {
         // Assert
         verify(dataObjectMock.addBook(anyOfClass(Book)));
     });
+
+    test('list', async () => {
+        // Arrange
+        const offset = 10;
+        const count = 20;
+
+        // Act
+        await service.list(offset, count);
+
+        // Assert
+        verify(dataObjectMock.getBooks(offset, count)).once();
+    });
 });

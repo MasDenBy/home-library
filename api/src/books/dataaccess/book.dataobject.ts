@@ -1,15 +1,15 @@
-import debug from 'debug';
 import { injectable } from 'inversify';
 import { DatabaseWrapper } from '../../common/dataaccess/db.wrapper';
 import { DataObject } from '../../common/dataaccess/data.object';
 
-import { BookDto } from "../dto/books.model";
+import { BookDto } from "../dto/book.dto";
 import { Book } from '../../common/dataaccess/entities/book.entity';
-
-const log: debug.IDebugger = debug('app:in-memory-dao');
+import { Repository } from 'typeorm';
+import { skips } from 'debug';
 
 @injectable()
 export class BookDataObject extends DataObject {
+    private alias: string = 'book';
     books: Array<BookDto> = [];
 
     constructor(public database: DatabaseWrapper) {
@@ -23,8 +23,14 @@ export class BookDataObject extends DataObject {
         return newEntity.id;
     }
 
-    async getBooks() {
-        return this.books;
+    public async getBooks(offset: number, count: number): Promise<Book[]> {
+        const repository = await this.database.getRepository(Book) as Repository<Book>;
+
+        return await repository
+            .createQueryBuilder(this.alias)
+            .skip(offset)
+            .take(count)
+            .getMany()
     }
     
     async getBookById(bookId: string) {

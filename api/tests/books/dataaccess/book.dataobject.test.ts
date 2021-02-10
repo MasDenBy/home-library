@@ -1,5 +1,5 @@
-import { mock, instance, when, verify, deepEqual } from 'ts-mockito';
-import { Repository } from 'typeorm';
+import { mock, instance, when, verify, deepEqual, anyString } from 'ts-mockito';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 
 import { BookDataObject } from '../../../src/books/dataaccess/book.dataobject';
 import { DatabaseWrapper } from '../../../src/common/dataaccess/db.wrapper';
@@ -16,6 +16,7 @@ describe('BookDataObject', () => {
     });
 
     test('addBook', async () => {
+        // Arrange
         const entity = new Book();
         const savedEntity = { id: 1 } as Book;
 
@@ -32,5 +33,31 @@ describe('BookDataObject', () => {
 
         verify(databaseMock.getRepository(Book)).once();
         verify(repository.save(deepEqual(entity))).once();
+    });
+
+    test('getBooks', async () => {
+        // Arrange
+        const offset = 10;
+        const count = 20;
+
+        const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
+        when(selectQueryBuilder.skip(offset)).thenReturn(instance(selectQueryBuilder));
+        when(selectQueryBuilder.take(count)).thenReturn(instance(selectQueryBuilder));
+        when(selectQueryBuilder.getMany()).thenResolve([new Book()]);
+
+        const repository = mock<Repository<Book>>();
+        when(repository.createQueryBuilder(anyString())).thenReturn(instance(selectQueryBuilder));
+
+        when(databaseMock.getRepository(Book)).thenResolve(resolvableInstance(repository));
+
+        // Act
+        const result = await dataObject.getBooks(offset, count);
+
+        // Assert
+        expect(result.length).toBe(1);
+
+        verify(selectQueryBuilder.skip(offset)).once();
+        verify(selectQueryBuilder.take(count)).once();
+        verify(selectQueryBuilder.getMany()).once();
     });
 });

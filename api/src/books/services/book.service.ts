@@ -5,32 +5,32 @@ import { Library } from "../../common/dataaccess/entities/library.entity";
 import { FileSystemWrapper } from "../../common/services/fs.wrapper";
 
 import { BookDataObject } from '../dataaccess/book.dataobject';
-import { BookDto } from "../dto/Books.model";
+import { BookDto } from "../dto/book.dto";
 
 @injectable()
 export class BookService {
 
-    constructor(private bookDao: BookDataObject, private fs: FileSystemWrapper) {}
+    constructor(private dataObject: BookDataObject, private fs: FileSystemWrapper) {}
 
     public async create(resource: BookDto) {
         const book = <Book>{};
-        return await this.bookDao.addBook(book);
+        return await this.dataObject.addBook(book);
     }
 
     public async deleteById(resourceId: string) {
-        return await this.bookDao.removeBookById(resourceId);
+        return await this.dataObject.removeBookById(resourceId);
     }
 
-    public async list(limit: number, page: number) {
-        return await this.bookDao.getBooks();
+    public async list(offset: number, count: number) {
+        return await this.dataObject.getBooks(offset, count);
     }
 
     public async getById(resourceId: string) {
-        return await this.bookDao.getBookById(resourceId);
+        return await this.dataObject.getBookById(resourceId);
     }
 
     public async update(resource: BookDto) {
-        return await this.bookDao.putBookById(resource);
+        return await this.dataObject.putBookById(resource);
     }
 
     public async createFromFile(path: string, library: Library): Promise<void> {
@@ -42,6 +42,6 @@ export class BookService {
             }
         }
 
-        await this.bookDao.addBook(book);
+        await this.dataObject.addBook(book);
     }
 }
