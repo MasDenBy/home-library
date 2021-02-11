@@ -2,12 +2,13 @@ import 'reflect-metadata';
 
 import { Request } from 'express';
 
-import { mock, instance, when, verify } from 'ts-mockito';
+import { mock, instance, when, verify, deepEqual, anything } from 'ts-mockito';
 
 import { BooksController } from '../../../src/books/controllers/books.controller';
 import { BookSearchDto } from '../../../src/books/dto/book.search.dto';
 import { BookService } from '../../../src/books/services/book.service';
 import { Book } from '../../../src/common/dataaccess/entities/book.entity';
+import { BookDto } from '../../../src/books/dto/book.dto';
 
 describe('BooksController', () => {
     let controller: BooksController;
@@ -68,5 +69,22 @@ describe('BooksController', () => {
         expect(result.json).toBeTruthy();
 
         verify(bookServiceMock.getById(id)).once();
+    });
+
+    test('put', async () => {
+        // Arrange
+        const id = 10;
+        const dto = <BookDto> { authors: null, description: null, title: null };
+
+        const requestMock: Request = mock<Request>();
+        when(requestMock.body).thenReturn(dto);
+
+        // Act
+        const result = await controller.put(id, instance(requestMock));
+
+        // Assert
+        expect(result.statusCode).toBe(204);
+
+        verify(bookServiceMock.update(anything())).once();
     });
 });

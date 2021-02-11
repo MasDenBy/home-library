@@ -1,5 +1,5 @@
 import { mock, instance, when, verify, deepEqual, anyString, anything } from 'ts-mockito';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder, UpdateQueryBuilder, UpdateResult } from 'typeorm';
 
 import { BookDataObject } from '../../../src/books/dataaccess/book.dataobject';
 import { DatabaseWrapper } from '../../../src/common/dataaccess/db.wrapper';
@@ -90,5 +90,33 @@ describe('BookDataObject', () => {
         verify(selectQueryBuilder.skip(offset)).once();
         verify(selectQueryBuilder.take(count)).once();
         verify(selectQueryBuilder.getMany()).once();
+    });
+
+    test('update', async () => {
+        // Arrange
+        const entity = <Book>{id:1, authors: 'authors', description: 'description', title: 'title'};
+        const setObject = { title: entity.title, authors: entity.authors, description: entity.description };
+        
+        const updateQueryBuilder = mock<UpdateQueryBuilder<Book>>();
+        when(updateQueryBuilder.set(deepEqual(setObject)))
+            .thenReturn(instance(updateQueryBuilder));
+        when(updateQueryBuilder.where("id = :id", deepEqual({ id: entity.id }))).thenReturn(instance(updateQueryBuilder));
+        when(updateQueryBuilder.execute()).thenResolve(new UpdateResult());
+
+        const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
+        when(selectQueryBuilder.update(Book)).thenReturn(instance(updateQueryBuilder));
+
+        const repository = mock<Repository<Book>>();
+        when(repository.createQueryBuilder()).thenReturn(instance(selectQueryBuilder));
+
+        when(databaseMock.getRepository(Book)).thenResolve(resolvableInstance(repository));
+
+        // Act
+        await dataObject.update(entity);
+
+        // Assert
+        verify(updateQueryBuilder.set(deepEqual(setObject))).once();
+        verify(updateQueryBuilder.where("id = :id", deepEqual({ id: entity.id }))).once();
+        verify(updateQueryBuilder.execute()).once();
     });
 });

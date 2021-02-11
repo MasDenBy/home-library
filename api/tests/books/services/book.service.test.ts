@@ -1,6 +1,7 @@
-import { mock, instance, verify, when, anyOfClass } from 'ts-mockito';
+import { mock, instance, verify, when, anyOfClass, deepEqual } from 'ts-mockito';
 
 import { BookDataObject } from '../../../src/books/dataaccess/book.dataobject';
+import { BookDto } from '../../../src/books/dto/book.dto';
 import { BookSearchDto } from '../../../src/books/dto/book.search.dto';
 import { BookService } from '../../../src/books/services/book.service';
 import { Book } from '../../../src/common/dataaccess/entities/book.entity';
@@ -64,5 +65,16 @@ describe('BookService', () => {
 
         // Assert
         verify(dataObjectMock.findById(Book, id)).once();
+    });
+
+    test('update', async () => {
+        // Arrange
+        const dto = <BookDto> { id:10, authors: null, description: null, title: null };
+
+        // Act
+        await service.update(dto);
+
+        // Assert
+        verify(dataObjectMock.update(deepEqual({file: null, ...dto}))).once();
     });
 });

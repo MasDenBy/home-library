@@ -10,7 +10,6 @@ import { skips } from 'debug';
 @injectable()
 export class BookDataObject extends DataObject {
     private alias: string = 'book';
-    books: Array<BookDto> = [];
 
     constructor(public database: DatabaseWrapper) {
         super(database);
@@ -46,15 +45,18 @@ export class BookDataObject extends DataObject {
             .getMany()
     }
 
-    async putBookById(book: BookDto) {
-        const objIndex = this.books.findIndex((obj: { id: string; }) => obj.id === book.id);
-        this.books.splice(objIndex, 1, book);
-        return `${book.id} updated via put`;
+    public async update(book: Book): Promise<void> {
+        const repository = await this.database.getRepository(Book) as Repository<Book>;
+
+        await repository
+            .createQueryBuilder()
+            .update(Book)
+            .set({ title: book.title, authors: book.authors, description: book.description })
+            .where("id = :id", { id: book.id })
+            .execute();
     }
 
     async removeBookById(bookId: string) {
-        const objIndex = this.books.findIndex((obj: { id: string; }) => obj.id === bookId);
-        this.books.splice(objIndex, 1);
         return `${bookId} removed`;
     }
 }

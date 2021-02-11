@@ -34,8 +34,8 @@ export class BookService {
         return await this.dataObject.findById(Book, id);
     }
 
-    public async update(resource: BookDto) {
-        return await this.dataObject.putBookById(resource);
+    public async update(dto: BookDto) {
+        return await this.dataObject.update(BookService.toEntity(dto));
     }
 
     public async createFromFile(path: string, library: Library): Promise<void> {
@@ -48,5 +48,15 @@ export class BookService {
         }
 
         await this.dataObject.addBook(book);
+    }
+
+    private static toEntity(dto: BookDto): Book {
+        return <Book> {
+            id: dto.id,
+            authors: dto.authors,
+            description: dto.description,
+            file: null,
+            title: dto.title
+        };
     }
 }

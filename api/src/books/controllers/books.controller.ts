@@ -1,10 +1,11 @@
 import express from 'express';
-import { interfaces, controller, httpGet, httpPost, httpDelete, request, queryParam, response, requestParam, httpPut } from "inversify-express-utils";
+import { controller, httpGet, httpPost, httpDelete, requestParam, httpPut } from "inversify-express-utils";
 
 import { BookService } from '../services/book.service';
 
 import debug from 'debug';
 import { ApiController } from '../../common/controllers/api.controller';
+import { BookDto } from '../dto/book.dto';
 
 const log: debug.IDebugger = debug('app:books-controller');
 
@@ -36,16 +37,11 @@ export class BooksController extends ApiController {
         return this.json(book);
     }
 
-    @httpPost('/')
-    public async createBook(req: express.Request, res: express.Response) {
-        const bookId = await this.bookService.create(req.body);
-        res.status(201).send({id: bookId});
-    }
-
     @httpPut('/:id')
-    public async put(@requestParam('id') id: string, req: express.Request, res: express.Response) {
-        log(await this.bookService.update({id: id, ...req.body}));
-        res.status(204).send(``);
+    public async put(@requestParam('id') id: number, request: express.Request) {
+        await this.bookService.update(<BookDto>{id: id, ...request.body});
+
+        return this.noContent();
     }
 
     @httpDelete('/:id')
