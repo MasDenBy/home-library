@@ -53,4 +53,20 @@ describe('BooksController', () => {
 
         verify(bookServiceMock.search(dto)).once();
     });
+
+    test('getBookById', async () => {
+        // Arrange
+        const id = 10;
+
+        when(bookServiceMock.getById(id)).thenResolve(new Book());
+
+        // Act
+        const result = await controller.getBookById(id);
+
+        // Assert
+        expect(result.statusCode).toBe(200);
+        expect(result.json).toBeTruthy();
+
+        verify(bookServiceMock.getById(id)).once();
+    });
 });

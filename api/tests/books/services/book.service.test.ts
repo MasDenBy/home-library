@@ -54,4 +54,15 @@ describe('BookService', () => {
         // Assert
         verify(dataObjectMock.searchBooks(dto.pattern, dto.offset, dto.count)).once();
     });
+
+    test('getById', async () => {
+        // Arrange
+        const id = 10;
+
+        // Act
+        await service.getById(id);
+
+        // Assert
+        verify(dataObjectMock.findById(Book, id)).once();
+    });
 });

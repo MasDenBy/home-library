@@ -30,8 +30,8 @@ export class BookService {
         return await this.dataObject.searchBooks(dto.pattern, dto.offset, dto.count);
     }
 
-    public async getById(resourceId: string) {
-        return await this.dataObject.getBookById(resourceId);
+    public async getById(id: number) {
+        return await this.dataObject.findById(Book, id);
     }
 
     public async update(resource: BookDto) {

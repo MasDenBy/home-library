@@ -45,10 +45,6 @@ export class BookDataObject extends DataObject {
             .take(count)
             .getMany()
     }
-    
-    async getBookById(bookId: string) {
-        return this.books.find((book: { id: string; }) => book.id === bookId);
-    }
 
     async putBookById(book: BookDto) {
         const objIndex = this.books.findIndex((obj: { id: string; }) => obj.id === book.id);

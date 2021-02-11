@@ -30,9 +30,10 @@ export class BooksController extends ApiController {
     }
 
     @httpGet('/:id')
-    public async getBookById(@requestParam('id') id: string, res: express.Response) {
+    public async getBookById(@requestParam('id') id: number) {
         const book = await this.bookService.getById(id);
-        res.status(200).send(book);
+        
+        return this.json(book);
     }
 
     @httpPost('/')
