@@ -38,4 +38,8 @@ export class FileSystemWrapper {
 
         return path.basename(filePath, extension);
     }
+
+    public readFileContent(filePath: string): fs.ReadStream {
+        return fs.createReadStream(filePath);
+    }
 }

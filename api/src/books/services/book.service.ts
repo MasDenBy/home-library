@@ -46,6 +46,14 @@ export class BookService {
         await this.dataObject.addBook(book);
     }
 
+    public async getFile(id: number) {
+        const book = await this.getById(id) as Book;
+
+        if(book.file == null) return null;
+
+        return this.fs.readFileContent(book.file.path);
+    }
+
     private static toEntity(dto: BookDto): Book {
         return <Book> {
             id: dto.id,
