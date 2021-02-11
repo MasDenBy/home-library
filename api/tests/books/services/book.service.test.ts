@@ -77,4 +77,15 @@ describe('BookService', () => {
         // Assert
         verify(dataObjectMock.update(deepEqual({file: null, ...dto}))).once();
     });
+
+    test('deleteById', async () => {
+        // Arrange
+        const id = 10;
+
+        // Act
+        await service.deleteById(id);
+
+        // Assert
+        verify(dataObjectMock.deleteById(Book, id)).once();
+    });
 });

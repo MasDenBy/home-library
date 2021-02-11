@@ -45,8 +45,9 @@ export class BooksController extends ApiController {
     }
 
     @httpDelete('/:id')
-    public async removeBook(@requestParam('id') id: string, res: express.Response) {
-        log(await this.bookService.deleteById(id));
-        res.status(204).send(``);
+    public async removeBook(@requestParam('id') id: number) {
+        await this.bookService.deleteById(id);
+
+        return this.noContent();
     }
 }

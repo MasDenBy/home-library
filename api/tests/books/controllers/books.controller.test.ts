@@ -87,4 +87,17 @@ describe('BooksController', () => {
 
         verify(bookServiceMock.update(anything())).once();
     });
+
+    test('removeBook', async () => {
+        // Arrange
+        const id = 10;
+
+        // Act
+        const result = await controller.removeBook(id);
+
+        // Assert
+        expect(result.statusCode).toBe(204);
+
+        verify(bookServiceMock.deleteById(id)).once();
+    });
 });

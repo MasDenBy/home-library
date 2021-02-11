@@ -1,4 +1,5 @@
 import { injectable } from "inversify";
+import { DeleteResult } from "typeorm";
 import { Book } from "../../common/dataaccess/entities/book.entity";
 import { File } from "../../common/dataaccess/entities/file.entity";
 import { Library } from "../../common/dataaccess/entities/library.entity";
@@ -13,13 +14,8 @@ export class BookService {
 
     constructor(private dataObject: BookDataObject, private fs: FileSystemWrapper) {}
 
-    public async create(resource: BookDto) {
-        const book = <Book>{};
-        return await this.dataObject.addBook(book);
-    }
-
-    public async deleteById(resourceId: string) {
-        return await this.dataObject.removeBookById(resourceId);
+    public async deleteById(id: number): Promise<DeleteResult> {
+        return await this.dataObject.deleteById(Book, id);
     }
 
     public async list(offset: number, count: number) {
