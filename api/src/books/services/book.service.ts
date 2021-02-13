@@ -1,4 +1,6 @@
+import { FSWatcher, ReadStream } from "fs";
 import { injectable } from "inversify";
+import { Stream } from "stream";
 import { DeleteResult } from "typeorm";
 import { Book } from "../../common/dataaccess/entities/book.entity";
 import { File } from "../../common/dataaccess/entities/file.entity";
@@ -46,12 +48,12 @@ export class BookService {
         await this.dataObject.addBook(book);
     }
 
-    public async getFile(id: number) {
-        const book = await this.getById(id) as Book;
+    public async getFile(id: number): Promise<[Stream, string]> {
+        const book = await this.dataObject.findByIdWithReferences(id);
 
-        if(book.file == null) return null;
+        if(book?.file == null) return null;
 
-        return this.fs.readFileContent(book.file.path);
+        return [this.fs.readFileContent(book.file.path), this.fs.basenameExt(book.file.path)];
     }
 
     private static toEntity(dto: BookDto): Book {

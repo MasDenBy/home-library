@@ -1,11 +1,10 @@
 import { injectable } from 'inversify';
+import { Repository } from 'typeorm';
+
 import { DatabaseWrapper } from '../../common/dataaccess/db.wrapper';
 import { DataObject } from '../../common/dataaccess/data.object';
-
-import { BookDto } from "../dto/book.dto";
 import { Book } from '../../common/dataaccess/entities/book.entity';
-import { Repository } from 'typeorm';
-import { skips } from 'debug';
+
 
 @injectable()
 export class BookDataObject extends DataObject {
@@ -13,6 +12,16 @@ export class BookDataObject extends DataObject {
 
     constructor(public database: DatabaseWrapper) {
         super(database);
+    }
+
+    public async findByIdWithReferences(id: number) : Promise<Book> {
+        const repository = await this.database.getRepository(Book) as Repository<Book>;
+
+        return await repository
+            .createQueryBuilder(this.alias)
+            .leftJoinAndSelect(`${this.alias}.file`, 'file')
+            .where(`${this.alias}.id = :id`, { id: id })
+            .getOne();
     }
 
     public async addBook(book: Book): Promise<number> {

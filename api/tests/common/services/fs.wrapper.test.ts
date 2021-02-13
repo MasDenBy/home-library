@@ -67,4 +67,21 @@ describe('FileSystemWrapper', () => {
         expect(extnameMock).toHaveBeenCalledWith(fileName);
         expect(basenameMock).toHaveBeenCalledWith(fileName, extension);
     });
+
+    test('basenameExt', () => {
+        // Arrange
+        const fileName = 'fullpath/book.pdf';
+        const returnValue = 'book.pdf';
+
+        const basenameMock = basename as jest.MockedFunction<(filePath: string) => string>;
+        basenameMock.mockReturnValue(returnValue);
+
+        // Act
+        const actual = wrapper.basenameExt(fileName);
+
+        // Assert
+        expect(actual).toBe(returnValue);
+
+        expect(basenameMock).toHaveBeenCalledWith(fileName);
+    });
 });

@@ -1,14 +1,15 @@
 import 'reflect-metadata';
 
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
-import { mock, instance, when, verify, deepEqual, anything } from 'ts-mockito';
+import { mock, instance, when, verify, anything } from 'ts-mockito';
 
 import { BooksController } from '../../../src/books/controllers/books.controller';
 import { BookSearchDto } from '../../../src/books/dto/book.search.dto';
 import { BookService } from '../../../src/books/services/book.service';
 import { Book } from '../../../src/common/dataaccess/entities/book.entity';
 import { BookDto } from '../../../src/books/dto/book.dto';
+import { PassThrough } from 'stream';
 
 describe('BooksController', () => {
     let controller: BooksController;
@@ -99,5 +100,25 @@ describe('BooksController', () => {
         expect(result.statusCode).toBe(204);
 
         verify(bookServiceMock.deleteById(id)).once();
+    });
+
+    test('getBookFile', async () => {
+        // Arrange
+        const id = 10;
+        const fileName = 'file.name';
+
+        const responseMock = mock<Response>();
+
+        const streamMock = new PassThrough();
+        streamMock.push("data");
+        streamMock.end();
+
+        when(bookServiceMock.getFile(id)).thenResolve([streamMock, fileName]);
+
+        // Act
+        await controller.getBookFile(id, instance(responseMock));
+
+        // Assert
+        verify(bookServiceMock.getFile(id)).once();
     });
 });

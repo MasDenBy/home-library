@@ -1,5 +1,5 @@
 import express, { Response } from 'express';
-import { controller, httpGet, httpPost, httpDelete, requestParam, httpPut, response } from "inversify-express-utils";
+import { controller, httpGet, httpPost, httpDelete, requestParam, httpPut, response, queryParam } from "inversify-express-utils";
 
 import { BookService } from '../services/book.service';
 import { ApiController } from '../../common/controllers/api.controller';
@@ -15,8 +15,8 @@ export class BooksController extends ApiController {
         super()
     }
 
-    @httpGet('/:offset&:count')
-    public async list(@requestParam('offset') offset: number, @requestParam('count') count: number) {
+    @httpGet('/')
+    public async list(@queryParam('offset') offset: number, @queryParam('count') count: number) {
         const books = await this.bookService.list(offset, count);
         
         return this.json(books);
@@ -52,8 +52,8 @@ export class BooksController extends ApiController {
 
     @httpGet('/:id/file')
     public async getBookFile(@requestParam('id') id: number, @response() response: Response) {
-        const stream = await this.bookService.getFile(id);
+        const file = await this.bookService.getFile(id);
         
-        return this.fileResponse(stream, response);
+        await this.fileResponse(file, response);
     }
 }

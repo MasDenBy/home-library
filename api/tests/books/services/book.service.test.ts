@@ -1,4 +1,5 @@
 import { mock, instance, verify, when, anyOfClass, deepEqual } from 'ts-mockito';
+import { ReadStream } from 'typeorm/platform/PlatformTools';
 
 import { BookDataObject } from '../../../src/books/dataaccess/book.dataobject';
 import { BookDto } from '../../../src/books/dto/book.dto';
@@ -87,5 +88,52 @@ describe('BookService', () => {
 
         // Assert
         verify(dataObjectMock.deleteById(Book, id)).once();
+    });
+
+    describe('getFile', () => {
+        const id = 10;
+
+        test('book is null should return null', async () => {
+            // Arrange
+            when(dataObjectMock.findByIdWithReferences(id)).thenResolve(null);
+
+            // Act
+            const result = await service.getFile(id);
+
+            // Assert
+            expect(result).toBeNull();
+        });
+
+        test('file is null should return null', async () => {
+            // Arrange
+            when(dataObjectMock.findByIdWithReferences(id)).thenResolve(<Book>{});
+
+            // Act
+            const result = await service.getFile(id);
+
+            // Assert
+            expect(result).toBeNull();
+        });
+
+        test('return stream and file name', async () => {
+            // Arrange
+            const book = <Book>{ file: { path: 'path' }};
+            const readStream = mock(ReadStream);
+
+            when(dataObjectMock.findByIdWithReferences(id)).thenResolve(book);
+            when(fsMock.readFileContent(book.file.path)).thenReturn(instance(readStream));
+            when(fsMock.basenameExt(book.file.path)).thenReturn('file.txt');
+
+            // Act
+            const result = await service.getFile(id);
+
+            // Assert
+            expect(result).not.toBeNull();
+            expect(result[0]).not.toBeNull();
+            expect(result[1]).not.toBeNull();
+
+            verify(fsMock.readFileContent(book.file.path));
+            verify(fsMock.basenameExt(book.file.path));
+        });
     });
 });

@@ -119,4 +119,29 @@ describe('BookDataObject', () => {
         verify(updateQueryBuilder.where("id = :id", deepEqual({ id: entity.id }))).once();
         verify(updateQueryBuilder.execute()).once();
     });
+
+    test('findByIdWithReferences', async () => {
+        // Arrange
+        const id = 10;
+
+        const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
+        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
+        when(selectQueryBuilder.where(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
+        when(selectQueryBuilder.getOne()).thenResolve(new Book());
+
+        const repository = mock<Repository<Book>>();
+        when(repository.createQueryBuilder(anyString())).thenReturn(instance(selectQueryBuilder));
+
+        when(databaseMock.getRepository(Book)).thenResolve(resolvableInstance(repository));
+
+        // Act
+        const result = await dataObject.findByIdWithReferences(id);
+
+        // Assert
+        expect(result).not.toBeNull();
+
+        verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
+        verify(selectQueryBuilder.where(anyString(), anything())).once();
+        verify(selectQueryBuilder.getOne()).once();
+    });
 });
