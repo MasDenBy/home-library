@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 
-import { basename, extname } from 'path';
+import { basename, extname, join, parse, ParsedPath } from 'path';
 import { promisify } from 'util';
-import { lstatSync, Stats } from 'fs';
+import { createReadStream, lstatSync, ReadStream, Stats } from 'fs';
 
 import { mock, instance, when } from 'ts-mockito';
 
@@ -16,6 +16,7 @@ describe('FileSystemWrapper', () => {
     let wrapper: FileSystemWrapper;
 
     beforeEach(()=> {
+        jest.resetAllMocks();
         wrapper = new FileSystemWrapper();
     });
 
@@ -83,5 +84,78 @@ describe('FileSystemWrapper', () => {
         expect(actual).toBe(returnValue);
 
         expect(basenameMock).toHaveBeenCalledWith(fileName);
+    });
+
+    test('readFileContent', () => {
+        // Arrange
+        const fileName = 'fullpath/book.pdf';
+
+        const createReadStreamMock = createReadStream as jest.MockedFunction<(filePath: string) => ReadStream>;
+
+        // Act
+        wrapper.readFileContent(fileName);
+
+        // Assert
+        expect(createReadStreamMock).toHaveBeenCalledWith(fileName);
+    });
+
+    test('readDirectory', async () => {
+        // Arrange
+        const readdirAsyncMock = jest.fn();
+        readdirAsyncMock.mockReturnValueOnce(['folder2', 'folder']);
+
+        const promisifyMock = promisify as jest.MockedFunction<typeof promisify>;
+        promisifyMock.mockReturnValue(readdirAsyncMock);
+
+        const dirStats = mock(Stats);
+        when(dirStats.isDirectory()).thenReturn(true);
+
+        const lstatSyncMock = lstatSync as jest.MockedFunction<typeof lstatSync>;
+        lstatSyncMock.mockReturnValue(instance(dirStats));
+
+        // Act
+        const result = await wrapper.readDirectory('folder');
+
+        // Assert
+        expect(result.length).toBe(2);
+    });
+
+    test('osRoot', () => {
+        // Arrange
+        const root = 'root';
+        const cwdPath = '/';
+
+        const parseMock = parse as jest.MockedFunction<(filePath: string) => ParsedPath>;
+        parseMock.mockReturnValue(<ParsedPath>{ root: root });
+
+        const spy = jest.spyOn(process, 'cwd');
+        spy.mockReturnValue(cwdPath);
+
+        // Act
+        wrapper.osRoot();
+
+        // Assert
+        expect(parseMock).toHaveBeenCalledWith(cwdPath);
+    });
+
+    test('pathFromRoot', () => {
+        // Arrange
+        const root = 'root';
+        const cwdPath = '/';
+
+        const parseMock = parse as jest.MockedFunction<(filePath: string) => ParsedPath>;
+        parseMock.mockReturnValue(<ParsedPath>{ root: root });
+
+        const joinMock = join as jest.MockedFunction<typeof join>;
+
+        const spy = jest.spyOn(process, 'cwd');
+        spy.mockReturnValue(cwdPath);
+
+        // Act
+        wrapper.pathFromRoot('');
+
+        // Assert
+        expect(parseMock).toHaveBeenCalledWith(cwdPath);
+        expect(joinMock).toBeCalledTimes(1);
     });
 });

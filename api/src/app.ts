@@ -8,6 +8,7 @@ import cors from 'cors';
 import debug from 'debug';
 
 import './books/controllers/books.controller';
+import './fm/controllers/filemanager.controller';
 import './libraries/controllers/libraries.controller';
 
 import { Config } from './config';

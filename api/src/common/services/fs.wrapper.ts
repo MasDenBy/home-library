@@ -46,4 +46,30 @@ export class FileSystemWrapper {
     public readFileContent(filePath: string): fs.ReadStream {
         return fs.createReadStream(filePath);
     }
+
+    public async readDirectory(folderPath: string): Promise<string[]> {
+        const readdirAsync = util.promisify(fs.readdir);
+        const items = await readdirAsync(folderPath);
+
+        let result: string[] = [];
+
+        for (const itemIndex in items) {
+            const fullPath = path.join(folderPath, items[itemIndex]);
+            const itemInfo: fs.Stats = fs.lstatSync(fullPath);
+
+            if (itemInfo.isDirectory()) {
+                result.push(items[itemIndex]);
+            }
+        }
+
+        return result;
+    }
+
+    public osRoot(): string {
+        return path.parse(process.cwd()).root;
+    }
+
+    public pathFromRoot(partPath: string) {
+        return path.join(this.osRoot(), partPath);
+    }
 }
