@@ -48,7 +48,7 @@ describe('DataObject', () => {
         verify(repository.findOne(objectContaining({ id: id }))).once();
     });
 
-    test('deleteById', async () => {
+    test('delete', async () => {
         // Arrange
         const id = 1;
 
@@ -66,7 +66,7 @@ describe('DataObject', () => {
         when(databaseMock.getConnection()).thenResolve(resolvableInstance(connection));
 
         // Act
-        await dataObject.deleteById(BaseEntity, id);
+        await dataObject.delete(BaseEntity, id);
 
         // Assert
         verify(deleteQueryBuilder.from(BaseEntity)).once();

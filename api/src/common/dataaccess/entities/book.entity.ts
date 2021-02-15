@@ -14,7 +14,7 @@ export class Book extends BaseEntity {
     @Column({ nullable: true })
     authors: string;
 
-    @OneToOne(() => File, {cascade: true})
+    @OneToOne(() => File, { cascade: true, onDelete: 'CASCADE' })
     @JoinColumn()
     file: File;
 }

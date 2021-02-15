@@ -19,7 +19,7 @@ export abstract class DataObject {
         return (await this.database.getRepository(target)).findOne({ id: id }) as Promise<TEntity>;
     }
 
-    public async deleteById(target: EntityTarget<BaseEntity>, id: number): Promise<DeleteResult> {
+    public async delete(target: EntityTarget<BaseEntity>, id: number): Promise<DeleteResult> {
         const connection = await this.database.getConnection();
 
         return await connection
@@ -27,6 +27,6 @@ export abstract class DataObject {
                 .delete()
                 .from(target)
                 .where('id = :id', {id: id})
-                .execute()
+                .execute();
     }
 }

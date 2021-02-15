@@ -87,7 +87,7 @@ describe('BookService', () => {
         await service.deleteById(id);
 
         // Assert
-        verify(dataObjectMock.deleteById(Book, id)).once();
+        verify(dataObjectMock.deleteById(id)).once();
     });
 
     describe('getFile', () => {
@@ -134,6 +134,17 @@ describe('BookService', () => {
 
             verify(fsMock.readFileContent(book.file.path));
             verify(fsMock.basenameExt(book.file.path));
+        });
+
+        test('deleteByFilePath', async () => {
+            // Arrange
+            const path = 'file.dat';
+    
+            // Act
+            await service.deleteByFilePath(path);
+    
+            // Assert
+            verify(dataObjectMock.deleteByFilePath(path)).once();
         });
     });
 });

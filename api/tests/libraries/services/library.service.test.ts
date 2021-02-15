@@ -67,13 +67,13 @@ describe('LibraryService', () => {
         // Arrange
         const id = 1;
 
-        when(dataObjectMock.deleteById(Library, id)).thenResolve(new DeleteResult());
+        when(dataObjectMock.delete(Library, id)).thenResolve(new DeleteResult());
 
         // Act
         await service.deleteById(id);
 
         // Assert
-        verify(dataObjectMock.deleteById(Library, id)).once();
+        verify(dataObjectMock.delete(Library, id)).once();
     });
 
     describe('index', () => {

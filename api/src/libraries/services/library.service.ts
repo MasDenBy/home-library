@@ -25,7 +25,7 @@ export class LibraryService {
     }
 
     public async deleteById(id: number): Promise<any> {
-        return await this.libraryDataObject.deleteById(Library, id);
+        return await this.libraryDataObject.delete(Library, id);
     }
 
     public async index(ids: number[]): Promise<any> {

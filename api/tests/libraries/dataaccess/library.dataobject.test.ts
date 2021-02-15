@@ -1,7 +1,7 @@
 import "reflect-metadata";
 
-import { Repository } from 'typeorm';
-import { mock, instance, when, verify, deepEqual } from 'ts-mockito';
+import { Repository, SelectQueryBuilder } from 'typeorm';
+import { mock, instance, when, verify, deepEqual, anyString, anything } from 'ts-mockito';
 
 import { LibraryDataObject } from '../../../src/libraries/dataaccess/library.dataobject';
 import { Library } from '../../../src/common/dataaccess/entities/library.entity';
@@ -36,5 +36,27 @@ describe('LibraryDataObject', () => {
 
         verify(databaseMock.getRepository(Library)).once();
         verify(repository.save(deepEqual(entity))).once();
+    });
+
+    test('getByIds', async () => {
+        // Arrange
+        //const entity = new Library();
+        const ids = [1, 2];
+
+        const selectQueryBuilderMock = mock<SelectQueryBuilder<Library>>();
+        when(selectQueryBuilderMock.where(anyString(), anything())).thenReturn(instance(selectQueryBuilderMock));
+
+        const repository = mock<Repository<Library>>();
+        when(repository.createQueryBuilder(anyString())).thenReturn(instance(selectQueryBuilderMock));
+
+        when(databaseMock.getRepository(Library)).thenResolve(resolvableInstance(repository));
+
+        // Act
+        await dataObject.getByIds(ids);
+
+        // Assert
+        verify(databaseMock.getRepository(Library)).once();
+        verify(selectQueryBuilderMock.where(anyString(), anything())).once();
+        verify(selectQueryBuilderMock.getMany()).once();
     });
 });

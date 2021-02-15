@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { DatabaseWrapper } from '../../common/dataaccess/db.wrapper';
 import { DataObject } from '../../common/dataaccess/data.object';
 import { Book } from '../../common/dataaccess/entities/book.entity';
+import { File } from '../../common/dataaccess/entities/file.entity';
 
 
 @injectable()
@@ -65,7 +66,19 @@ export class BookDataObject extends DataObject {
             .execute();
     }
 
-    async removeBookById(bookId: string) {
-        return `${bookId} removed`;
+    public async deleteById(id: number): Promise<void> {
+        const book = await this.findByIdWithReferences(id);
+
+        await this.delete(File, book.file.id);
+        await this.delete(Book, book.id);
+    }
+
+    public async deleteByFilePath(path: string): Promise<void> {
+        const connection = await this.database.getConnection();
+
+        const file = await connection.getRepository(File).findOne({ path: path });
+        const book = await connection.getRepository(Book).findOne({ file: file });
+        
+        await this.deleteById(book.id);
     }
 }

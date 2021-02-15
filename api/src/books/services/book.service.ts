@@ -1,13 +1,12 @@
-import { FSWatcher, ReadStream } from "fs";
 import { injectable } from "inversify";
 import { Stream } from "stream";
-import { DeleteResult } from "typeorm";
+
 import { Book } from "../../common/dataaccess/entities/book.entity";
 import { File } from "../../common/dataaccess/entities/file.entity";
 import { Library } from "../../common/dataaccess/entities/library.entity";
 import { FileSystemWrapper } from "../../common/services/fs.wrapper";
-
 import { BookDataObject } from '../dataaccess/book.dataobject';
+
 import { BookDto } from "../dto/book.dto";
 import { BookSearchDto } from "../dto/book.search.dto";
 
@@ -16,8 +15,12 @@ export class BookService {
 
     constructor(private dataObject: BookDataObject, private fs: FileSystemWrapper) {}
 
-    public async deleteById(id: number): Promise<DeleteResult> {
-        return await this.dataObject.deleteById(Book, id);
+    public async deleteById(id: number): Promise<void> {
+        return await this.dataObject.deleteById(id);
+    }
+
+    public async deleteByFilePath(path: string): Promise<void> {
+        return this.dataObject.deleteByFilePath(path);
     }
 
     public async list(offset: number, count: number) {
