@@ -13,6 +13,8 @@ import './libraries/controllers/libraries.controller';
 
 import { Config } from './config';
 import { Container } from "inversify";
+import { LibraryService } from "./libraries/services/library.service";
+import { LibraryWatcher } from "./libraries/services/library.watcher";
 
 const debugLog: debug.IDebugger = debug('app');
 
@@ -44,5 +46,11 @@ export class App {
         app.listen(this.container.resolve(Config).port);
 
         return app;
+    }
+    public async watchLibraries(): Promise<void> {
+        const libraries = await this.container.resolve(LibraryService).list();
+        const watcher = this.container.resolve(LibraryWatcher);
+        
+        libraries.forEach(lib => watcher.run(lib));
     }
 }
