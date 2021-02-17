@@ -20,3 +20,9 @@ export interface IPage {
     count: number;
     data: IBook[];
 }
+
+export interface BookSearchDto {
+    pattern: string;
+    offset: number;
+    count: number;
+}

@@ -23,7 +23,7 @@ describe('BookService', () => {
     let httpService: jasmine.SpyObj<HttpService>;
 
     beforeEach(() => {
-        var spy = jasmine.createSpyObj('HttpService', ['get', 'put', 'delete', 'getBlob']);
+        var spy = jasmine.createSpyObj('HttpService', ['get', 'put', 'delete', 'getBlob', 'post']);
 
         TestBed.configureTestingModule({
             providers: [
@@ -44,7 +44,7 @@ describe('BookService', () => {
         service.getBooks(offset, count).subscribe(result => {
             expect(result).toEqual(page);
 
-            expect(httpService.get).toHaveBeenCalledWith(`/books/${offset}/${count}`);
+            expect(httpService.get).toHaveBeenCalledWith(`/books?offset=${offset}&count=${count}`);
         });
     });
 
@@ -83,14 +83,14 @@ describe('BookService', () => {
     it('should search books', () => {
         const pattern: string = 'cool';
 
-        httpService.get.and.returnValue(Observable.create(observer => {
+        httpService.post.and.returnValue(Observable.create(observer => {
             observer.next(page);
         }));
 
         service.search(pattern, offset, count).subscribe(result => {
             expect(result).toEqual(page);
 
-            expect(httpService.get).toHaveBeenCalledWith(`/books/${pattern}/${offset}/${count}`);
+            expect(httpService.post).toHaveBeenCalledWith('/books/search', jasmine.anything());
         });
     });
 
