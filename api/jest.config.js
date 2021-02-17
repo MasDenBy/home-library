@@ -10,6 +10,7 @@ module.exports = {
 
     // Code Coverage
     collectCoverage: true,
+    coverageReporters: ["json", "lcov", "text", "clover", "cobertura"],
 
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   }
