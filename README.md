@@ -1,5 +1,5 @@
 # home-library
 The simple implementation of books library.
 ## Structure
-* API: Python 3.5.3, Flask
+* API: Node.js, Express, TypeScript
 * Front-end: Angular 9
