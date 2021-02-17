@@ -1,0 +1,40 @@
+trigger:
+  paths:
+    include:
+      - web
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '12.x'
+  displayName: 'Install Node.js'
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: 'web'
+  displayName: 'Instal dependencies'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'web'
+    customCommand: 'run build'
+  displayName: 'Build'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'web'
+    customCommand: 'run coverage'
+  displayName: 'Test'
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: 'web/coverage/home-library/cobertura-coverage.xml'
+    pathToSources: 'web/src'
+  displayName: 'Publish Code Coverage'

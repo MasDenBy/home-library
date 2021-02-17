@@ -1,0 +1,36 @@
+trigger:
+  branches:
+    include:
+      - main
+      - pr/*
+  paths:
+    include:
+      - api
+
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '12.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    cd ./api
+    npm install -g webpack webpack-cli --save-dev
+    npm install
+    npx webpack --config webpack.config.js
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'api'
+    customCommand: 'run test'
+  displayName: 'test'
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: 'api/coverage/cobertura-coverage.xml'
+    pathToSources: 'api/src'
+  displayName: 'Publish Code Coverage'
