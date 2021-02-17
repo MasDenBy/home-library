@@ -1,5 +1,12 @@
 trigger:
-- main
+  branches:
+    include:
+      - main
+      - pr/*
+  paths:
+    include:
+      - api
+
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -15,5 +22,15 @@ steps:
     npm install -g webpack webpack-cli --save-dev
     npm install
     npx webpack --config webpack.config.js
-    npm run test
-  displayName: 'npm install, run webpack'
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'api'
+    customCommand: 'run test'
+  displayName: 'test'
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: 'api/coverage/cobertura-coverage.xml'
+    pathToSources: 'api/src'
+  displayName: 'Publish Code Coverage'
