@@ -1,4 +1,5 @@
-import { mock, instance, verify, when, anyOfClass, deepEqual } from 'ts-mockito';
+import { off } from 'process';
+import { mock, instance, verify, when, anyOfClass, deepEqual, anything } from 'ts-mockito';
 import { ReadStream } from 'typeorm/platform/PlatformTools';
 
 import { BookDataObject } from '../../../src/books/dataaccess/book.dataobject';
@@ -38,17 +39,24 @@ describe('BookService', () => {
         // Arrange
         const offset = 10;
         const count = 20;
+        const book = <Book>{ file: {} };
+
+        when(dataObjectMock.getBooks(offset, count)).thenResolve([book]);
 
         // Act
         await service.list(offset, count);
 
         // Assert
         verify(dataObjectMock.getBooks(offset, count)).once();
+        verify(dataObjectMock.count(Book)).once();
     });
 
     test('search', async () => {
         // Arrange
         const dto = <BookSearchDto> { pattern: 'book', offset: 0, count: 10 };
+        const book = <Book>{ file: {} };
+
+        when(dataObjectMock.searchBooks(dto.pattern, dto.offset, dto.count)).thenResolve([[book], 10]);
 
         // Act
         await service.search(dto);
@@ -60,12 +68,15 @@ describe('BookService', () => {
     test('getById', async () => {
         // Arrange
         const id = 10;
+        const book = <Book>{ file: {} };
+
+        when(dataObjectMock.findByIdWithReferences(id)).thenResolve(book);
 
         // Act
         await service.getById(id);
 
         // Assert
-        verify(dataObjectMock.findById(Book, id)).once();
+        verify(dataObjectMock.findByIdWithReferences(id)).once();
     });
 
     test('update', async () => {
@@ -76,7 +87,7 @@ describe('BookService', () => {
         await service.update(dto);
 
         // Assert
-        verify(dataObjectMock.update(deepEqual({file: null, ...dto}))).once();
+        verify(dataObjectMock.update(anything())).once();
     });
 
     test('deleteById', async () => {

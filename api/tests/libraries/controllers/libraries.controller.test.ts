@@ -53,7 +53,6 @@ describe('/libraries', () => {
         // Arrange
         const testId: number = 1;
         const dto = <LibraryDto>{ path: 'lib' };
-        const responseDto = {id: testId};
 
         const requestMock: Request = mock<Request>();
         when(requestMock.body).thenReturn(dto);
@@ -65,7 +64,7 @@ describe('/libraries', () => {
 
         // Assert
         expect(result.location).toBe('/libraries');
-        expect(result.content).toEqual(responseDto);
+        expect(result.content).toEqual(testId);
     });
 
     test('delete', async () => {
@@ -85,17 +84,14 @@ describe('/libraries', () => {
 
     test('index', async () => {
         // Arrange
-        const ids = [5];
-
-        const requestMock: Request = mock<Request>();
-        when(requestMock.body).thenReturn(ids);
+        const id = 5;
 
         // Act
-        var result = await controller.index(instance(requestMock));
+        var result = await controller.index(id);
 
         // Assert
         expect(result).toBeInstanceOf(results.OkResult);
         
-        verify(libraryServiceMock.index(ids)).once();
+        verify(libraryServiceMock.index(id)).once();
     });
 });

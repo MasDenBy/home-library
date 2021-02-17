@@ -32,7 +32,7 @@ export class LibrariesController extends ApiController {
     public async create(request: express.Request) {
         const id = await this.libraryService.save(request.body);
 
-        return this.created('/libraries', {id: id});
+        return this.created('/libraries', id);
     }
 
     @httpDelete('/:id')
@@ -42,9 +42,9 @@ export class LibrariesController extends ApiController {
         return this.noContent();
     }
 
-    @httpPost('/index')
-    public async index(request: express.Request) {
-        await this.libraryService.index(request.body);
+    @httpGet('/:id/index')
+    public async index(@requestParam('id') id: number) {
+        await this.libraryService.index(id);
 
         return this.ok();
     }

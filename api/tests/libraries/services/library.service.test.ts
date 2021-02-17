@@ -77,28 +77,28 @@ describe('LibraryService', () => {
     });
 
     describe('index', () => {
-        test('libraries exist, then index', async () => {
+        test('library exist, then index', async () => {
             // Arrange
-            const ids = [2];
-            const libs = [<Library>{ id: 1 }];
+            const id = 2;
+            const lib = <Library>{ id: id };
     
-            when(dataObjectMock.getByIds(ids)).thenResolve(libs);
+            when(dataObjectMock.findById(Library, id)).thenResolve(lib);
             
             // Act
-            await service.index(ids);
+            await service.index(id);
     
             // Assert
-            verify(indexerMock.index(libs)).once();
+            verify(indexerMock.index(lib)).once();
         });
 
-        test('libraries do not exist, then index does not fire', async () => {
+        test('library do not exist, then index does not fire', async () => {
             // Arrange
-            const ids = [2];
+            const id = 2;
     
-            when(dataObjectMock.getByIds(ids)).thenResolve(null);
+            when(dataObjectMock.findById(Library, id)).thenResolve(null);
             
             // Act
-            await service.index(ids);
+            await service.index(id);
     
             // Assert
             verify(indexerMock.index(anything())).never();

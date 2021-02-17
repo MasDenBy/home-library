@@ -17,9 +17,9 @@ export class BooksController extends ApiController {
 
     @httpGet('/')
     public async list(@queryParam('offset') offset: number, @queryParam('count') count: number) {
-        const books = await this.bookService.list(offset, count);
+        const page = await this.bookService.list(offset, count);
         
-        return this.json(books);
+        return this.json(page);
     }
 
     @httpPost('/search')

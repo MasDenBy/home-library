@@ -55,11 +55,16 @@ export class FileSystemWrapper {
 
         for (const itemIndex in items) {
             const fullPath = path.join(folderPath, items[itemIndex]);
-            const itemInfo: fs.Stats = fs.lstatSync(fullPath);
+            try {
+                const itemInfo: fs.Stats = fs.lstatSync(fullPath);
 
-            if (itemInfo.isDirectory()) {
-                result.push(items[itemIndex]);
+                if (itemInfo.isDirectory()) {
+                    result.push(items[itemIndex]);
+                }
+            } catch (ex) {
+                debugLog(ex);
             }
+            
         }
 
         return result;
@@ -67,9 +72,5 @@ export class FileSystemWrapper {
 
     public osRoot(): string {
         return path.parse(process.cwd()).root;
-    }
-
-    public pathFromRoot(partPath: string) {
-        return path.join(this.osRoot(), partPath);
     }
 }

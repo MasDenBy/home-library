@@ -45,6 +45,7 @@ describe('BookDataObject', () => {
         const count = 20;
 
         const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
+        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.skip(offset)).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.take(count)).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.getMany()).thenResolve([new Book()]);
@@ -55,11 +56,11 @@ describe('BookDataObject', () => {
         when(databaseMock.getRepository(Book)).thenResolve(resolvableInstance(repository));
 
         // Act
-        const result = await dataObject.getBooks(offset, count);
+        await dataObject.getBooks(offset, count);
 
         // Assert
-        expect(result.length).toBe(1);
 
+        verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
         verify(selectQueryBuilder.skip(offset)).once();
         verify(selectQueryBuilder.take(count)).once();
         verify(selectQueryBuilder.getMany()).once();
@@ -74,6 +75,7 @@ describe('BookDataObject', () => {
         const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
         when(selectQueryBuilder.where(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.orWhere(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
+        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.skip(offset)).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.take(count)).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.getMany()).thenResolve([new Book()]);
@@ -84,16 +86,16 @@ describe('BookDataObject', () => {
         when(databaseMock.getRepository(Book)).thenResolve(resolvableInstance(repository));
 
         // Act
-        const result = await dataObject.searchBooks(pattern, offset, count);
+        await dataObject.searchBooks(pattern, offset, count);
 
         // Assert
-        expect(result.length).toBe(1);
-
+        verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
         verify(selectQueryBuilder.where(anyString(), anything())).once();
         verify(selectQueryBuilder.orWhere(anyString(), anything())).twice();
         verify(selectQueryBuilder.skip(offset)).once();
         verify(selectQueryBuilder.take(count)).once();
         verify(selectQueryBuilder.getMany()).once();
+        verify(selectQueryBuilder.getCount()).once();
     });
 
     test('update', async () => {

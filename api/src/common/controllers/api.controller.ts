@@ -9,7 +9,8 @@ export abstract class ApiController extends BaseHttpController {
 
     protected async fileResponse(file: [Stream, string], response: Response): Promise<void> {
         response.setHeader('content-type', 'application/octet-stream');
-        response.setHeader('Content-Disposition', `attachment; filename="${file[1]}"`)
+        response.setHeader('Content-Disposition', `attachment; filename="${file[1]}"`);
+        response.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
         file[0].pipe(response);
 
         await this.streamFinished(file[0]);

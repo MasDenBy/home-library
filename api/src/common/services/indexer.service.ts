@@ -12,11 +12,9 @@ export class IndexerService {
     constructor(private fs: FileSystemWrapper, private bookService: BookService,
         private watcher: LibraryWatcher) {}
 
-    public async index(libs: Library[]): Promise<void> {
-        for (const index in libs) {
-            await this.processLibrary(libs[index]);
-            this.watcher.run(libs[index]);
-        }
+    public async index(lib: Library): Promise<void> {
+        await this.processLibrary(lib);
+        this.watcher.run(lib);
     }
 
     private async processLibrary(library: Library): Promise<void> {

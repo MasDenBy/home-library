@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
@@ -46,10 +46,10 @@ describe('HttpService', () => {
             observer.next(new Blob());
         }));
 
-        service.getBlob(testUrl).subscribe((result: Blob) => {
+        service.getBlob(testUrl).subscribe((result: HttpResponse<Blob>) => {
             expect(result).toBeTruthy();
 
-            expect(httpClient.get).toHaveBeenCalledWith(environment.api + testUrl, Object({ responseType: 'blob' }));
+            expect(httpClient.get).toHaveBeenCalledWith(environment.api + testUrl, Object({ responseType: 'blob', observe: 'response' }));
         });
     });
 

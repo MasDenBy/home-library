@@ -7,9 +7,7 @@ export class FileManagerService {
     constructor(private fs: FileSystemWrapper) { }
 
     public async directoryList(path: string): Promise<FolderDto> {
-        if(path) {
-            path = this.fs.pathFromRoot(path);
-        } else {
+        if(!path) {
             path = this.fs.osRoot();
         }
 

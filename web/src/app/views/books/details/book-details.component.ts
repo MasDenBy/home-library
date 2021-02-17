@@ -4,8 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, ConfirmationService, MessageService } from 'primeng/api';
 
 import { BookService } from '../services/book.service';
-import { ImageService, IndexService } from '../../../common';
+import { ImageService, IndexService, HttpHelper, WindowWrapper } from '../../../common';
 import { IBook } from '../models/book.model';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     templateUrl:'./book-details.component.html',
@@ -19,6 +20,7 @@ export class BookDetails implements OnInit {
         private confirmationService: ConfirmationService,
         private messageService: MessageService,
         private router: Router,
+        private windowWrapper: WindowWrapper,
         public imageService: ImageService) { }
 
     Book: IBook;
@@ -30,16 +32,17 @@ export class BookDetails implements OnInit {
     }
 
     download(): void {
-        this.bookService.download(this.Book.id).subscribe((data: Blob) => {
-            const objectUrl = window.URL.createObjectURL(data);
+        this.bookService.download(this.Book.id).subscribe((response: HttpResponse<Blob>) => {
+            const wrapper = this.windowWrapper;
+            const objectUrl = wrapper.createObjectURL(response.body);
 
             var link = document.createElement('a');
             link.href = objectUrl;
-            link.download = this.Book.file.file_name;
+            link.download = HttpHelper.getFileNameFromHttpResponse<Blob>(response);
             link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
 
             setTimeout(function () {
-                window.URL.revokeObjectURL(objectUrl);
+                wrapper.revokeObjectURL(objectUrl);
                 link.remove();
             }, 100);
         },

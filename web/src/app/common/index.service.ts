@@ -8,7 +8,7 @@ export class IndexService {
     constructor(private http: HttpService){}
 
     public indexLibrary(libraryId: number): Observable<Object> {
-        return this.http.get(`/index/${libraryId}`);
+        return this.http.get(`/libraries/${libraryId}/index`);
     }
 
     public indexBook(bookId: number): Observable<Object> {

@@ -4,10 +4,11 @@ import { Stream } from "stream";
 import { Book } from "../../common/dataaccess/entities/book.entity";
 import { File } from "../../common/dataaccess/entities/file.entity";
 import { Library } from "../../common/dataaccess/entities/library.entity";
+import { IPage } from "../../common/dto/page.dto";
 import { FileSystemWrapper } from "../../common/services/fs.wrapper";
 import { BookDataObject } from '../dataaccess/book.dataobject';
 
-import { BookDto } from "../dto/book.dto";
+import { BookDto, FileDto } from "../dto/book.dto";
 import { BookSearchDto } from "../dto/book.search.dto";
 
 @injectable()
@@ -23,16 +24,29 @@ export class BookService {
         return this.dataObject.deleteByFilePath(path);
     }
 
-    public async list(offset: number, count: number) {
-        return await this.dataObject.getBooks(offset, count);
+    public async list(offset: number, count: number): Promise<IPage<BookDto>> {
+        const books = await this.dataObject.getBooks(offset, count);
+        const totalCount = await this.dataObject.count(Book);
+
+        return <IPage<BookDto>> {
+            data: books.map(book => BookService.toDto(book)),
+            count: totalCount
+        }
     }
 
-    public async search(dto: BookSearchDto) {
-        return await this.dataObject.searchBooks(dto.pattern, dto.offset, dto.count);
+    public async search(dto: BookSearchDto): Promise<IPage<BookDto>> {
+        const searchResult = await this.dataObject.searchBooks(dto.pattern, dto.offset, dto.count);
+
+        return <IPage<BookDto>> {
+            data: searchResult[0].map(book => BookService.toDto(book)),
+            count: searchResult[1]
+        }
     }
 
-    public async getById(id: number) {
-        return await this.dataObject.findById(Book, id);
+    public async getById(id: number): Promise<BookDto> {
+        const book = await this.dataObject.findByIdWithReferences(id);
+
+        return BookService.toDto(book);
     }
 
     public async update(dto: BookDto) {
@@ -66,6 +80,21 @@ export class BookService {
             description: dto.description,
             file: null,
             title: dto.title
+        };
+    }
+
+    private static toDto(entity: Book): BookDto {
+        return <BookDto> {
+            id: entity.id,
+            authors: entity.authors,
+            description: entity.description,
+            file: <FileDto> {
+                id: entity.file.id,
+                imageName: entity.file.imageName,
+                libraryId: entity.file.library?.id ?? null,
+                path: entity.file.path
+            },
+            title: entity.title
         };
     }
 }

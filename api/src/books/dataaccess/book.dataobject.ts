@@ -37,22 +37,40 @@ export class BookDataObject extends DataObject {
 
         return await repository
             .createQueryBuilder(this.alias)
+            .leftJoinAndSelect(`${this.alias}.file`, 'file')
             .skip(offset)
             .take(count)
             .getMany()
     }
 
-    public async searchBooks(pattern: string, offset: number, count: number): Promise<Book[]> {
+    public async searchBooks(pattern: string, offset: number, count: number): Promise<[Book[], number]> {
         const repository = await this.database.getRepository(Book) as Repository<Book>;
 
-        return await repository
+        const builder = repository
             .createQueryBuilder(this.alias)
             .where(`${this.alias}.title LIKE :title`, {title: `%${pattern}%`})
             .orWhere(`${this.alias}.description LIKE :description`, {description: `%${pattern}%`})
-            .orWhere(`${this.alias}.authors LIKE :authors`, {authors: `%${pattern}%`})
+            .orWhere(`${this.alias}.authors LIKE :authors`, {authors: `%${pattern}%`});
+
+        const books = await builder
+            .leftJoinAndSelect(`${this.alias}.file`, 'file')
             .skip(offset)
             .take(count)
             .getMany()
+
+        const totalCount = await builder.getCount();
+
+        return [books, totalCount];
+
+        // return await repository
+        //     .createQueryBuilder(this.alias)
+        //     .leftJoinAndSelect(`${this.alias}.file`, 'file')
+        //     .where(`${this.alias}.title LIKE :title`, {title: `%${pattern}%`})
+        //     .orWhere(`${this.alias}.description LIKE :description`, {description: `%${pattern}%`})
+        //     .orWhere(`${this.alias}.authors LIKE :authors`, {authors: `%${pattern}%`})
+        //     .skip(offset)
+        //     .take(count)
+        //     .getMany()
     }
 
     public async update(book: Book): Promise<void> {

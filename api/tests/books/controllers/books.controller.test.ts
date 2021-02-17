@@ -10,6 +10,7 @@ import { BookService } from '../../../src/books/services/book.service';
 import { Book } from '../../../src/common/dataaccess/entities/book.entity';
 import { BookDto } from '../../../src/books/dto/book.dto';
 import { PassThrough } from 'stream';
+import { IPage } from '../../../src/common/dto/page.dto';
 
 describe('BooksController', () => {
     let controller: BooksController;
@@ -25,7 +26,7 @@ describe('BooksController', () => {
         const offset = 10;
         const count = 20;
 
-        when(bookServiceMock.list(offset, count)).thenResolve([new Book()]);
+        when(bookServiceMock.list(offset, count)).thenResolve(<IPage<BookDto>> {});
 
         // Act
         const result = await controller.list(offset, count);
@@ -41,7 +42,7 @@ describe('BooksController', () => {
         // Arrange
         const dto = <BookSearchDto> { pattern: 'book', offset: 0, count: 10 };
 
-        when(bookServiceMock.search(dto)).thenResolve([new Book()]);
+        when(bookServiceMock.search(dto)).thenResolve(<IPage<BookDto>> {});
 
         const requestMock: Request = mock<Request>();
         when(requestMock.body).thenReturn(dto);
@@ -60,7 +61,7 @@ describe('BooksController', () => {
         // Arrange
         const id = 10;
 
-        when(bookServiceMock.getById(id)).thenResolve(new Book());
+        when(bookServiceMock.getById(id)).thenResolve(<BookDto>{});
 
         // Act
         const result = await controller.getBookById(id);

@@ -29,4 +29,8 @@ export abstract class DataObject {
                 .where('id = :id', {id: id})
                 .execute();
     }
+
+    public async count(target: EntityTarget<BaseEntity>): Promise<number> {
+        return (await this.database.getRepository(target)).count();
+    }
 }

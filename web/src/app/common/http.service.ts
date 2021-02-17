@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
@@ -13,8 +13,8 @@ export class HttpService {
         return this.http.get<T>(this.getUrl(url))
     }
 
-    public getBlob(url: string): Observable<Blob> {
-        return this.http.get(this.getUrl(url), { responseType: 'blob' })
+    public getBlob(url: string): Observable<HttpResponse<Blob>> {
+        return this.http.get(this.getUrl(url), { responseType: 'blob', observe: 'response' });
     }
 
     public delete(url: string): Observable<Object> {

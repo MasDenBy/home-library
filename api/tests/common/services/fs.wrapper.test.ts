@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { basename, extname, join, parse, ParsedPath } from 'path';
+import { basename, extname, parse, ParsedPath } from 'path';
 import { promisify } from 'util';
 import { createReadStream, lstatSync, ReadStream, Stats } from 'fs';
 
@@ -136,26 +136,5 @@ describe('FileSystemWrapper', () => {
 
         // Assert
         expect(parseMock).toHaveBeenCalledWith(cwdPath);
-    });
-
-    test('pathFromRoot', () => {
-        // Arrange
-        const root = 'root';
-        const cwdPath = '/';
-
-        const parseMock = parse as jest.MockedFunction<(filePath: string) => ParsedPath>;
-        parseMock.mockReturnValue(<ParsedPath>{ root: root });
-
-        const joinMock = join as jest.MockedFunction<typeof join>;
-
-        const spy = jest.spyOn(process, 'cwd');
-        spy.mockReturnValue(cwdPath);
-
-        // Act
-        wrapper.pathFromRoot('');
-
-        // Assert
-        expect(parseMock).toHaveBeenCalledWith(cwdPath);
-        expect(joinMock).toBeCalledTimes(1);
     });
 });

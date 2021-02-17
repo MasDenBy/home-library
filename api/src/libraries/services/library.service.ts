@@ -28,11 +28,11 @@ export class LibraryService {
         return await this.libraryDataObject.delete(Library, id);
     }
 
-    public async index(ids: number[]): Promise<any> {
-        const libs = await this.libraryDataObject.getByIds(ids);
+    public async index(id: number): Promise<void> {
+        const lib = await this.libraryDataObject.findById(Library, id) as Library;
 
-        if(libs) {
-            await this.indexer.index(libs);
+        if(lib) {
+            await this.indexer.index(lib);
         }
     }
 

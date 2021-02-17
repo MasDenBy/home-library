@@ -15,23 +15,18 @@ describe('FileManagerService', () => {
     });
 
     describe('directoryList', () => {
-        test('path is not null get folders from path', async () => {
+        test('path is not null get folders', async () => {
             // Arrange
             const path = '/';
-            const fullPath = '/root/';
-            
-            when(fmMock.pathFromRoot(path)).thenReturn(fullPath);
-            when(fmMock.readDirectory(fullPath)).thenResolve([]);
+
+            when(fmMock.readDirectory(path)).thenResolve([]);
 
             // Act
-            const result = await service.directoryList(path);
+            await service.directoryList(path);
 
             // Assert
-            expect(result.path).toBe(fullPath);
-            expect(result.folders).not.toBeNull();
-
-            verify(fmMock.pathFromRoot(path)).once();
-            verify(fmMock.readDirectory(fullPath)).once();
+            verify(fmMock.osRoot()).never();
+            verify(fmMock.readDirectory(path)).once();
         });
 
         test('path is null get root path', async () => {

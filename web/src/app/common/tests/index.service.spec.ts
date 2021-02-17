@@ -34,7 +34,7 @@ describe('IndexService', () => {
         service.indexLibrary(testId).subscribe(result => {
             expect(result).toBeTruthy();
 
-            expect(httpService.get).toHaveBeenCalledWith(`/index/${testId}`);
+            expect(httpService.get).toHaveBeenCalledWith(`/libraries/${testId}/index`);
         });
     });
 

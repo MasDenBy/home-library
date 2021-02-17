@@ -28,7 +28,7 @@ describe('IndexerService', () => {
         when(fsMock.readFiles(lib1.path)).thenResolve(['filename.book', 'second.book']);
 
         // Act
-        await indexer.index([lib1]);
+        await indexer.index(lib1);
 
         // Assert
         verify(fsMock.readFiles(anyString())).once();

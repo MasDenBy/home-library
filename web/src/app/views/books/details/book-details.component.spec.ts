@@ -13,8 +13,9 @@ import { Observable } from 'rxjs';
 
 import { BookDetails } from "./book-details.component";
 import { BookService } from '../services/book.service';
-import { ImageService, IndexService } from '../../../common';
+import { ImageService, IndexService, WindowWrapper } from '../../../common';
 import { IBook } from '../models/book.model';
+import { HttpResponse } from '@angular/common/http';
 
 describe('BookDetails', () => {
     const id: number = 15;
@@ -32,6 +33,7 @@ describe('BookDetails', () => {
     let bookService: jasmine.SpyObj<BookService>;
     let indexService: jasmine.SpyObj<IndexService>;
     let router: jasmine.SpyObj<Router>;
+    let windowWrapper: jasmine.SpyObj<WindowWrapper>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -47,6 +49,7 @@ describe('BookDetails', () => {
                 { provide: BookService, useValue: jasmine.createSpyObj('BookService', ['getBook', 'delete', 'download']) },
                 { provide: IndexService, useValue: jasmine.createSpyObj('IndexService', ['indexBook'])},
                 { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigateByUrl'])},
+                { provide: WindowWrapper, useValue: jasmine.createSpyObj('WindowWrapper', ['createObjectURL', 'revokeObjectURL'])},
                 { 
                     provide: ActivatedRoute, 
                     useValue: {
@@ -149,6 +152,7 @@ describe('BookDetails', () => {
         it('should delete if accept and redirect to root', () => {
             bookService.delete.and.returnValue(Observable.create(observer => {
                 observer.next();
+                observer.complete();
             }));
 
             const confirm = fixture.debugElement.query(By.css('.ui-dialog-footer')).children[0].nativeElement;
@@ -157,6 +161,7 @@ describe('BookDetails', () => {
             fixture.detectChanges();
 
             expect(bookService.delete).toHaveBeenCalledWith(id);
+            expect(router.navigateByUrl).toHaveBeenCalledWith(`/`);
         });
 
         it('should delete if accept and show ERROR message when error', () => {
@@ -188,8 +193,11 @@ describe('BookDetails', () => {
 
     describe('download', () => {
         it('should download book file', () => {
+            let blobResponse = new HttpResponse<Blob>();
+            blobResponse.headers.append('Content-Disposition', `attachment; filename="test.pdf"`);
+
             bookService.download.and.returnValue(Observable.create(observer => {
-                observer.next(new Blob());
+                observer.next(blobResponse);
             }));
 
             component.Book = book;

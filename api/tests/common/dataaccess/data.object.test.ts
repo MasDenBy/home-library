@@ -74,6 +74,21 @@ describe('DataObject', () => {
         verify(deleteQueryBuilder.execute()).once();
         verify(selectQueryBuilder.delete()).once();
     });
+
+    test('count', async () => {
+        // Arrange
+        const repository = mock<Repository<BaseEntity>>();
+        when(repository.count()).thenResolve(1000);
+
+        when(databaseMock.getRepository(BaseEntity)).thenResolve(resolvableInstance(repository));
+
+        // Act
+        await dataObject.count(BaseEntity);
+
+        // Assert
+        verify(databaseMock.getRepository(BaseEntity)).once();
+        verify(repository.count()).once();
+    });
 });
 
 class TestDataObject extends DataObject { }

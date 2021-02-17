@@ -1,17 +1,18 @@
+import { HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
 import { HttpService } from '../../../common';
 
-import { IPage, IBook } from '../models/book.model';
+import { IPage, IBook, BookSearchDto } from '../models/book.model';
 
 @Injectable()
 export class BookService {
     constructor(private http: HttpService){}
 
     public getBooks(offset: number, count: number): Observable<IPage> {
-        return this.http.get<IPage>(`/books/${offset}/${count}`);
+        return this.http.get<IPage>(`/books?offset=${offset}&count=${count}`);
     }
 
     public getBook(id: number): Observable<IBook> {
@@ -27,10 +28,15 @@ export class BookService {
     }
 
     public search(pattern: string, offset: number, count: number): Observable<IPage> {
-        return this.http.get<IPage>(`/books/${pattern}/${offset}/${count}`);
+        const dto = <BookSearchDto> {
+            count: count,
+            offset: offset,
+            pattern: pattern
+        };
+        return this.http.post('/books/search', dto);
     }
 
-    public download(id: number): Observable<Blob> {
+    public download(id: number): Observable<HttpResponse<Blob>> {
         return this.http.getBlob(`/books/${id}/file`);
     }
 }
