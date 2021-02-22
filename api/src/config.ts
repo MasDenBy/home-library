@@ -4,6 +4,7 @@ import { injectable } from "inversify";
 export class Config {
     port: Number = +(process.env.PORT ?? 0);
     database: DatabaseConfig = new DatabaseConfig();
+    assets: 'assets';
 }
 
 class DatabaseConfig {

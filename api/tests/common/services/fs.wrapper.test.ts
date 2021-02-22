@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 
-import { basename, extname, parse, ParsedPath } from 'path';
+import { basename, extname, parse, ParsedPath, join } from 'path';
 import { promisify } from 'util';
-import { createReadStream, lstatSync, ReadStream, Stats } from 'fs';
+import { createReadStream, lstatSync, ReadStream, Stats, existsSync, mkdirSync, unlinkSync } from 'fs';
 
 import { mock, instance, when } from 'ts-mockito';
 
@@ -11,8 +11,15 @@ import { FileSystemWrapper } from '../../../src/common/services/fs.wrapper';
 jest.mock('path');
 jest.mock('util');
 jest.mock('fs');
+jest.mock('app-root-path', () => {
+    return {
+        path: jest.fn().mockReturnValue('root')
+    }
+});
 
 describe('FileSystemWrapper', () => {
+    const testFileName = 'file.name';
+
     let wrapper: FileSystemWrapper;
 
     beforeEach(()=> {
@@ -136,5 +143,80 @@ describe('FileSystemWrapper', () => {
 
         // Assert
         expect(parseMock).toHaveBeenCalledWith(cwdPath);
+    });
+
+    test('pathFromAppRoot', () => {
+        const joinMock = join as jest.MockedFunction<typeof join>;
+
+        // Act
+        wrapper.pathFromAppRoot('directory');
+
+        // Assert
+        expect(joinMock).toHaveBeenCalled();
+    });
+
+    test('writeFile', async () => {
+        // Arrange
+        const testContent = 'content';
+
+        const writeFileAsyncMock = jest.fn();
+
+        const promisifyMock = promisify as jest.MockedFunction<typeof promisify>;
+        promisifyMock.mockReturnValue(writeFileAsyncMock);
+
+        // Act
+        await wrapper.writeFile(testContent, testFileName);
+
+        // Assert
+        expect(writeFileAsyncMock).toHaveBeenCalledWith(testFileName, testContent);
+    });
+
+    test('deleteFile', async () => {
+        // Arrange
+        const unlinkSyncMock = unlinkSync as jest.MockedFunction<typeof unlinkSync>;
+
+        // Act
+        await wrapper.deleteFile(testFileName);
+
+        // Assert
+        expect(unlinkSyncMock).toHaveBeenCalledWith(testFileName);
+    });
+
+    describe('checkOrCreateDirectory', () => {
+        const testDir: string = 'test';
+
+        let existsSyncMock: jest.MockedFunction<typeof existsSync>;
+        let mkdirSyncMock: jest.MockedFunction<typeof mkdirSync>;
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+
+            existsSyncMock = existsSync as jest.MockedFunction<typeof existsSync>;
+            mkdirSyncMock = mkdirSync as jest.MockedFunction<typeof mkdirSync>;
+        });
+
+        test('if directory does not exist then create', () => {
+            // Arrange
+            existsSyncMock.mockReturnValue(false);
+
+            // Act
+            wrapper.checkOrCreateDirectory(testDir);
+
+            // Assert
+            expect(existsSyncMock).toHaveBeenCalledWith(testDir);
+            expect(mkdirSyncMock).toHaveBeenCalledWith(testDir, { recursive:true });
+        });
+
+        test('if directory exists then skip creation', () => {
+            // Arrange
+            existsSyncMock.mockReturnValue(true);
+
+            // Act
+            wrapper.checkOrCreateDirectory(testDir);
+
+            // Assert
+            expect(existsSyncMock).toHaveBeenCalledWith(testDir);
+            expect(mkdirSyncMock).not.toHaveBeenCalled();
+        });
     });
 });

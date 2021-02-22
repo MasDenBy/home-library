@@ -56,4 +56,11 @@ export class BooksController extends ApiController {
         
         await this.fileResponse(file, response);
     }
+
+    @httpGet('/:id/index')
+    public async index(@requestParam('id') id: number) {
+        await this.bookService.index(id);
+
+        return this.ok();
+    }
 }

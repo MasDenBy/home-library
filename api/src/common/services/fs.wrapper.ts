@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
+import * as root from 'app-root-path';
 
 import { injectable } from 'inversify';
 
@@ -72,5 +73,24 @@ export class FileSystemWrapper {
 
     public osRoot(): string {
         return path.parse(process.cwd()).root;
+    }
+
+    public pathFromAppRoot(folder: string): string {
+        return path.join(root.path, folder);
+    }
+
+    public checkOrCreateDirectory(dir: string) {
+        if(!fs.existsSync(dir))
+            fs.mkdirSync(dir, { recursive:true });
+    }
+
+    public async writeFile(content: any, fileName: string): Promise<void> {
+        const writeFileAsync = util.promisify(fs.writeFile);
+
+        await writeFileAsync(fileName, content);
+    }
+
+    public deleteFile(file: string) {
+        fs.unlinkSync(file);
     }
 }

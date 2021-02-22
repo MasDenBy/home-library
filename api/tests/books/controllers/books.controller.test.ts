@@ -7,12 +7,15 @@ import { mock, instance, when, verify, anything } from 'ts-mockito';
 import { BooksController } from '../../../src/books/controllers/books.controller';
 import { BookSearchDto } from '../../../src/books/dto/book.search.dto';
 import { BookService } from '../../../src/books/services/book.service';
-import { Book } from '../../../src/common/dataaccess/entities/book.entity';
 import { BookDto } from '../../../src/books/dto/book.dto';
 import { PassThrough } from 'stream';
 import { IPage } from '../../../src/common/dto/page.dto';
+import { OkResult } from 'inversify-express-utils/dts/results';
+import { results } from 'inversify-express-utils';
 
 describe('BooksController', () => {
+    const id = 10;
+
     let controller: BooksController;
     let bookServiceMock: BookService;
 
@@ -59,8 +62,6 @@ describe('BooksController', () => {
 
     test('getBookById', async () => {
         // Arrange
-        const id = 10;
-
         when(bookServiceMock.getById(id)).thenResolve(<BookDto>{});
 
         // Act
@@ -75,7 +76,6 @@ describe('BooksController', () => {
 
     test('put', async () => {
         // Arrange
-        const id = 10;
         const dto = <BookDto> { authors: null, description: null, title: null };
 
         const requestMock: Request = mock<Request>();
@@ -91,9 +91,6 @@ describe('BooksController', () => {
     });
 
     test('removeBook', async () => {
-        // Arrange
-        const id = 10;
-
         // Act
         const result = await controller.removeBook(id);
 
@@ -105,7 +102,6 @@ describe('BooksController', () => {
 
     test('getBookFile', async () => {
         // Arrange
-        const id = 10;
         const fileName = 'file.name';
 
         const responseMock = mock<Response>();
@@ -121,5 +117,17 @@ describe('BooksController', () => {
 
         // Assert
         verify(bookServiceMock.getFile(id)).once();
+    });
+
+    test('index', async () => {
+        // Arrange
+
+        // Act
+        const result = await controller.index(id);
+
+        // Assert
+        expect(result).toBeInstanceOf(results.OkResult);
+
+        verify(bookServiceMock.index(id)).once();
     });
 });

@@ -21,6 +21,7 @@ export class BookDataObject extends DataObject {
         return await repository
             .createQueryBuilder(this.alias)
             .leftJoinAndSelect(`${this.alias}.file`, 'file')
+            .leftJoinAndSelect(`${this.alias}.metadata`, 'metadata')
             .where(`${this.alias}.id = :id`, { id: id })
             .getOne();
     }
@@ -61,27 +62,26 @@ export class BookDataObject extends DataObject {
         const totalCount = await builder.getCount();
 
         return [books, totalCount];
-
-        // return await repository
-        //     .createQueryBuilder(this.alias)
-        //     .leftJoinAndSelect(`${this.alias}.file`, 'file')
-        //     .where(`${this.alias}.title LIKE :title`, {title: `%${pattern}%`})
-        //     .orWhere(`${this.alias}.description LIKE :description`, {description: `%${pattern}%`})
-        //     .orWhere(`${this.alias}.authors LIKE :authors`, {authors: `%${pattern}%`})
-        //     .skip(offset)
-        //     .take(count)
-        //     .getMany()
     }
 
     public async update(book: Book): Promise<void> {
-        const repository = await this.database.getRepository(Book) as Repository<Book>;
+        const connection = await this.database.getConnection();
+        const queryRunner = connection.createQueryRunner();
 
-        await repository
-            .createQueryBuilder()
-            .update(Book)
-            .set({ title: book.title, authors: book.authors, description: book.description })
-            .where("id = :id", { id: book.id })
-            .execute();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            await queryRunner.manager.save(book.metadata);
+            await queryRunner.manager.save(book.file);
+            await queryRunner.manager.save(book);
+
+            await queryRunner.commitTransaction();
+        } catch {
+            await queryRunner.rollbackTransaction();
+        } finally {
+            queryRunner.release();
+        }
     }
 
     public async deleteById(id: number): Promise<void> {

@@ -1,5 +1,4 @@
-import { off } from 'process';
-import { mock, instance, verify, when, anyOfClass, deepEqual, anything } from 'ts-mockito';
+import { mock, instance, verify, when, anyOfClass, anything, anyString, objectContaining } from 'ts-mockito';
 import { ReadStream } from 'typeorm/platform/PlatformTools';
 
 import { BookDataObject } from '../../../src/books/dataaccess/book.dataobject';
@@ -8,18 +7,29 @@ import { BookSearchDto } from '../../../src/books/dto/book.search.dto';
 import { BookService } from '../../../src/books/services/book.service';
 import { Book } from '../../../src/common/dataaccess/entities/book.entity';
 import { Library } from '../../../src/common/dataaccess/entities/library.entity';
+import { Metadata } from '../../../src/common/dataaccess/entities/metadata.entity';
 import { FileSystemWrapper } from '../../../src/common/services/fs.wrapper';
+import { ImageService } from '../../../src/common/services/image.service';
+import { OpenLibraryService } from '../../../src/common/services/openlibrary';
+import { BookInfo } from '../../../src/common/services/openlibrary/openlibrary.dto';
 
 describe('BookService', () => {
+    const id = 10;
+
     let service: BookService;
     let dataObjectMock: BookDataObject;
     let fsMock: FileSystemWrapper;
+    let openlibraryMock: OpenLibraryService;
+    let imageServiceMock: ImageService;
 
-    beforeEach(()=> {
+    beforeEach(() => {
         dataObjectMock = mock(BookDataObject);
         fsMock = mock(FileSystemWrapper);
+        openlibraryMock = mock(OpenLibraryService);
+        imageServiceMock = mock(ImageService);
 
-        service = new BookService(instance(dataObjectMock), instance(fsMock));
+        service = new BookService(instance(dataObjectMock), instance(fsMock), instance(openlibraryMock), 
+            instance(imageServiceMock));
     });
 
     test('createFromFile', async () => {
@@ -67,7 +77,6 @@ describe('BookService', () => {
 
     test('getById', async () => {
         // Arrange
-        const id = 10;
         const book = <Book>{ file: {} };
 
         when(dataObjectMock.findByIdWithReferences(id)).thenResolve(book);
@@ -91,9 +100,6 @@ describe('BookService', () => {
     });
 
     test('deleteById', async () => {
-        // Arrange
-        const id = 10;
-
         // Act
         await service.deleteById(id);
 
@@ -102,8 +108,6 @@ describe('BookService', () => {
     });
 
     describe('getFile', () => {
-        const id = 10;
-
         test('book is null should return null', async () => {
             // Arrange
             when(dataObjectMock.findByIdWithReferences(id)).thenResolve(null);
@@ -156,6 +160,111 @@ describe('BookService', () => {
     
             // Assert
             verify(dataObjectMock.deleteByFilePath(path)).once();
+        });
+    });
+
+    describe('index', () => {
+        test('metadata is missing then search in openlibrary', async () => {
+            // Arrange
+            const book = <Book>{ metadata: null, title: 'title' };
+
+            when(dataObjectMock.findByIdWithReferences(id)).thenResolve(book);
+
+            // Act
+            await service.index(id);
+
+            // Assert
+            verify(openlibraryMock.search(book.title)).once();
+        });
+
+        test('ISBN is missing then search in openlibrary', async () => {
+            // Arrange
+            const book = <Book>{ metadata: <Metadata>{ isbn: null }, title: 'title' };
+
+            when(dataObjectMock.findByIdWithReferences(id)).thenResolve(book);
+
+            // Act
+            await service.index(id);
+
+            // Assert
+            verify(openlibraryMock.search(book.title)).once();
+        });
+
+        test('when ISBN is not found then stop processing', async () => {
+            // Arrange
+            const book = <Book>{ metadata: <Metadata>{ isbn: null }, title: 'title' };
+
+            when(dataObjectMock.findByIdWithReferences(id)).thenResolve(book);
+
+            // Act
+            await service.index(id);
+
+            // Assert
+            verify(openlibraryMock.findByIsbn(anyString())).never();
+        });
+
+        describe('should', () => {
+            const isbn = 'isbn';
+            const oldImageName = 'old_image';
+            const newImageName = 'new_image';
+            const authorName = 'author1';
+
+            const bookInfo = <BookInfo>{
+                details: {
+                    number_of_pages: 15,
+                    authors: [
+                        { name: authorName }
+                    ],
+                    description: 'description',
+                    publish_date: '1985',
+                    title: 'book title'
+                },
+                thumbnail_url: 'url'
+            };
+
+            beforeEach(async () => {
+                // Arrange
+                const book = <Book>{ title: 'title', file: { imageName: oldImageName } };
+
+                when(dataObjectMock.findByIdWithReferences(id)).thenResolve(book);
+
+                when(openlibraryMock.search(book.title)).thenResolve(isbn);
+                when(openlibraryMock.findByIsbn(isbn)).thenResolve(bookInfo);
+
+                when(imageServiceMock.download(bookInfo.thumbnail_url)).thenResolve(newImageName);
+
+                // Act
+                await service.index(id);
+            });
+
+            test('create metadata if missing', () => {
+                // Assert
+                verify(dataObjectMock.update(objectContaining(<Book>{metadata: { isbn: isbn }}))).once();
+            });
+
+            test('remove old image and download new', () => {
+                // Assert
+                verify(imageServiceMock.download(bookInfo.thumbnail_url)).once();
+                verify(imageServiceMock.remove(oldImageName)).once();
+            });
+
+            test('update book with all details', () => {
+                // Assert
+                verify(dataObjectMock.update(objectContaining(
+                    <Book>{
+                        authors: authorName,
+                        description: bookInfo.details.description,
+                        title: bookInfo.details.title,
+                        metadata: { 
+                            isbn: isbn,
+                            pages: bookInfo.details.number_of_pages,
+                            year: bookInfo.details.publish_date 
+                        },
+                        file: {
+                            imageName: newImageName
+                        }
+                    }))).once();
+            });
         });
     });
 });

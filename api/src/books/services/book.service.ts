@@ -4,8 +4,11 @@ import { Stream } from "stream";
 import { Book } from "../../common/dataaccess/entities/book.entity";
 import { File } from "../../common/dataaccess/entities/file.entity";
 import { Library } from "../../common/dataaccess/entities/library.entity";
+import { Metadata } from "../../common/dataaccess/entities/metadata.entity";
 import { IPage } from "../../common/dto/page.dto";
 import { FileSystemWrapper } from "../../common/services/fs.wrapper";
+import { ImageService } from "../../common/services/image.service";
+import { OpenLibraryService } from "../../common/services/openlibrary";
 import { BookDataObject } from '../dataaccess/book.dataobject';
 
 import { BookDto, FileDto } from "../dto/book.dto";
@@ -14,7 +17,8 @@ import { BookSearchDto } from "../dto/book.search.dto";
 @injectable()
 export class BookService {
 
-    constructor(private dataObject: BookDataObject, private fs: FileSystemWrapper) {}
+    constructor(private dataObject: BookDataObject, private fs: FileSystemWrapper,
+        private openLibraryService: OpenLibraryService, private imageService: ImageService) {}
 
     public async deleteById(id: number): Promise<void> {
         return await this.dataObject.deleteById(id);
@@ -71,6 +75,41 @@ export class BookService {
         if(book?.file == null) return null;
 
         return [this.fs.readFileContent(book.file.path), this.fs.basenameExt(book.file.path)];
+    }
+
+    public async index(id: number) {
+        let book = await this.dataObject.findByIdWithReferences(id);
+        let isbn = book.metadata?.isbn;
+
+        if(!isbn) {
+            isbn = await this.openLibraryService.search(book.title);
+        }
+
+        if(!isbn) return;
+
+        const bookInfo = await this.openLibraryService.findByIsbn(isbn);
+
+        book.authors = bookInfo.details.authors.map(x => x.name).join(', ');
+        book.description = bookInfo.details.description;
+        book.title = bookInfo.details.title;
+        
+        if(!book.metadata) {
+            book.metadata = new Metadata();
+        }
+
+        book.metadata.isbn = isbn;
+        book.metadata.pages = bookInfo.details.number_of_pages;
+        book.metadata.year = bookInfo.details.publish_date;
+
+        if(bookInfo.thumbnail_url) {
+            const oldName = book.file.imageName;
+
+            book.file.imageName = await this.imageService.download(bookInfo.thumbnail_url);
+
+            this.imageService.remove(oldName);
+        }
+
+        await this.dataObject.update(book);
     }
 
     private static toEntity(dto: BookDto): Book {
