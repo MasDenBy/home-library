@@ -50,4 +50,20 @@ describe('ImageService', () => {
         verify(fsMock.pathFromAppRoot(anyString())).once();
         verify(fsMock.deleteFile(anyString())).once();
     });
+
+    test('getImageContent', async () => {
+        // Arrange
+        const fileName: string = 'myfile.png';
+
+        when(fsMock.readFile(anyString())).thenResolve(Buffer.from("content"));
+        when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
+
+        // Act
+        const content = await service.getImageContent(fileName);
+
+        // Assert
+        expect(content).not.toBeNull();
+
+        verify(fsMock.readFile(anyString())).once();
+    });
 });

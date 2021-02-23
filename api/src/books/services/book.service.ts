@@ -32,8 +32,14 @@ export class BookService {
         const books = await this.dataObject.getBooks(offset, count);
         const totalCount = await this.dataObject.count(Book);
 
+        let dtos = [];
+
+        for (let index in books) {
+            dtos.push(await this.toDto(books[index]));
+        }
+
         return <IPage<BookDto>> {
-            data: books.map(book => BookService.toDto(book)),
+            data: dtos,
             count: totalCount
         }
     }
@@ -41,16 +47,22 @@ export class BookService {
     public async search(dto: BookSearchDto): Promise<IPage<BookDto>> {
         const searchResult = await this.dataObject.searchBooks(dto.pattern, dto.offset, dto.count);
 
+        let dtos = [];
+
+        for (let index in searchResult[0]) {
+            dtos.push(await this.toDto(searchResult[0][index]));
+        }
+
         return <IPage<BookDto>> {
-            data: searchResult[0].map(book => BookService.toDto(book)),
+            data: dtos,
             count: searchResult[1]
         }
     }
 
     public async getById(id: number): Promise<BookDto> {
         const book = await this.dataObject.findByIdWithReferences(id);
-
-        return BookService.toDto(book);
+        
+        return await this.toDto(book);
     }
 
     public async update(dto: BookDto) {
@@ -122,18 +134,23 @@ export class BookService {
         };
     }
 
-    private static toDto(entity: Book): BookDto {
-        return <BookDto> {
+    private async toDto(entity: Book): Promise<BookDto> {
+        let dto = <BookDto> {
             id: entity.id,
             authors: entity.authors,
             description: entity.description,
             file: <FileDto> {
                 id: entity.file.id,
-                imageName: entity.file.imageName,
                 libraryId: entity.file.library?.id ?? null,
                 path: entity.file.path
             },
             title: entity.title
         };
+
+        if(entity.file.imageName) {
+            dto.file.image = await this.imageService.getImageContent(entity.file.imageName);
+        }
+
+        return dto;
     }
 }

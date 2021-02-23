@@ -25,9 +25,20 @@ export class ImageService {
     }
 
     public remove(imageName: string): void {
-        const imagesDirectoryPath = this.fs.pathFromAppRoot(this.imagesDirectoryName);
-        const fullPath = path.join(imagesDirectoryPath, imageName);
+        const fullPath = this.getImagePath(imageName);
 
         this.fs.deleteFile(fullPath);
+    }
+
+    public async getImageContent(imageName: string): Promise<string> {
+        const imagePath = this.getImagePath(imageName);
+        const buffer = await this.fs.readFile(imagePath);
+
+        return buffer.toString('base64');
+    }
+
+    private getImagePath(imageName: string): string {
+        const imagesDirectoryPath = this.fs.pathFromAppRoot(this.imagesDirectoryName);
+        return path.join(imagesDirectoryPath, imageName);
     }
 }

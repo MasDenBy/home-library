@@ -22,7 +22,7 @@ describe('BookDetails', () => {
     const book: IBook = { 
         authors: '', 
         description: '', 
-        file: { image: '', file_name: '', full_path: '', id: 1, library_id:1, path:'' },
+        file: { image: '', id: 1, libraryId:1, path:'' },
         goodreads_id: 1, 
         id: id, 
         title: '' 
@@ -91,7 +91,7 @@ describe('BookDetails', () => {
             const updatedBook: IBook = { 
                 authors: 'Author, Name', 
                 description: '', 
-                file: { image: '', file_name: '', full_path: '', id: 1, library_id:1, path:'' }, 
+                file: { image: '', id: 1, libraryId:1, path:'' }, 
                 goodreads_id: 1, 
                 id: id, 
                 title: 'Updated book' 

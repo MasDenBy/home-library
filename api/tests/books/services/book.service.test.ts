@@ -77,7 +77,7 @@ describe('BookService', () => {
 
     test('getById', async () => {
         // Arrange
-        const book = <Book>{ file: {} };
+        const book = <Book>{ file: { imageName: 'image.png'} };
 
         when(dataObjectMock.findByIdWithReferences(id)).thenResolve(book);
 
@@ -86,6 +86,7 @@ describe('BookService', () => {
 
         // Assert
         verify(dataObjectMock.findByIdWithReferences(id)).once();
+        verify(imageServiceMock.getImageContent(book.file.imageName)).once();
     });
 
     test('update', async () => {

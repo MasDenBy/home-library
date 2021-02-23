@@ -93,4 +93,10 @@ export class FileSystemWrapper {
     public deleteFile(file: string) {
         fs.unlinkSync(file);
     }
+
+    public async readFile(filePath: string): Promise<Buffer> {
+        const readFileAsync = util.promisify(fs.readFile);
+
+        return await readFileAsync(filePath);
+    }
 }

@@ -9,6 +9,6 @@ export interface BookDto {
 export interface FileDto {
     id: number;
     path: string;
-    imageName: string;
+    image: string;
     libraryId: number;
 }

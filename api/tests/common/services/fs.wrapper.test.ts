@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import { basename, extname, parse, ParsedPath, join } from 'path';
 import { promisify } from 'util';
-import { createReadStream, lstatSync, ReadStream, Stats, existsSync, mkdirSync, unlinkSync } from 'fs';
+import { createReadStream, lstatSync, ReadStream, Stats, existsSync, mkdirSync, unlinkSync, readFile } from 'fs';
 
 import { mock, instance, when } from 'ts-mockito';
 
@@ -180,6 +180,20 @@ describe('FileSystemWrapper', () => {
 
         // Assert
         expect(unlinkSyncMock).toHaveBeenCalledWith(testFileName);
+    });
+
+    test('readFile', async () => {
+        // Arrange
+        const readFileAsyncMock = jest.fn();
+
+        const promisifyMock = promisify as jest.MockedFunction<typeof promisify>;
+        promisifyMock.mockReturnValue(readFileAsyncMock);
+
+        // Act
+        await wrapper.readFile(testFileName);
+
+        // Assert
+        expect(readFileAsyncMock).toHaveBeenCalledWith(testFileName);
     });
 
     describe('checkOrCreateDirectory', () => {
