@@ -2,13 +2,14 @@ import { Entity, Column, OneToOne, JoinColumn } from "typeorm";
 
 import { BaseEntity } from './base.entity';
 import { File } from "./file.entity";
+import { Metadata } from "./metadata.entity";
 
 @Entity()
 export class Book extends BaseEntity {
     @Column({ length: 1000 })
     title: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, length: 4000 })
     description: string;
 
     @Column({ nullable: true })
@@ -17,4 +18,8 @@ export class Book extends BaseEntity {
     @OneToOne(() => File, { cascade: true, onDelete: 'CASCADE' })
     @JoinColumn()
     file: File;
+
+    @OneToOne(() => Metadata, { cascade: true, onDelete: 'CASCADE' })
+    @JoinColumn()
+    metadata: Metadata;
 }

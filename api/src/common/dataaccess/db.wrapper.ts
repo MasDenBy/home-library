@@ -8,6 +8,7 @@ import { BaseEntity } from './entities/base.entity';
 import { Book } from "./entities/book.entity";
 import { File } from "./entities/file.entity";
 import { Library } from "./entities/library.entity";
+import { Metadata } from "./entities/metadata.entity";
 
 @injectable()
 export class DatabaseWrapper {
@@ -30,7 +31,8 @@ export class DatabaseWrapper {
                 entities: [
                     Book,  
                     File,
-                    Library
+                    Library,
+                    Metadata
                 ],
                 synchronize: true
             });

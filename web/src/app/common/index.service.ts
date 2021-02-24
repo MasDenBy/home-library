@@ -12,6 +12,6 @@ export class IndexService {
     }
 
     public indexBook(bookId: number): Observable<Object> {
-        return this.http.get(`/index/book/${bookId}`);
+        return this.http.get(`/books/${bookId}/index`);
     }
 }

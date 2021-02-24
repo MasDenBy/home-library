@@ -9,11 +9,9 @@ export interface IBook {
 
 export interface IFile {
     id: number;
-    file_name: string;
     path: string;
-    full_path: string;
     image: string;
-    library_id: number;
+    libraryId: number;
 }
 
 export interface IPage {
