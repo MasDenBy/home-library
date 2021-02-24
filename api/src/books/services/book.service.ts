@@ -65,8 +65,14 @@ export class BookService {
         return await this.toDto(book);
     }
 
-    public async update(dto: BookDto) {
-        return await this.dataObject.update(BookService.toEntity(dto));
+    public async update(id: number, dto: BookDto) {
+        const book = await this.dataObject.findByIdWithReferences(id);
+
+        book.authors = dto.authors;
+        book.description = dto.description;
+        book.title = dto.title;
+
+        return await this.dataObject.update(book);
     }
 
     public async createFromFile(path: string, library: Library): Promise<void> {
@@ -102,7 +108,7 @@ export class BookService {
         const bookInfo = await this.openLibraryService.findByIsbn(isbn);
 
         book.authors = bookInfo.details.authors.map(x => x.name).join(', ');
-        book.description = bookInfo.details.description;
+        book.description = bookInfo.details.description?.value;
         book.title = bookInfo.details.title;
         
         if(!book.metadata) {
@@ -118,20 +124,11 @@ export class BookService {
 
             book.file.imageName = await this.imageService.download(bookInfo.thumbnail_url);
 
-            this.imageService.remove(oldName);
+            if(oldName) 
+                this.imageService.remove(oldName);
         }
 
         await this.dataObject.update(book);
-    }
-
-    private static toEntity(dto: BookDto): Book {
-        return <Book> {
-            id: dto.id,
-            authors: dto.authors,
-            description: dto.description,
-            file: null,
-            title: dto.title
-        };
     }
 
     private async toDto(entity: Book): Promise<BookDto> {

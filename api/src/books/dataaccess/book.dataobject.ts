@@ -6,6 +6,8 @@ import { DataObject } from '../../common/dataaccess/data.object';
 import { Book } from '../../common/dataaccess/entities/book.entity';
 import { File } from '../../common/dataaccess/entities/file.entity';
 
+import debug from 'debug';
+const debugLog: debug.IDebugger = debug('app:book.dataobject');
 
 @injectable()
 export class BookDataObject extends DataObject {
@@ -72,12 +74,17 @@ export class BookDataObject extends DataObject {
         await queryRunner.startTransaction();
 
         try {
-            await queryRunner.manager.save(book.metadata);
-            await queryRunner.manager.save(book.file);
+            if(book.metadata)
+                await queryRunner.manager.save(book.metadata);
+
+            if(book.file)
+                await queryRunner.manager.save(book.file);
+
             await queryRunner.manager.save(book);
 
             await queryRunner.commitTransaction();
-        } catch {
+        } catch (ex) {
+            debugLog(ex);
             await queryRunner.rollbackTransaction();
         } finally {
             queryRunner.release();

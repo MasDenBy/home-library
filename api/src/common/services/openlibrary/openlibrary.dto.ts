@@ -15,7 +15,7 @@ export interface BookInfo {
 export interface BookDetails {
     number_of_pages: number;
     title: string;
-    description: string;
+    description: Description;
     authors: Author[];
     publish_date:string;
 }
@@ -23,4 +23,8 @@ export interface BookDetails {
 export interface Author {
     key:string;
     name: string;
+}
+
+export interface Description {
+    value:string;
 }

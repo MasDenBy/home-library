@@ -93,10 +93,13 @@ describe('BookService', () => {
         // Arrange
         const dto = <BookDto> { id:10, authors: null, description: null, title: null };
 
+        when(dataObjectMock.findByIdWithReferences(dto.id)).thenResolve(<Book>{});
+
         // Act
-        await service.update(dto);
+        await service.update(dto.id, dto);
 
         // Assert
+        verify(dataObjectMock.findByIdWithReferences(dto.id)).once();
         verify(dataObjectMock.update(anything())).once();
     });
 
@@ -216,7 +219,7 @@ describe('BookService', () => {
                     authors: [
                         { name: authorName }
                     ],
-                    description: 'description',
+                    description: { value: 'description' },
                     publish_date: '1985',
                     title: 'book title'
                 },
@@ -254,7 +257,7 @@ describe('BookService', () => {
                 verify(dataObjectMock.update(objectContaining(
                     <Book>{
                         authors: authorName,
-                        description: bookInfo.details.description,
+                        description: bookInfo.details.description.value,
                         title: bookInfo.details.title,
                         metadata: { 
                             isbn: isbn,

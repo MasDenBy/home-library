@@ -38,7 +38,7 @@ export class BooksController extends ApiController {
 
     @httpPut('/:id')
     public async put(@requestParam('id') id: number, request: express.Request) {
-        await this.bookService.update(<BookDto>{id: id, ...request.body});
+        await this.bookService.update(id, <BookDto>{id: id, ...request.body});
 
         return this.noContent();
     }

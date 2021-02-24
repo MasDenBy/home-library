@@ -87,7 +87,7 @@ describe('BooksController', () => {
         // Assert
         expect(result.statusCode).toBe(204);
 
-        verify(bookServiceMock.update(anything())).once();
+        verify(bookServiceMock.update(id, anything())).once();
     });
 
     test('removeBook', async () => {

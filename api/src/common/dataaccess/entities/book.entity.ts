@@ -9,7 +9,7 @@ export class Book extends BaseEntity {
     @Column({ length: 1000 })
     title: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, length: 4000 })
     description: string;
 
     @Column({ nullable: true })
