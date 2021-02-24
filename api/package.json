@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "start": "npm run build && node -r dotenv/config ./dist/index.js",
-    "debug": "set DEBUG=* && npm start",
-    "test": "jest --forceExit"
+    "start": "set DEBUG=* && npm run build && node -r dotenv/config ./dist/index.js",
+    "test": "jest --forceExit",
+    "coverage": "jest --forceExit --collectCoverage"
   },
   "repository": {
     "type": "git",

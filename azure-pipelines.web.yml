@@ -30,7 +30,7 @@ steps:
     command: 'custom'
     workingDir: 'web'
     customCommand: 'run coverage'
-  displayName: 'Test'
+  displayName: 'Test & Coverage'
 
 - task: PublishCodeCoverageResults@1
   inputs:
