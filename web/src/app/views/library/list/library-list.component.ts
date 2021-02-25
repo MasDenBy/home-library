@@ -7,15 +7,16 @@ import { LibraryService } from '../services/library.service';
 
 
 @Component({
-    templateUrl:'./library-list.component.html',
-    selector: 'library-list',
+    templateUrl: './library-list.component.html',
+    selector: 'app-library-list',
     styleUrls: ['./library-list.component.scss'],
     providers: [ConfirmationService, MessageService]
 })
-export class LibraryList implements OnInit {
-    constructor(private libraryService: LibraryService, 
+export class LibraryListComponent implements OnInit {
+    constructor(
+        private libraryService: LibraryService,
         private confirmationService: ConfirmationService,
-        private messageService: MessageService){}
+        private messageService: MessageService) {}
 
     Libraries: ILibrary[];
 
@@ -29,12 +30,12 @@ export class LibraryList implements OnInit {
             accept: () => {
                 this.libraryService.delete(id).subscribe(
                     x => null,
-                    error => this.messageService.add({severity:'error', summary:'Library folder was not deleted'}),
+                    error => this.messageService.add({severity: 'error', summary: 'Library folder was not deleted'}),
                     () => {
-                        this.messageService.add({severity:'success', summary:'Library folder was deleted'});
+                        this.messageService.add({severity: 'success', summary: 'Library folder was deleted'});
                         this.getLibraries();
                     }
-                )
+                );
             }
         });
     }

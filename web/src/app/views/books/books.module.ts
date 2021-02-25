@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from "@angular/common";
+import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
@@ -14,9 +14,9 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { BooksRoutingModule } from './books-routing.module';
 
-import { BooksList } from './list/books-list.component';
-import { BookDetails } from './details/book-details.component';
-import { BookEdit } from './edit/book-edit.component';
+import { BooksListComponent } from './list/books-list.component';
+import { BookDetailsComponent } from './details/book-details.component';
+import { BookEditComponent } from './edit/book-edit.component';
 import { BookService } from './services/book.service';
 import { ImageService, SessionStorage, WindowWrapper } from '../../common';
 
@@ -34,11 +34,11 @@ import { ImageService, SessionStorage, WindowWrapper } from '../../common';
         ToastModule
     ],
     declarations: [
-        BookDetails,
-        BookEdit,
-        BooksList
+        BookDetailsComponent,
+        BookEditComponent,
+        BooksListComponent
     ],
-    providers:[
+    providers: [
         BookService,
         ImageService,
         SessionStorage,

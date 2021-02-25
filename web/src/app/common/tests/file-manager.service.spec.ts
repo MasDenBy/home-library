@@ -7,29 +7,26 @@ import { FileManagerService } from '../file-manager.service';
 import { IPath } from '../../models';
 
 describe('FileManagerService', () => {
-    const expectedPath = <IPath>{path: 'path', folders:["a", "b"]};
+    const expectedPath: IPath = { path: 'path', folders: ['a', 'b'] };
 
     let service: FileManagerService;
     let httpSpy: jasmine.SpyObj<HttpService>;
-
     beforeEach(() => {
-        var spy = jasmine.createSpyObj('HttpService', ['get']);
-
         TestBed.configureTestingModule({
             providers: [
                 FileManagerService,
-                { provide: HttpService, useValue: spy }
+                { provide: HttpService, useValue: jasmine.createSpyObj('HttpService', ['get']) }
             ]
         });
 
         service = TestBed.inject(FileManagerService);
         httpSpy = TestBed.inject(HttpService) as jasmine.SpyObj<HttpService>;
 
-        httpSpy.get.and.returnValue(Observable.create(observer => {
+        httpSpy.get.and.returnValue(new Observable(observer => {
             observer.next(expectedPath);
             observer.complete();
         }));
-    })
+    });
 
     it('should get /fm when path is empty', () => {
         service.getPaths().subscribe((result: IPath) => {
@@ -49,5 +46,5 @@ describe('FileManagerService', () => {
             expect(httpSpy.get.calls.count()).toBe(1);
             expect(httpSpy.get).toHaveBeenCalledWith('/fm?path=test');
         });
-    })
-})
+    });
+});

@@ -7,8 +7,8 @@ import {ListboxModule} from 'primeng/listbox';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {InputTextModule} from 'primeng/inputtext';
 
-import { LibraryList } from './list/library-list.component';
-import { ManageLibrary } from './manage/manage-library.component';
+import { LibraryListComponent } from './list/library-list.component';
+import { ManageLibraryComponent } from './manage/manage-library.component';
 
 import { LibraryService } from './services/library.service';
 import { LibraryRoutingModule } from './library-routing.module';
@@ -24,9 +24,9 @@ import { LibraryRoutingModule } from './library-routing.module';
         LibraryRoutingModule
     ],
     declarations: [
-        LibraryList,
-        ManageLibrary
+        LibraryListComponent,
+        ManageLibraryComponent
     ],
-    providers:[ LibraryService ]
+    providers: [ LibraryService ]
 })
 export class LibraryModule { }

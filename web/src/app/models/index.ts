@@ -1,1 +1,1 @@
-export * from './file-manager.model'
+export * from './file-manager.model';

@@ -9,12 +9,13 @@ import { IBook } from '../models/book.model';
 import { HttpResponse } from '@angular/common/http';
 
 @Component({
-    templateUrl:'./book-details.component.html',
-    selector: 'book-details',
-    styleUrls:['./book-details.component.scss']
+    templateUrl: './book-details.component.html',
+    selector: 'app-book-details',
+    styleUrls: ['./book-details.component.scss']
 })
-export class BookDetails implements OnInit {
-    constructor(private route: ActivatedRoute,
+export class BookDetailsComponent implements OnInit {
+    constructor(
+        private route: ActivatedRoute,
         private bookService: BookService,
         private indexService: IndexService,
         private confirmationService: ConfirmationService,
@@ -28,7 +29,7 @@ export class BookDetails implements OnInit {
 
     ngOnInit(): void {
         this.initializeCommands();
-        this.getBook();        
+        this.getBook();
     }
 
     download(): void {
@@ -36,17 +37,17 @@ export class BookDetails implements OnInit {
             const wrapper = this.windowWrapper;
             const objectUrl = wrapper.createObjectURL(response.body);
 
-            var link = document.createElement('a');
+            const link = document.createElement('a');
             link.href = objectUrl;
             link.download = HttpHelper.getFileNameFromHttpResponse<Blob>(response);
             link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
 
-            setTimeout(function () {
+            setTimeout(() => {
                 wrapper.revokeObjectURL(objectUrl);
                 link.remove();
             }, 100);
         },
-        error => this.messageService.add({severity:'error', summary:'Error of downloading the book'}));
+        error => this.messageService.add({severity: 'error', summary: 'Error of downloading the book'}));
     }
 
     edit(): void {
@@ -69,7 +70,7 @@ export class BookDetails implements OnInit {
     }
 
     private updateMetadata(): void {
-        this.indexService.indexBook(this.Book.id).subscribe(()=>{
+        this.indexService.indexBook(this.Book.id).subscribe(() => {
             this.getBook();
         });
     }
@@ -80,9 +81,9 @@ export class BookDetails implements OnInit {
             accept: () => {
                 this.bookService.delete(this.Book.id).subscribe(
                     x => null,
-                    error => this.messageService.add({severity:'error', summary:'Book was not deleted'}),
+                    error => this.messageService.add({severity: 'error', summary: 'Book was not deleted'}),
                     () => this.router.navigateByUrl('/')
-                )
+                );
             }
         });
     }

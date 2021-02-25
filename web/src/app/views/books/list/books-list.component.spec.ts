@@ -5,56 +5,56 @@ import { Observable } from 'rxjs';
 
 import { DataViewModule } from 'primeng/dataview';
 
-import { BooksList } from "./books-list.component"
+import { BooksListComponent } from './books-list.component';
 import { BookService } from '../services/book.service';
-import { IPage, IBook } from '../models/book.model';
+import { IPage } from '../models/book.model';
 import { ImageService, SessionStorage } from '../../../common';
 import { Constants } from '../../../constants';
 
-describe('BooksList', () => {
-    const pattern: string = 'cool book';
-    const page: IPage = <IPage>{
-        count: 2, 
+describe('BooksListComponent', () => {
+    const pattern = 'cool book';
+    const page: IPage = {
+        count: 2,
         data: [
-            <IBook>{ authors: '', description: '', file: null, goodreads_id: 1, id: 1, title: '' }
+            { authors: '', description: '', file: null, goodreads_id: 1, id: 1, title: '' }
         ]
     };
 
-    let fixture: ComponentFixture<BooksList>;
-    let component: BooksList;
+    let fixture: ComponentFixture<BooksListComponent>;
+    let component: BooksListComponent;
     let bookService: jasmine.SpyObj<BookService>;
     let sessionStorage: jasmine.SpyObj<SessionStorage>;
-    let paramMap: jasmine.SpyObj<ParamMap> = jasmine.createSpyObj('ParamMap', ['get']);
+    const paramMap: jasmine.SpyObj<ParamMap> = jasmine.createSpyObj('ParamMap', ['get']);
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports:[
+            imports: [
                 DataViewModule
             ],
-            declarations: [BooksList],
+            declarations: [BooksListComponent],
             providers: [
                 { provide: BookService, useValue: jasmine.createSpyObj('BookService', ['getBooks', 'search']) },
                 { provide: SessionStorage, useValue: jasmine.createSpyObj('SessionStorage', ['getItem', 'setItem'])},
-                { 
-                    provide: ActivatedRoute, 
+                {
+                    provide: ActivatedRoute,
                     useValue: {
                         snapshot: {
-                            paramMap: paramMap
-                        } 
+                            paramMap
+                        }
                     },
                 },
                 ImageService
             ]
         });
 
-        fixture = TestBed.createComponent(BooksList);
+        fixture = TestBed.createComponent(BooksListComponent);
         component = fixture.componentInstance;
         bookService = TestBed.inject(BookService) as jasmine.SpyObj<BookService>;
         sessionStorage = TestBed.inject(SessionStorage) as jasmine.SpyObj<SessionStorage>;
     });
 
     describe('ngOnInit', () => {
-        beforeEach(()=> {
+        beforeEach(() => {
             paramMap.get.and.returnValue(pattern);
         });
 
@@ -65,7 +65,7 @@ describe('BooksList', () => {
         });
 
         it('should set offset when it exists in session', () => {
-            const testOffset: number = 10;
+            const testOffset = 10;
 
             sessionStorage.getItem.and.returnValue(testOffset.toString());
 
@@ -87,14 +87,14 @@ describe('BooksList', () => {
 
     describe('loadBooks', () => {
         it('should load books with offset and count specified', () => {
-            bookService.getBooks.and.returnValue(Observable.create(observer => {
+            bookService.getBooks.and.returnValue(new Observable(observer => {
                 observer.next(page);
             }));
 
             const event = { first: 10, rows: 20};
             component.loadBooks(event);
 
-            expect(component.Page).toEqual(page)
+            expect(component.Page).toEqual(page);
             expect(bookService.getBooks).toHaveBeenCalledWith(event.first, event.rows);
             expect(sessionStorage.setItem).toHaveBeenCalledWith(Constants.OffsetKey, event.first as any);
         });
@@ -102,11 +102,11 @@ describe('BooksList', () => {
         it('should search books with offset and count if pattern is specified', () => {
             paramMap.get.and.returnValue(pattern);
 
-            bookService.getBooks.and.returnValue(Observable.create(observer => {
+            bookService.getBooks.and.returnValue(new Observable(observer => {
                 observer.next(page);
             }));
 
-            bookService.search.and.returnValue(Observable.create(observer => {
+            bookService.search.and.returnValue(new Observable(observer => {
                 observer.next(page);
             }));
 

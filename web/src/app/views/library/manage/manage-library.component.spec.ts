@@ -13,14 +13,14 @@ import { Observable } from 'rxjs';
 
 import { FileManagerService, IndexService } from '../../../common';
 import { IPath } from '../../../models';
-import { ManageLibrary } from './manage-library.component';
+import { ManageLibraryComponent } from './manage-library.component';
 import { LibraryService } from '../services/library.service';
 
-describe('ManageLibrary', () => {
+describe('ManageLibraryComponent', () => {
     const testPath: IPath = { path: '\\', folders: ['a', 'b']};
 
-    let component: ManageLibrary;
-    let fixture: ComponentFixture<ManageLibrary>;
+    let component: ManageLibraryComponent;
+    let fixture: ComponentFixture<ManageLibraryComponent>;
     let libraryService: jasmine.SpyObj<LibraryService>;
     let fileManagerService: jasmine.SpyObj<FileManagerService>;
     let indexService: jasmine.SpyObj<IndexService>;
@@ -28,11 +28,11 @@ describe('ManageLibrary', () => {
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [ManageLibrary],
-            imports:[
+            declarations: [ManageLibraryComponent],
+            imports: [
                 FormsModule,
                 BrowserAnimationsModule,
-                ListboxModule, 
+                ListboxModule,
                 ToastModule
             ],
             providers: [
@@ -43,15 +43,15 @@ describe('ManageLibrary', () => {
                 { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigateByUrl']) },
             ]
         });
-        
-        fixture = TestBed.createComponent(ManageLibrary);
+
+        fixture = TestBed.createComponent(ManageLibraryComponent);
         component = fixture.componentInstance;
         libraryService = TestBed.inject(LibraryService) as jasmine.SpyObj<LibraryService>;
         fileManagerService = TestBed.inject(FileManagerService) as jasmine.SpyObj<FileManagerService>;
         indexService = TestBed.inject(IndexService) as jasmine.SpyObj<IndexService>;
         router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 
-        fileManagerService.getPaths.and.returnValue(Observable.create(observer => {
+        fileManagerService.getPaths.and.returnValue(new Observable(observer => {
             observer.next(testPath);
         }));
 
@@ -64,16 +64,16 @@ describe('ManageLibrary', () => {
     });
 
     describe('save', () => {
-        const id: number = 1;
+        const id = 1;
 
         it('should create and index library with SUCCESS toast', () => {
             // Arrange
-            libraryService.create.and.returnValue(Observable.create(observer => {
+            libraryService.create.and.returnValue(new Observable(observer => {
                 observer.next(id);
                 observer.complete();
             }));
 
-            indexService.indexLibrary.and.returnValue(Observable.create(observer => {
+            indexService.indexLibrary.and.returnValue(new Observable(observer => {
                 observer.complete();
             }));
 
@@ -88,7 +88,7 @@ describe('ManageLibrary', () => {
 
         it('should create and index library with ERROR toast', fakeAsync(() => {
             // Arrange
-            libraryService.create.and.returnValue(Observable.create(observer => {
+            libraryService.create.and.returnValue(new Observable(observer => {
                 observer.error();
             }));
 
@@ -104,28 +104,28 @@ describe('ManageLibrary', () => {
     });
 
     describe('openFolder', () => {
-        const testPath = 'path';
+        const folderPath = 'path';
 
         it('should add \\ to folder if current is root', () => {
-            component.openFolder(testPath);
-            
-            expect(fileManagerService.getPaths).toHaveBeenCalledWith(`\\${testPath}`);
+            component.openFolder(folderPath);
+
+            expect(fileManagerService.getPaths).toHaveBeenCalledWith(`\\${folderPath}`);
         });
 
         it('should join the path and open folder', () => {
             const currentPath = '\\myfolder';
 
             component.CurrentPath = currentPath;
-            component.openFolder(testPath);
-            
-            expect(fileManagerService.getPaths).toHaveBeenCalledWith(`${currentPath}\\${testPath}`);
+            component.openFolder(folderPath);
+
+            expect(fileManagerService.getPaths).toHaveBeenCalledWith(`${currentPath}\\${folderPath}`);
         });
 
         it('should use path args if currentPath is null', () => {
             component.CurrentPath = null;
-            component.openFolder(testPath);
-            
-            expect(fileManagerService.getPaths).toHaveBeenCalledWith(testPath);
+            component.openFolder(folderPath);
+
+            expect(fileManagerService.getPaths).toHaveBeenCalledWith(folderPath);
         });
     });
 

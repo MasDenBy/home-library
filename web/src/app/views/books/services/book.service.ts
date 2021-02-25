@@ -19,20 +19,16 @@ export class BookService {
         return this.http.get<IBook>(`/books/${id}`);
     }
 
-    public update(book: IBook): Observable<Object> {
+    public update(book: IBook): Observable<IBook> {
         return this.http.put<IBook>(`/books/${book.id}`, book);
     }
 
-    public delete(id: number): Observable<Object> {
+    public delete(id: number): Observable<object> {
         return this.http.delete(`/books/${id}`);
     }
 
     public search(pattern: string, offset: number, count: number): Observable<IPage> {
-        const dto = <BookSearchDto> {
-            count: count,
-            offset: offset,
-            pattern: pattern
-        };
+        const dto = { count, offset, pattern } as BookSearchDto;
         return this.http.post('/books/search', dto);
     }
 

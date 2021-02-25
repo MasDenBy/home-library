@@ -8,7 +8,7 @@ export class FileManagerService {
     constructor(private http: HttpService){}
 
     public getPaths(path: string = ''): Observable<IPath> {
-        let uri = path != '' ? `/fm?path=${path}` : `/fm`;
+        const uri = path !== '' ? `/fm?path=${path}` : `/fm`;
         return this.http.get<IPath>(uri);
     }
 }

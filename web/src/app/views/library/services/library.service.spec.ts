@@ -12,7 +12,7 @@ describe('LibraryService', () => {
     let httpService: jasmine.SpyObj<HttpService>;
 
     beforeEach(() => {
-        var spy = jasmine.createSpyObj('HttpService', ['get', 'delete', 'post']);
+        const spy = jasmine.createSpyObj('HttpService', ['get', 'delete', 'post']);
 
         TestBed.configureTestingModule({
             providers: [
@@ -23,12 +23,12 @@ describe('LibraryService', () => {
 
         service = TestBed.inject(LibraryService);
         httpService = TestBed.inject(HttpService) as jasmine.SpyObj<HttpService>;
-    })
+    });
 
     it('should get libraries', () => {
-        const library: ILibrary = {path: 'path', id:1};
+        const library: ILibrary = { path: 'path', id: 1 };
 
-        httpService.get.and.returnValue(Observable.create(observer => {
+        httpService.get.and.returnValue(new Observable(observer => {
             observer.next([library]);
         }));
 
@@ -42,7 +42,7 @@ describe('LibraryService', () => {
     it('should delete library', () => {
         const libId = 1;
 
-        httpService.delete.and.returnValue(Observable.create(observer => {
+        httpService.delete.and.returnValue(new Observable(observer => {
             observer.next(new Object());
         }));
 
@@ -57,14 +57,14 @@ describe('LibraryService', () => {
         const path = 'path';
         const id = 1;
 
-        httpService.post.and.returnValue(Observable.create(observer => {
+        httpService.post.and.returnValue(new Observable(observer => {
             observer.next(id);
         }));
 
         service.create(path).subscribe(result => {
             expect(result).toBe(id);
 
-            expect(httpService.post).toHaveBeenCalledWith('/libraries/', { path: path, id: 0 });
+            expect(httpService.post).toHaveBeenCalledWith('/libraries/', { path, id: 0 });
         });
     });
-})
+});
