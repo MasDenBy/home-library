@@ -1,11 +1,7 @@
 import { injectable } from "inversify";
 import { EntityTarget, DeleteResult } from "typeorm";
 import { BaseEntity } from './entities/base.entity';
-
-import debug from "debug";
 import { DatabaseWrapper } from "./db.wrapper";
-
-const debugLog: debug.IDebugger = debug('app: data.object');
 
 @injectable()
 export abstract class DataObject {

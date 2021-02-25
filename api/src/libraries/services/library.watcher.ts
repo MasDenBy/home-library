@@ -11,7 +11,7 @@ const debugLog: debug.IDebugger = debug('app:library.watcher');
 export class LibraryWatcher {
     constructor(private bookService: BookService) { }
 
-    public run(library: Library) {
+    public run(library: Library): void {
         const watcher = chokidar.watch(library.path, {
             ignoreInitial: true
         });

@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import { basename, extname, parse, ParsedPath, join } from 'path';
 import { promisify } from 'util';
-import { createReadStream, lstatSync, ReadStream, Stats, existsSync, mkdirSync, unlinkSync, readFile } from 'fs';
+import { createReadStream, lstatSync, ReadStream, Stats, existsSync, mkdirSync, unlinkSync } from 'fs';
 
 import { mock, instance, when } from 'ts-mockito';
 
@@ -197,7 +197,7 @@ describe('FileSystemWrapper', () => {
     });
 
     describe('checkOrCreateDirectory', () => {
-        const testDir: string = 'test';
+        const testDir = 'test';
 
         let existsSyncMock: jest.MockedFunction<typeof existsSync>;
         let mkdirSyncMock: jest.MockedFunction<typeof mkdirSync>;

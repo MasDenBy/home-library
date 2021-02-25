@@ -15,7 +15,7 @@ export class FileSystemWrapper {
         const readdirAsync = util.promisify(fs.readdir);
         const items = await readdirAsync(folderPath);
 
-        let result: string[] = [];
+        const result: string[] = [];
 
         for (const itemIndex in items) {
             const fullPath = path.join(folderPath, items[itemIndex]);
@@ -34,13 +34,13 @@ export class FileSystemWrapper {
         return result;
     }
 
-    public basename(filePath: string) {
+    public basename(filePath: string): string {
         const extension = path.extname(filePath);
 
         return path.basename(filePath, extension);
     }
 
-    public basenameExt(filePath: string) {
+    public basenameExt(filePath: string): string {
         return path.basename(filePath);
     }
 
@@ -52,7 +52,7 @@ export class FileSystemWrapper {
         const readdirAsync = util.promisify(fs.readdir);
         const items = await readdirAsync(folderPath);
 
-        let result: string[] = [];
+        const result: string[] = [];
 
         for (const itemIndex in items) {
             const fullPath = path.join(folderPath, items[itemIndex]);
@@ -79,18 +79,18 @@ export class FileSystemWrapper {
         return path.join(root.path, folder);
     }
 
-    public checkOrCreateDirectory(dir: string) {
+    public checkOrCreateDirectory(dir: string): void {
         if(!fs.existsSync(dir))
             fs.mkdirSync(dir, { recursive:true });
     }
 
-    public async writeFile(content: any, fileName: string): Promise<void> {
+    public async writeFile(content: string | NodeJS.ArrayBufferView, fileName: string): Promise<void> {
         const writeFileAsync = util.promisify(fs.writeFile);
 
         await writeFileAsync(fileName, content);
     }
 
-    public deleteFile(file: string) {
+    public deleteFile(file: string): void {
         fs.unlinkSync(file);
     }
 

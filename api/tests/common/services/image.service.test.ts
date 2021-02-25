@@ -22,7 +22,7 @@ describe('ImageService', () => {
     test('download', async () => {
         // Arrange
         const axiosMock = axios as jest.Mocked<typeof axios>;
-        axiosMock.get.mockResolvedValue(<AxiosResponse<any>>{ data: 'data' });
+        axiosMock.get.mockResolvedValue(<AxiosResponse<unknown>>{ data: 'data' });
 
         when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
 
@@ -53,7 +53,7 @@ describe('ImageService', () => {
 
     test('getImageContent', async () => {
         // Arrange
-        const fileName: string = 'myfile.png';
+        const fileName = 'myfile.png';
 
         when(fsMock.readFile(anyString())).thenResolve(Buffer.from("content"));
         when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');

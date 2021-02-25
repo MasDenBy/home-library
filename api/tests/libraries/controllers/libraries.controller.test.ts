@@ -1,8 +1,8 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 
 import { Request } from 'express';
 import { mock, instance, when, verify } from 'ts-mockito';
-import { results } from "inversify-express-utils";
+import { results } from 'inversify-express-utils';
 
 import { LibraryService } from '../../../src/libraries/services/library.service';
 import { LibrariesController } from '../../../src/libraries/controllers/libraries.controller';
@@ -36,13 +36,13 @@ describe('/libraries', () => {
 
     test('getById', async () => {
         // Arrange
-        const testId: number = 1;
+        const testId = 1;
         const dto = <LibraryDto>{ id: testId, path: 'lib' };
 
         when(libraryServiceMock.getById(testId)).thenResolve(dto);
 
         // Act
-        var result = await controller.getById(testId);
+        const result = await controller.getById(testId);
 
         // Assert
         expect(result.statusCode).toBe(200);
@@ -51,7 +51,7 @@ describe('/libraries', () => {
 
     test('create', async () => {
         // Arrange
-        const testId: number = 1;
+        const testId = 1;
         const dto = <LibraryDto>{ path: 'lib' };
 
         const requestMock: Request = mock<Request>();
@@ -60,16 +60,15 @@ describe('/libraries', () => {
         when(libraryServiceMock.save(dto)).thenResolve(testId);
 
         // Act
-        var result = await controller.create(instance(requestMock)) as any;
+        const result = await controller.create(instance(requestMock));
 
         // Assert
-        expect(result.location).toBe('/libraries');
-        expect(result.content).toEqual(testId);
+        expect(result).toBeInstanceOf(results.CreatedNegotiatedContentResult);
     });
 
     test('delete', async () => {
         // Arrange
-        const testId: number = 1;
+        const testId = 1;
 
         when(libraryServiceMock.deleteById(testId));
 
@@ -87,7 +86,7 @@ describe('/libraries', () => {
         const id = 5;
 
         // Act
-        var result = await controller.index(id);
+        const result = await controller.index(id);
 
         // Assert
         expect(result).toBeInstanceOf(results.OkResult);

@@ -1,4 +1,4 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 
 import { BaseEntity } from '../../../src/common/dataaccess/entities/base.entity';
 import { DatabaseWrapper } from '../../../src/common/dataaccess/db.wrapper';
@@ -52,12 +52,12 @@ describe('DataObject', () => {
         // Arrange
         const id = 1;
 
-        const deleteQueryBuilder = mock<DeleteQueryBuilder<any>>();
+        const deleteQueryBuilder = mock<DeleteQueryBuilder<BaseEntity>>();
         when(deleteQueryBuilder.from(BaseEntity)).thenReturn(instance(deleteQueryBuilder));
         when(deleteQueryBuilder.where('id = :id', objectContaining({id: id}))).thenReturn(instance(deleteQueryBuilder));
         when(deleteQueryBuilder.execute()).thenResolve(new DeleteResult());
 
-        const selectQueryBuilder = mock<SelectQueryBuilder<any>>();
+        const selectQueryBuilder = mock<SelectQueryBuilder<BaseEntity>>();
         when(selectQueryBuilder.delete()).thenReturn(instance(deleteQueryBuilder));
 
         const connection = mock<Connection>();

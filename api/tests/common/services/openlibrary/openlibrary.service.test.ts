@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 
 import axios, { AxiosResponse } from 'axios';
-import { mock, instance, when, verify, anyString, anything } from 'ts-mockito';
 
 import { OpenLibraryService } from '../../../../src/common/services/openlibrary';
 import { BookInfo, SearchResponseDto } from '../../../../src/common/services/openlibrary/openlibrary.dto';
@@ -9,7 +8,7 @@ import { BookInfo, SearchResponseDto } from '../../../../src/common/services/ope
 jest.mock('axios');
 
 describe('OpenLibraryService', () => {
-    const pattern: string = 'search pattern';
+    const pattern = 'search pattern';
 
     let service: OpenLibraryService;
 
@@ -88,7 +87,7 @@ describe('OpenLibraryService', () => {
     });
 
     describe('findByIsbn', () => {
-        const isbn: string = '123456789';
+        const isbn = '123456789';
 
         let axiosMock: jest.Mocked<typeof axios>;
 
@@ -98,7 +97,7 @@ describe('OpenLibraryService', () => {
 
         test('if response doesn not have data should return null', async () => {
             // Arrange
-            axiosMock.get.mockResolvedValue(<AxiosResponse<any>>{ data: null });
+            axiosMock.get.mockResolvedValue(<AxiosResponse<unknown>>{ data: null });
 
             // Act
             const result = await service.findByIsbn(isbn);
@@ -109,10 +108,10 @@ describe('OpenLibraryService', () => {
 
         test('if response have data should return book info', async () => {
             // Arrange
-            let response = {};
+            const response = {};
             response[`isbn:${isbn}`] = <BookInfo>{ details: { title: 'title' } };
 
-            axiosMock.get.mockResolvedValue(<AxiosResponse<any>>{ 
+            axiosMock.get.mockResolvedValue(<AxiosResponse<unknown>>{ 
                 data: response
             });
 

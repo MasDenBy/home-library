@@ -1,10 +1,8 @@
-import { MetadataReader } from 'inversify';
-import { mock, instance, when, verify, deepEqual, anyString, anything, objectContaining, anyOfClass } from 'ts-mockito';
-import { Connection, DeleteQueryBuilder, DeleteResult, Repository, SelectQueryBuilder, UpdateQueryBuilder, UpdateResult, QueryRunner, EntityManager } from 'typeorm';
+import { mock, instance, when, verify, deepEqual, anyString, anything, objectContaining } from 'ts-mockito';
+import { Connection, DeleteQueryBuilder, Repository, SelectQueryBuilder, QueryRunner, EntityManager } from 'typeorm';
 
 import { BookDataObject } from '../../../src/books/dataaccess/book.dataobject';
 import { DatabaseWrapper } from '../../../src/common/dataaccess/db.wrapper';
-import { BaseEntity } from '../../../src/common/dataaccess/entities/base.entity';
 import { Book } from '../../../src/common/dataaccess/entities/book.entity';
 import { File } from '../../../src/common/dataaccess/entities/file.entity';
 import { Metadata } from '../../../src/common/dataaccess/entities/metadata.entity';
@@ -181,11 +179,11 @@ describe('BookDataObject', () => {
 
     test('deleteById', async () => {
         // Arrange
-        const deleteQueryBuilder = mock<DeleteQueryBuilder<any>>();
+        const deleteQueryBuilder = mock<DeleteQueryBuilder<Book>>();
         when(deleteQueryBuilder.from(anything())).thenReturn(instance(deleteQueryBuilder));
         when(deleteQueryBuilder.where('id = :id', objectContaining({id: id}))).thenReturn(instance(deleteQueryBuilder));
 
-        const selectQueryBuilder = mock<SelectQueryBuilder<any>>();
+        const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
         when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata')).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.where(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
@@ -212,11 +210,11 @@ describe('BookDataObject', () => {
 
     test('deleteByFilePath', async () => {
         // Arrange
-        const deleteQueryBuilder = mock<DeleteQueryBuilder<any>>();
+        const deleteQueryBuilder = mock<DeleteQueryBuilder<Book>>();
         when(deleteQueryBuilder.from(anything())).thenReturn(instance(deleteQueryBuilder));
         when(deleteQueryBuilder.where('id = :id', objectContaining({id: id}))).thenReturn(instance(deleteQueryBuilder));
 
-        const selectQueryBuilder = mock<SelectQueryBuilder<any>>();
+        const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
         when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata')).thenReturn(instance(selectQueryBuilder));
         when(selectQueryBuilder.where(anyString(), anything())).thenReturn(instance(selectQueryBuilder));

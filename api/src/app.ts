@@ -5,7 +5,6 @@ import * as bodyparser from 'body-parser';
 import * as winston from 'winston';
 import * as expressWinston from 'express-winston';
 import cors from 'cors';
-import debug from 'debug';
 
 import './books/controllers/books.controller';
 import './fm/controllers/filemanager.controller';
@@ -15,8 +14,6 @@ import { Config } from './config';
 import { Container } from "inversify";
 import { LibraryService } from "./libraries/services/library.service";
 import { LibraryWatcher } from "./libraries/services/library.watcher";
-
-const debugLog: debug.IDebugger = debug('app');
 
 export class App {
     private server: InversifyExpressServer;
@@ -42,7 +39,7 @@ export class App {
     }
     
     public run(): express.Application {
-        let app = this.server.build();
+        const app = this.server.build();
         app.listen(this.container.resolve(Config).port);
 
         return app;

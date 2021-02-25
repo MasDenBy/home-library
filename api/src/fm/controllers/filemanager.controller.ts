@@ -1,4 +1,5 @@
 import { controller, httpGet, queryParam } from "inversify-express-utils";
+import { JsonResult } from "inversify-express-utils/dts/results";
 import { ApiController } from "../../common/controllers/api.controller";
 import { FileManagerService } from "../services/filemanager.service";
 
@@ -10,7 +11,7 @@ export class FileManagerController extends ApiController {
     }
 
     @httpGet('/')
-    public async list(@queryParam('path') path: string) {
+    public async list(@queryParam('path') path: string): Promise<JsonResult> {
         const result = await this.fileManagerService.directoryList(path);
 
         return this.json(result);

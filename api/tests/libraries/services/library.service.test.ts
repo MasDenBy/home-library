@@ -12,7 +12,6 @@ describe('LibraryService', () => {
     let service: LibraryService;
     let dataObjectMock: LibraryDataObject;
     let indexerMock: IndexerService;
-
     beforeEach(() => {
         dataObjectMock = mock(LibraryDataObject);
         indexerMock = mock(IndexerService);
@@ -39,7 +38,7 @@ describe('LibraryService', () => {
         when(dataObjectMock.save(anyOfClass(Library))).thenResolve(id);
 
         // Act
-        var actual = await service.save(dto);
+        const actual = await service.save(dto);
 
         // Assert
         expect(actual).toBe(id);
@@ -54,7 +53,7 @@ describe('LibraryService', () => {
         when(dataObjectMock.findById(Library, entity.id)).thenResolve(entity);
 
         // Act
-        var dto = await service.getById(entity.id);
+        const dto = await service.getById(entity.id);
 
         // Assert
         expect(dto.id).toBe(entity.id);

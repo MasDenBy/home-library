@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { instance } from "ts-mockito";
 
 export const resolvableInstance = <T extends {}>(mock: T) => new Proxy<T>(instance(mock), {
@@ -7,5 +10,5 @@ export const resolvableInstance = <T extends {}>(mock: T) => new Proxy<T>(instan
     }
 
     return (target as any)[name];
-  },
+  }
 });
