@@ -14,6 +14,9 @@ import { HttpResponse } from '@angular/common/http';
     styleUrls: ['./book-details.component.scss']
 })
 export class BookDetailsComponent implements OnInit {
+    public book: IBook;
+    public commands: MenuItem[];
+
     constructor(
         private route: ActivatedRoute,
         private bookService: BookService,
@@ -24,16 +27,13 @@ export class BookDetailsComponent implements OnInit {
         private windowWrapper: WindowWrapper,
         public imageService: ImageService) { }
 
-    Book: IBook;
-    commands: MenuItem[];
-
     ngOnInit(): void {
         this.initializeCommands();
         this.getBook();
     }
 
     download(): void {
-        this.bookService.download(this.Book.id).subscribe((response: HttpResponse<Blob>) => {
+        this.bookService.download(this.book.id).subscribe((response: HttpResponse<Blob>) => {
             const wrapper = this.windowWrapper;
             const objectUrl = wrapper.createObjectURL(response.body);
 
@@ -51,14 +51,14 @@ export class BookDetailsComponent implements OnInit {
     }
 
     edit(): void {
-        this.router.navigateByUrl(`/books/${this.Book.id}/edit`);
+        this.router.navigateByUrl(`/books/${this.book.id}/edit`);
     }
 
     private getBook(): void {
         const id = +this.route.snapshot.paramMap.get('id');
 
         this.bookService.getBook(id).subscribe((book: IBook) => {
-            this.Book = book;
+            this.book = book;
         });
     }
 
@@ -70,7 +70,7 @@ export class BookDetailsComponent implements OnInit {
     }
 
     private updateMetadata(): void {
-        this.indexService.indexBook(this.Book.id).subscribe(() => {
+        this.indexService.indexBook(this.book.id).subscribe(() => {
             this.getBook();
         });
     }
@@ -79,7 +79,7 @@ export class BookDetailsComponent implements OnInit {
         this.confirmationService.confirm({
             message: 'Are you sure that you want to delete this book file?',
             accept: () => {
-                this.bookService.delete(this.Book.id).subscribe(
+                this.bookService.delete(this.book.id).subscribe(
                     x => null,
                     error => this.messageService.add({severity: 'error', summary: 'Book was not deleted'}),
                     () => this.router.navigateByUrl('/')

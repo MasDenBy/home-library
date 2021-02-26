@@ -14,7 +14,6 @@ describe('BookEditComponent', () => {
         authors: '',
         description: '',
         file: null,
-        goodreads_id: 1,
         id,
         title: ''
     };

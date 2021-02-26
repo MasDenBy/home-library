@@ -36,7 +36,7 @@ describe('AppComponent', () => {
 
             component.search(pattern);
 
-            expect(sessionStorage.setItem).toHaveBeenCalledWith(Constants.OffsetKey, '0');
+            expect(sessionStorage.setItem).toHaveBeenCalledWith(Constants.offsetKey, '0');
             expect(router.navigateByUrl).toHaveBeenCalledWith(`/books/search/${pattern}`);
         });
 

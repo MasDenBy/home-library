@@ -3,7 +3,7 @@
     <button [routerLink]="'/libraries/manage'" pButton type="button" icon="pi pi-plus" iconPos="left"></button>
 </div>
 <div class="row-100">
-    <p-listbox [options]="Libraries" readonly="True">
+    <p-listbox [options]="libraries" readonly="True">
         <ng-template let-library let-i="index" pTemplate="item">
             <div class="ui-helper-clearfix">
                 <span>{{library.path}}</span>

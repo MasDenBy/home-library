@@ -23,7 +23,6 @@ describe('BookDetailsComponent', () => {
         authors: '',
         description: '',
         file: { image: '', id: 1, libraryId: 1, path: '' },
-        goodreads_id: 1,
         id,
         title: ''
     };
@@ -80,7 +79,7 @@ describe('BookDetailsComponent', () => {
 
             component.ngOnInit();
 
-            expect(component.Book).toEqual(book);
+            expect(component.book).toEqual(book);
             expect(bookService.getBook).toHaveBeenCalledWith(id);
         });
     });
@@ -91,7 +90,6 @@ describe('BookDetailsComponent', () => {
                 authors: 'Author, Name',
                 description: '',
                 file: { image: '', id: 1, libraryId: 1, path: '' },
-                goodreads_id: 1,
                 id,
                 title: 'Updated book'
             };
@@ -104,7 +102,7 @@ describe('BookDetailsComponent', () => {
                 observer.next();
             }));
 
-            component.Book = book;
+            component.book = book;
 
             fixture.detectChanges();
 
@@ -116,7 +114,7 @@ describe('BookDetailsComponent', () => {
             menuEl.click();
             fixture.detectChanges();
 
-            expect(component.Book).toEqual(updatedBook);
+            expect(component.book).toEqual(updatedBook);
             expect(bookService.getBook).toHaveBeenCalledWith(id);
             expect(indexService.indexBook).toHaveBeenCalledWith(id);
         });
@@ -182,7 +180,7 @@ describe('BookDetailsComponent', () => {
 
     describe('edit', () => {
         it('should navigate to edit page', () => {
-            component.Book = book;
+            component.book = book;
             component.edit();
 
             expect(router.navigateByUrl).toHaveBeenCalledWith(`/books/${book.id}/edit`);
@@ -198,7 +196,7 @@ describe('BookDetailsComponent', () => {
                 observer.next(blobResponse);
             }));
 
-            component.Book = book;
+            component.book = book;
             component.download();
 
             expect(bookService.download).toHaveBeenCalledWith(book.id);

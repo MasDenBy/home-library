@@ -17,7 +17,7 @@ export class HttpService {
         return this.http.get(this.getUrl(url), { responseType: 'blob', observe: 'response' });
     }
 
-    public delete(url: string): Observable<object> {
+    public delete(url: string): Observable<unknown> {
         return this.http.delete(this.getUrl(url));
     }
 

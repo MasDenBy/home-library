@@ -11,7 +11,6 @@ describe('BookService', () => {
         authors: '',
         description: '',
         file: null,
-        goodreads_id: 0,
         id: 1,
         title: ''
     };

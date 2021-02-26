@@ -23,7 +23,7 @@ export class BookService {
         return this.http.put<IBook>(`/books/${book.id}`, book);
     }
 
-    public delete(id: number): Observable<object> {
+    public delete(id: number): Observable<unknown> {
         return this.http.delete(`/books/${id}`);
     }
 

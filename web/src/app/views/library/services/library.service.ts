@@ -11,7 +11,7 @@ export class LibraryService {
         return this.http.get<ILibrary[]>('/libraries');
     }
 
-    public delete(id: number): Observable<object> {
+    public delete(id: number): Observable<unknown> {
         return this.http.delete(`/libraries/${id}`);
     }
 

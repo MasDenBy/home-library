@@ -16,7 +16,7 @@ describe('BooksListComponent', () => {
     const page: IPage = {
         count: 2,
         data: [
-            { authors: '', description: '', file: null, goodreads_id: 1, id: 1, title: '' }
+            { authors: '', description: '', file: null, id: 1, title: '' }
         ]
     };
 
@@ -71,8 +71,8 @@ describe('BooksListComponent', () => {
 
             component.ngOnInit();
 
-            expect(component.Offset).toEqual(testOffset);
-            expect(sessionStorage.getItem).toHaveBeenCalledWith(Constants.OffsetKey);
+            expect(component.offset).toEqual(testOffset);
+            expect(sessionStorage.getItem).toHaveBeenCalledWith(Constants.offsetKey);
         });
 
         it('should set offset to 0 when it doesnot exists in session', () => {
@@ -80,8 +80,8 @@ describe('BooksListComponent', () => {
 
             component.ngOnInit();
 
-            expect(component.Offset).toEqual(0);
-            expect(sessionStorage.getItem).toHaveBeenCalledWith(Constants.OffsetKey);
+            expect(component.offset).toEqual(0);
+            expect(sessionStorage.getItem).toHaveBeenCalledWith(Constants.offsetKey);
         });
     });
 
@@ -94,9 +94,9 @@ describe('BooksListComponent', () => {
             const event = { first: 10, rows: 20};
             component.loadBooks(event);
 
-            expect(component.Page).toEqual(page);
+            expect(component.page).toEqual(page);
             expect(bookService.getBooks).toHaveBeenCalledWith(event.first, event.rows);
-            expect(sessionStorage.setItem).toHaveBeenCalledWith(Constants.OffsetKey, event.first as any);
+            expect(sessionStorage.setItem).toHaveBeenCalledWith(Constants.offsetKey, event.first as any);
         });
 
         it('should search books with offset and count if pattern is specified', () => {

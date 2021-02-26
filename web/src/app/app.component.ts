@@ -15,7 +15,7 @@ export class AppComponent {
 
   search(pattern: string): void {
     if (pattern) {
-      this.sessionStorage.setItem(Constants.OffsetKey, '0');
+      this.sessionStorage.setItem(Constants.offsetKey, '0');
 
       this.router.navigateByUrl(`/books/search/${pattern}`);
     }

@@ -13,12 +13,12 @@ import { LibraryService } from '../services/library.service';
     providers: [ConfirmationService, MessageService]
 })
 export class LibraryListComponent implements OnInit {
+    libraries: ILibrary[];
+
     constructor(
         private libraryService: LibraryService,
         private confirmationService: ConfirmationService,
         private messageService: MessageService) {}
-
-    Libraries: ILibrary[];
 
     ngOnInit(): void {
         this.getLibraries();
@@ -42,7 +42,7 @@ export class LibraryListComponent implements OnInit {
 
     private getLibraries(): void {
         this.libraryService.getLibraries().subscribe((data: ILibrary[]) => {
-            this.Libraries = data;
+            this.libraries = data;
         });
     }
 }
