@@ -1,4 +1,4 @@
-import { mock, instance, when, verify, anyString, anything } from 'ts-mockito';
+import { mock, instance, verify } from 'ts-mockito';
 
 import { BookService } from '../../../src/books/services/book.service';
 import { LibraryWatcher } from '../../../src/libraries/services/library.watcher';
@@ -25,12 +25,12 @@ describe('LibraryWatcher', () => {
         const testPath = 'path';
 
         let watchMock: jest.MockedFunction<typeof watch>;
-        let fsWatcherMock: any;
+        let fsWatcherMock: EventEmitter;
 
         beforeEach(() => {
             fsWatcherMock = new EventEmitter();
             watchMock = watch as jest.MockedFunction<typeof watch>;
-            watchMock.mockReturnValue(fsWatcherMock as any);
+            watchMock.mockReturnValue(fsWatcherMock as never);
         });
 
         test('add new file', () => {

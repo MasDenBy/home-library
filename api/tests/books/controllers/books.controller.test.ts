@@ -10,7 +10,6 @@ import { BookService } from '../../../src/books/services/book.service';
 import { BookDto } from '../../../src/books/dto/book.dto';
 import { PassThrough } from 'stream';
 import { IPage } from '../../../src/common/dto/page.dto';
-import { OkResult } from 'inversify-express-utils/dts/results';
 import { results } from 'inversify-express-utils';
 
 describe('BooksController', () => {

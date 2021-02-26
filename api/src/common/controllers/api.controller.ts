@@ -1,6 +1,6 @@
-import { BaseHttpController, HttpResponseMessage } from "inversify-express-utils";
-import { Response } from "express";
-import { Stream } from "stream";
+import { BaseHttpController, HttpResponseMessage } from 'inversify-express-utils';
+import { Response } from 'express';
+import { Stream } from 'stream';
 
 export abstract class ApiController extends BaseHttpController {
     protected noContent(): HttpResponseMessage {
@@ -16,7 +16,7 @@ export abstract class ApiController extends BaseHttpController {
         await this.streamFinished(file[0]);
     }
 
-    private streamFinished(stream: Stream): Promise<any> {
+    private streamFinished(stream: Stream): Promise<void> {
         return new Promise((resolve, reject) => {
             stream.on('end', (v) => resolve(v));
             stream.on('error', () => reject());

@@ -15,7 +15,7 @@ describe('AppComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports:[ RouterTestingModule ],
+            imports: [ RouterTestingModule ],
             declarations: [AppComponent],
             providers: [
                 { provide: SessionStorage, useValue: jasmine.createSpyObj('SessionStorage', ['setItem'])},
@@ -30,19 +30,19 @@ describe('AppComponent', () => {
 
     describe('search', () => {
         it('should redirect to search screen when pattern is specified', () => {
-            const pattern: string = 'test pattern'
-            
+            const pattern = 'test pattern';
+
             spyOn(router, 'navigateByUrl');
-            
+
             component.search(pattern);
 
-            expect(sessionStorage.setItem).toHaveBeenCalledWith(Constants.OffsetKey, '0');
+            expect(sessionStorage.setItem).toHaveBeenCalledWith(Constants.offsetKey, '0');
             expect(router.navigateByUrl).toHaveBeenCalledWith(`/books/search/${pattern}`);
         });
 
         it('should not redirect to search screen when pattern is not specified', () => {
             spyOn(router, 'navigateByUrl');
-            
+
             component.search(null);
 
             expect(sessionStorage.setItem).not.toHaveBeenCalled();

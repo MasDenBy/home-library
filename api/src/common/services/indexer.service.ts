@@ -4,9 +4,6 @@ import { Library } from '../dataaccess/entities/library.entity';
 import { BookService } from "../../books/services/book.service";
 import { LibraryWatcher } from "../../libraries/services/library.watcher";
 
-import debug from 'debug';
-const debugLog: debug.IDebugger = debug('app:library.indexer.service');
-
 @injectable()
 export class IndexerService {
     constructor(private fs: FileSystemWrapper, private bookService: BookService,

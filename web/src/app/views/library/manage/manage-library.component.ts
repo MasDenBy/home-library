@@ -7,39 +7,39 @@ import { LibraryService } from '../services/library.service';
 import { IPath } from 'src/app/models';
 
 @Component({
-    templateUrl:'./manage-library.component.html',
-    selector: 'manage-library',
+    templateUrl: './manage-library.component.html',
+    selector: 'app-manage-library',
     styleUrls: ['./manage-library.component.scss'],
     providers: [MessageService]
 })
-export class ManageLibrary implements OnInit {
+export class ManageLibraryComponent implements OnInit {
+    folders: string[];
+    currentPath: string;
+
     constructor(
-        private fileManagerService: FileManagerService, 
+        private fileManagerService: FileManagerService,
         private messageService: MessageService,
         private indexService: IndexService,
         private libraryService: LibraryService,
         private router: Router){}
-   
-    Folders: string[];
-    CurrentPath: string;
 
     ngOnInit(): void {
         this.openPath();
     }
 
     save(): void {
-        this.libraryService.create(this.CurrentPath).subscribe(
+        this.libraryService.create(this.currentPath).subscribe(
             x => this.indexService.indexLibrary(x).subscribe(),
-            error => this.messageService.add({severity:'error', summary:'Library folder was not added'}),
+            error => this.messageService.add({severity: 'error', summary: 'Library folder was not added'}),
             () => this.router.navigateByUrl('/libraries')
-        )
+        );
     }
 
     openFolder(path: string): void {
         let followingPath;
 
-        if(this.CurrentPath) {
-            followingPath = this.CurrentPath.length == 1 ? `\\${path}` : `${this.CurrentPath}\\${path}`;
+        if (this.currentPath) {
+            followingPath = this.currentPath.length === 1 ? `\\${path}` : `${this.currentPath}\\${path}`;
         } else {
             followingPath = path;
         }
@@ -48,20 +48,20 @@ export class ManageLibrary implements OnInit {
     }
 
     back(): void {
-        if(!this.CurrentPath || this.CurrentPath.length == 1) {
+        if (!this.currentPath || this.currentPath.length === 1) {
             return;
         }
 
-        let index = this.CurrentPath.lastIndexOf("\\");
-        let path = index == 0 ? '\\' : this.CurrentPath.substring(0, index);
+        const index = this.currentPath.lastIndexOf('\\');
+        const path = index === 0 ? '\\' : this.currentPath.substring(0, index);
 
         this.openPath(path);
     }
 
     private openPath(path: string = ''): void {
         this.fileManagerService.getPaths(path).subscribe((data: IPath) => {
-            this.Folders = data.folders;
-            this.CurrentPath = data.path;
+            this.folders = data.folders;
+            this.currentPath = data.path;
         });
     }
 }

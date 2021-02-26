@@ -1,3 +1,3 @@
 export class Constants {
-    public static readonly OffsetKey = 'offset_key';
+    public static readonly offsetKey = 'offset_key';
 }

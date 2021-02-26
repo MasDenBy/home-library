@@ -5,32 +5,29 @@ import { Observable } from 'rxjs';
 
 import { HttpService } from '../http.service';
 import { IPath } from '../../models';
-import { environment } from '../../../environments/environment'
-
+import { environment } from '../../../environments/environment';
 
 describe('HttpService', () => {
-    const expectedPath = <IPath>{path: 'path', folders:[]};
+    const expectedPath: IPath = { path: 'path', folders: [] };
     const testUrl = '/test';
 
     let service: HttpService;
     let httpClient: jasmine.SpyObj<HttpClient>;
 
     beforeEach(() => {
-        var spy = jasmine.createSpyObj('HttpClient', ['get', 'delete', 'post', 'put']);
-
         TestBed.configureTestingModule({
             providers: [
                 HttpService,
-                { provide: HttpClient, useValue: spy }
+                { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['get', 'delete', 'post', 'put']) }
             ]
         });
 
         service = TestBed.inject(HttpService);
         httpClient = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
-    })
+    });
 
     it('should get', () => {
-        httpClient.get.and.returnValue(Observable.create(observer => {
+        httpClient.get.and.returnValue(new Observable(observer => {
             observer.next(expectedPath);
         }));
 
@@ -42,7 +39,7 @@ describe('HttpService', () => {
     });
 
     it('should get blob', () => {
-        httpClient.get.and.returnValue(Observable.create(observer => {
+        httpClient.get.and.returnValue(new Observable(observer => {
             observer.next(new Blob());
         }));
 
@@ -54,7 +51,7 @@ describe('HttpService', () => {
     });
 
     it('should post', () => {
-        httpClient.post.and.returnValue(Observable.create(observer => {
+        httpClient.post.and.returnValue(new Observable(observer => {
             observer.next(expectedPath);
         }));
 
@@ -66,7 +63,7 @@ describe('HttpService', () => {
     });
 
     it('should delete', () => {
-        httpClient.delete.and.returnValue(Observable.create(observer => {
+        httpClient.delete.and.returnValue(new Observable(observer => {
             observer.next(new Object());
         }));
 
@@ -78,7 +75,7 @@ describe('HttpService', () => {
     });
 
     it('should put', () => {
-        httpClient.put.and.returnValue(Observable.create(observer => {
+        httpClient.put.and.returnValue(new Observable(observer => {
             observer.next(expectedPath);
         }));
 
@@ -88,4 +85,4 @@ describe('HttpService', () => {
             expect(httpClient.put).toHaveBeenCalledWith(environment.api + testUrl, expectedPath);
         });
     });
-})
+});

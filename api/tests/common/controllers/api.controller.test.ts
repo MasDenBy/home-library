@@ -11,7 +11,7 @@ describe('ApiController', () => {
 
     test('noContent', () => {
         // Act
-        var response = controller.noContentCaller();
+        const response = controller.noContentCaller();
 
         // Assert
         expect(response.statusCode).toBe(204);

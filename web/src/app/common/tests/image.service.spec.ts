@@ -1,6 +1,6 @@
 import { DomSanitizer } from '@angular/platform-browser';
 
-import { ImageService } from "../image.service";
+import { ImageService } from '../image.service';
 import { TestBed } from '@angular/core/testing';
 
 describe('ImageService', () => {
@@ -17,11 +17,11 @@ describe('ImageService', () => {
 
         service = TestBed.inject(ImageService);
         domSanitizer = TestBed.inject(DomSanitizer) as jasmine.SpyObj<DomSanitizer>;
-    })
+    });
 
     describe('prepareBase64Image', () => {
         it('should return no image when image is null', () => {
-            let image = service.prepareBase64Image(null);
+            const image = service.prepareBase64Image(null);
 
             expect(image).toEqual('/assets/images/no_image.png');
         });

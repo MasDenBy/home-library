@@ -1,15 +1,15 @@
-<div class="p-grid" *ngIf="Book">
+<div class="p-grid" *ngIf="book">
     <div class="p-col-2 book-image">
-        <img [src]="imageService.prepareBase64Image(Book.file.image)">
+        <img [src]="imageService.prepareBase64Image(book.file.image)">
         <div class="actions">
             <button (click)="download()" pButton type="button" icon="pi pi-download" iconPos="left" label="Download"></button>
             <p-splitButton icon="pi pi-pencil" (onClick)="edit()" [model]="commands"></p-splitButton>
         </div>
     </div>
     <div class="p-col-10">
-        <h2>{{Book.title}}</h2>
-        <h3>{{Book.authors}}</h3>
-        <div class="description" [innerHTML]="Book.description"></div>
+        <h2>{{book.title}}</h2>
+        <h3>{{book.authors}}</h3>
+        <div class="description" [innerHTML]="book.description"></div>
     </div>
 </div>
 <p-confirmDialog header="Confirmation"></p-confirmDialog>

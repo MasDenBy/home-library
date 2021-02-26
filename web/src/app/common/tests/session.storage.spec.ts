@@ -1,6 +1,5 @@
 import { SessionStorage } from '../session.storage';
 
-
 describe('SessionStorage', () => {
     const testKey = 'test_key';
     const testValue = 'test_value';
@@ -9,7 +8,7 @@ describe('SessionStorage', () => {
 
     beforeEach(() => {
         service = new SessionStorage();
-    })
+    });
 
     it('should get item', () => {
         spyOn(window.sessionStorage, 'getItem').and.returnValue(testValue);
@@ -25,4 +24,4 @@ describe('SessionStorage', () => {
 
         expect(window.sessionStorage.setItem).toHaveBeenCalledWith(testKey, testValue);
     });
-})
+});

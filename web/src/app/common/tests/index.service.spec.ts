@@ -13,21 +13,19 @@ describe('IndexService', () => {
     let httpService: jasmine.SpyObj<HttpService>;
 
     beforeEach(() => {
-        var spy = jasmine.createSpyObj('HttpService', ['get']);
-
         TestBed.configureTestingModule({
             providers: [
                 IndexService,
-                { provide: HttpService, useValue: spy }
+                { provide: HttpService, useValue: jasmine.createSpyObj('HttpService', ['get']) }
             ]
         });
 
         service = TestBed.inject(IndexService);
         httpService = TestBed.inject(HttpService) as jasmine.SpyObj<HttpService>;
-    })
+    });
 
     it('should index library', () => {
-        httpService.get.and.returnValue(Observable.create(observer => {
+        httpService.get.and.returnValue(new Observable(observer => {
             observer.next(new Object());
         }));
 
@@ -39,7 +37,7 @@ describe('IndexService', () => {
     });
 
     it('should index book', () => {
-        httpService.get.and.returnValue(Observable.create(observer => {
+        httpService.get.and.returnValue(new Observable(observer => {
             observer.next(new Object());
         }));
 
@@ -49,4 +47,4 @@ describe('IndexService', () => {
             expect(httpService.get).toHaveBeenCalledWith(`/books/${testId}/index`);
         });
     });
-})
+});

@@ -32,9 +32,9 @@ export class BookService {
         const books = await this.dataObject.getBooks(offset, count);
         const totalCount = await this.dataObject.count(Book);
 
-        let dtos = [];
+        const dtos = [];
 
-        for (let index in books) {
+        for (const index in books) {
             dtos.push(await this.toDto(books[index]));
         }
 
@@ -47,9 +47,9 @@ export class BookService {
     public async search(dto: BookSearchDto): Promise<IPage<BookDto>> {
         const searchResult = await this.dataObject.searchBooks(dto.pattern, dto.offset, dto.count);
 
-        let dtos = [];
+        const dtos = [];
 
-        for (let index in searchResult[0]) {
+        for (const index in searchResult[0]) {
             dtos.push(await this.toDto(searchResult[0][index]));
         }
 
@@ -65,7 +65,7 @@ export class BookService {
         return await this.toDto(book);
     }
 
-    public async update(id: number, dto: BookDto) {
+    public async update(id: number, dto: BookDto): Promise<void> {
         const book = await this.dataObject.findByIdWithReferences(id);
 
         book.authors = dto.authors;
@@ -76,7 +76,7 @@ export class BookService {
     }
 
     public async createFromFile(path: string, library: Library): Promise<void> {
-        let book = <Book> {
+        const book = <Book> {
             title: this.fs.basename(path),
             file: <File> {
                 library: library,
@@ -95,8 +95,8 @@ export class BookService {
         return [this.fs.readFileContent(book.file.path), this.fs.basenameExt(book.file.path)];
     }
 
-    public async index(id: number) {
-        let book = await this.dataObject.findByIdWithReferences(id);
+    public async index(id: number): Promise<void> {
+        const book = await this.dataObject.findByIdWithReferences(id);
         let isbn = book.metadata?.isbn;
 
         if(!isbn) {
@@ -132,7 +132,7 @@ export class BookService {
     }
 
     private async toDto(entity: Book): Promise<BookDto> {
-        let dto = <BookDto> {
+        const dto = <BookDto> {
             id: entity.id,
             authors: entity.authors,
             description: entity.description,

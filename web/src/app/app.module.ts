@@ -7,7 +7,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { BooksModule } from './views/books';
-import { LibraryModule } from './views/library'
+import { LibraryModule } from './views/library';
 
 import {
   FileManagerService,

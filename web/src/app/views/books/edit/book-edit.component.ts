@@ -6,14 +6,15 @@ import { ImageService } from '../../../common';
 import { IBook } from '../models/book.model';
 
 @Component({
-    templateUrl:'./book-edit.component.html',
-    selector: 'book-edit',
-    styleUrls:['./book-edit.component.scss']
+    templateUrl: './book-edit.component.html',
+    selector: 'app-book-edit',
+    styleUrls: ['./book-edit.component.scss']
 })
-export class BookEdit implements OnInit {
+export class BookEditComponent implements OnInit {
     book: IBook;
 
-    constructor(private route: ActivatedRoute,
+    constructor(
+        private route: ActivatedRoute,
         private bookService: BookService,
         private router: Router,
         public imageService: ImageService) { }

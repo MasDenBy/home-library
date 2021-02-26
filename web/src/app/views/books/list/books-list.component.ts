@@ -7,32 +7,32 @@ import { ImageService, SessionStorage } from '../../../common';
 import { Constants } from '../../../constants';
 
 @Component({
-    templateUrl:'./books-list.component.html',
-    selector: 'books-list',
-    styleUrls:['./books-list.component.scss']
+    templateUrl: './books-list.component.html',
+    selector: 'app-books-list',
+    styleUrls: ['./books-list.component.scss']
 })
-export class BooksList implements OnInit {
+export class BooksListComponent implements OnInit {
+    public page: IPage;
+    public count = 18;
+    public offset = 0;
     private pattern: string;
 
-    constructor(private route: ActivatedRoute, 
+    constructor(
+        private route: ActivatedRoute,
         private bookService: BookService,
         private sessionStorage: SessionStorage,
         public imageService: ImageService) { }
 
-    Page: IPage;
-    Count: number = 18;
-    Offset: number = 0;
-
     ngOnInit(): void {
         this.pattern = this.route.snapshot.paramMap.get('pattern');
 
-        const offset = this.sessionStorage.getItem(Constants.OffsetKey);
+        const offset = this.sessionStorage.getItem(Constants.offsetKey);
 
-        this.Offset = offset ? +offset : 0;
+        this.offset = offset ? +offset : 0;
     }
 
     loadBooks(event) {
-        this.sessionStorage.setItem(Constants.OffsetKey, event.first);
+        this.sessionStorage.setItem(Constants.offsetKey, event.first);
 
         this.retrieveBooks(event.first, event.rows);
     }
@@ -43,7 +43,7 @@ export class BooksList implements OnInit {
             : this.bookService.getBooks(offset, count);
 
         observable.subscribe((page: IPage) => {
-            this.Page = page;
+            this.page = page;
         });
     }
 }

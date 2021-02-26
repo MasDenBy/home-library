@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { LibraryList } from './list/library-list.component';
-import { ManageLibrary } from './manage/manage-library.component';
+import { LibraryListComponent } from './list/library-list.component';
+import { ManageLibraryComponent } from './manage/manage-library.component';
 
 const routes: Routes = [
-  { path: '', component: LibraryList },
-  { path: 'libraries/manage', component: ManageLibrary }
+  { path: '', component: LibraryListComponent },
+  { path: 'libraries/manage', component: ManageLibraryComponent }
 ];
 
 @NgModule({

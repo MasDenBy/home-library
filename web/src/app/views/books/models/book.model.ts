@@ -1,7 +1,6 @@
 export interface IBook {
     id: number;
     title: string;
-    goodreads_id: number;
     description: string;
     authors: string;
     file: IFile;

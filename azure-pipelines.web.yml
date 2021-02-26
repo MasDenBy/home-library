@@ -24,13 +24,20 @@ steps:
     workingDir: 'web'
     customCommand: 'run build'
   displayName: 'Build'
+  
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'web'
+    customCommand: 'run lint'
+  displayName: 'Lint'
 
 - task: Npm@1
   inputs:
     command: 'custom'
     workingDir: 'web'
     customCommand: 'run coverage'
-  displayName: 'Test'
+  displayName: 'Test & Coverage'
 
 - task: PublishCodeCoverageResults@1
   inputs:

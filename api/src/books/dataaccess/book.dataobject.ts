@@ -11,7 +11,7 @@ const debugLog: debug.IDebugger = debug('app:book.dataobject');
 
 @injectable()
 export class BookDataObject extends DataObject {
-    private alias: string = 'book';
+    private alias = 'book';
 
     constructor(public database: DatabaseWrapper) {
         super(database);

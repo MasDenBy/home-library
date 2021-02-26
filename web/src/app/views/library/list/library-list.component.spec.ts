@@ -12,21 +12,21 @@ import { Observable } from 'rxjs';
 
 import { LibraryService } from '../services/library.service';
 import { ILibrary } from '../models/library.model';
-import { LibraryList } from './library-list.component';
+import { LibraryListComponent } from './library-list.component';
 
-describe('LibraryList', () => {
+describe('LibraryListComponent', () => {
     const libraries: ILibrary[] = [{ id: 1, path: 'p' }, { id: 2, path: 't' }];
 
-    let component: LibraryList;
-    let fixture: ComponentFixture<LibraryList>;
+    let component: LibraryListComponent;
+    let fixture: ComponentFixture<LibraryListComponent>;
     let libraryService: jasmine.SpyObj<LibraryService>;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [LibraryList],
-            imports:[
-                ListboxModule, 
-                ConfirmDialogModule, 
+            declarations: [LibraryListComponent],
+            imports: [
+                ListboxModule,
+                ConfirmDialogModule,
                 ToastModule,
                 BrowserAnimationsModule
             ],
@@ -36,12 +36,12 @@ describe('LibraryList', () => {
                 { provide: LibraryService, useValue: jasmine.createSpyObj('LibraryService', ['getLibraries', 'delete']) },
             ]
         });
-        
-        fixture = TestBed.createComponent(LibraryList);
+
+        fixture = TestBed.createComponent(LibraryListComponent);
         component = fixture.componentInstance;
         libraryService = fixture.debugElement.injector.get(LibraryService) as jasmine.SpyObj<LibraryService>;
 
-        libraryService.getLibraries.and.returnValue(Observable.create(observer => {
+        libraryService.getLibraries.and.returnValue(new Observable(observer => {
             observer.next(libraries);
         }));
 
@@ -49,25 +49,25 @@ describe('LibraryList', () => {
     }));
 
     it('ngOnInit should set libraries', () => {
-        expect(component.Libraries).toEqual(libraries);
+        expect(component.libraries).toEqual(libraries);
     });
 
     describe('delete: ', () => {
-        const id: number = 1;
+        const id = 1;
 
-        it('should not delete if not accept', () => {           
+        it('should not delete if not accept', () => {
             component.delete(id);
 
             fixture.detectChanges();
 
             const reject = fixture.debugElement.query(By.css('.ui-dialog-footer')).children[1].nativeElement;
-		    reject.click();
+            reject.click();
 
             expect(libraryService.delete).not.toHaveBeenCalledWith(id);
         });
 
         it('should delete if accept and show SUCCESS message', () => {
-            libraryService.delete.and.returnValue(Observable.create(observer => {
+            libraryService.delete.and.returnValue(new Observable(observer => {
                 observer.complete();
             }));
 
@@ -82,13 +82,13 @@ describe('LibraryList', () => {
 
             const toastMessage = fixture.debugElement.query(By.css('.ui-toast-message'));
             expect(toastMessage.nativeElement).toBeTruthy();
-            expect(toastMessage.nativeElement.classList).toContain("ui-toast-message-success");
+            expect(toastMessage.nativeElement.classList).toContain('ui-toast-message-success');
 
             expect(libraryService.delete).toHaveBeenCalledWith(id);
         });
 
         it('should delete if accept and show ERROR message when error', () => {
-            libraryService.delete.and.returnValue(Observable.create(observer => {
+            libraryService.delete.and.returnValue(new Observable(observer => {
                 observer.error();
             }));
 
@@ -103,9 +103,9 @@ describe('LibraryList', () => {
 
             const toastMessage = fixture.debugElement.query(By.css('.ui-toast-message'));
             expect(toastMessage.nativeElement).toBeTruthy();
-            expect(toastMessage.nativeElement.classList).toContain("ui-toast-message-error");
+            expect(toastMessage.nativeElement.classList).toContain('ui-toast-message-error');
 
             expect(libraryService.delete).toHaveBeenCalledWith(id);
         });
-    })
-})
+    });
+});

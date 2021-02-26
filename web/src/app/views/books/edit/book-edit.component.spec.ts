@@ -6,46 +6,45 @@ import { Observable } from 'rxjs';
 import { BookService } from '../services/book.service';
 import { ImageService } from '../../../common';
 import { IBook } from '../models/book.model';
-import { BookEdit } from './book-edit.component';
+import { BookEditComponent } from './book-edit.component';
 
-describe('BookEdit', () => {
-    const id: number = 15;
-    const book: IBook = { 
-        authors: '', 
-        description: '', 
-        file: null, 
-        goodreads_id: 1, 
-        id: id, 
-        title: '' 
+describe('BookEditComponent', () => {
+    const id = 15;
+    const book: IBook = {
+        authors: '',
+        description: '',
+        file: null,
+        id,
+        title: ''
     };
 
-    let fixture: ComponentFixture<BookEdit>;
-    let component: BookEdit;
+    let fixture: ComponentFixture<BookEditComponent>;
+    let component: BookEditComponent;
     let bookService: jasmine.SpyObj<BookService>;
     let route: jasmine.SpyObj<ActivatedRoute>;
     let router: jasmine.SpyObj<Router>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [BookEdit],
+            declarations: [BookEditComponent],
             providers: [
                 { provide: BookService, useValue: jasmine.createSpyObj('BookService', ['getBook', 'update']) },
                 { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigateByUrl']) },
-                { 
-                    provide: ActivatedRoute, 
+                {
+                    provide: ActivatedRoute,
                     useValue: {
                         snapshot: {
                             paramMap: {
-                                get: () => { return id; }
+                                get: () => id
                             }
-                        } 
+                        }
                     },
                 },
                 ImageService
             ]
         });
 
-        fixture = TestBed.createComponent(BookEdit);
+        fixture = TestBed.createComponent(BookEditComponent);
         component = fixture.componentInstance;
         bookService = TestBed.inject(BookService) as jasmine.SpyObj<BookService>;
         route = TestBed.inject(ActivatedRoute) as jasmine.SpyObj<ActivatedRoute>;
@@ -54,7 +53,7 @@ describe('BookEdit', () => {
 
     describe('ngOnInit', () => {
         it('should load book', () => {
-            bookService.getBook.and.returnValue(Observable.create(observer => {
+            bookService.getBook.and.returnValue(new Observable(observer => {
                 observer.next(book);
             }));
 
@@ -67,7 +66,7 @@ describe('BookEdit', () => {
 
     describe('save', () => {
         it('should update book and redirect', () => {
-            bookService.update.and.returnValue(Observable.create(observer => {
+            bookService.update.and.returnValue(new Observable(observer => {
                 observer.next();
                 observer.complete();
             }));
@@ -76,7 +75,7 @@ describe('BookEdit', () => {
             component.save();
 
             expect(bookService.update).toHaveBeenCalledWith(book);
-            expect(router.navigateByUrl).toHaveBeenCalledWith(`/books/${book.id}`)
+            expect(router.navigateByUrl).toHaveBeenCalledWith(`/books/${book.id}`);
         });
     });
 });

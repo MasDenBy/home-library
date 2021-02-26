@@ -7,17 +7,18 @@ import { LibraryService } from '../services/library.service';
 
 
 @Component({
-    templateUrl:'./library-list.component.html',
-    selector: 'library-list',
+    templateUrl: './library-list.component.html',
+    selector: 'app-library-list',
     styleUrls: ['./library-list.component.scss'],
     providers: [ConfirmationService, MessageService]
 })
-export class LibraryList implements OnInit {
-    constructor(private libraryService: LibraryService, 
-        private confirmationService: ConfirmationService,
-        private messageService: MessageService){}
+export class LibraryListComponent implements OnInit {
+    libraries: ILibrary[];
 
-    Libraries: ILibrary[];
+    constructor(
+        private libraryService: LibraryService,
+        private confirmationService: ConfirmationService,
+        private messageService: MessageService) {}
 
     ngOnInit(): void {
         this.getLibraries();
@@ -29,19 +30,19 @@ export class LibraryList implements OnInit {
             accept: () => {
                 this.libraryService.delete(id).subscribe(
                     x => null,
-                    error => this.messageService.add({severity:'error', summary:'Library folder was not deleted'}),
+                    error => this.messageService.add({severity: 'error', summary: 'Library folder was not deleted'}),
                     () => {
-                        this.messageService.add({severity:'success', summary:'Library folder was deleted'});
+                        this.messageService.add({severity: 'success', summary: 'Library folder was deleted'});
                         this.getLibraries();
                     }
-                )
+                );
             }
         });
     }
 
     private getLibraries(): void {
         this.libraryService.getLibraries().subscribe((data: ILibrary[]) => {
-            this.Libraries = data;
+            this.libraries = data;
         });
     }
 }

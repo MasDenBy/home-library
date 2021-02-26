@@ -1,6 +1,6 @@
 <div class="row-100">
-    <p-dataView [value]="Page?.data" layout="grid" [paginator]="true" [rows]="Count" 
-        [totalRecords]="Page?.count" [lazy]="true" (onLazyLoad)="loadBooks($event)" [first]="Offset">
+    <p-dataView [value]="page?.data" layout="grid" [paginator]="true" [rows]="count" 
+        [totalRecords]="page?.count" [lazy]="true" (onLazyLoad)="loadBooks($event)" [first]="offset">
         <ng-template let-book pTemplate="gridItem">
             <div class="p-lg-4 p-sm-6">
                 <div class="book">

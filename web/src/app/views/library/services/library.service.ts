@@ -11,12 +11,12 @@ export class LibraryService {
         return this.http.get<ILibrary[]>('/libraries');
     }
 
-    public delete(id: number): Observable<Object> {
+    public delete(id: number): Observable<unknown> {
         return this.http.delete(`/libraries/${id}`);
     }
 
     public create(path: string): Observable<number> {
-        let body: ILibrary = { path: path, id: 0 };
+        const body: ILibrary = { path, id: 0 };
         return this.http.post<number>('/libraries/', body);
     }
 }

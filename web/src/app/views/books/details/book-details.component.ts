@@ -9,12 +9,16 @@ import { IBook } from '../models/book.model';
 import { HttpResponse } from '@angular/common/http';
 
 @Component({
-    templateUrl:'./book-details.component.html',
-    selector: 'book-details',
-    styleUrls:['./book-details.component.scss']
+    templateUrl: './book-details.component.html',
+    selector: 'app-book-details',
+    styleUrls: ['./book-details.component.scss']
 })
-export class BookDetails implements OnInit {
-    constructor(private route: ActivatedRoute,
+export class BookDetailsComponent implements OnInit {
+    public book: IBook;
+    public commands: MenuItem[];
+
+    constructor(
+        private route: ActivatedRoute,
         private bookService: BookService,
         private indexService: IndexService,
         private confirmationService: ConfirmationService,
@@ -23,41 +27,38 @@ export class BookDetails implements OnInit {
         private windowWrapper: WindowWrapper,
         public imageService: ImageService) { }
 
-    Book: IBook;
-    commands: MenuItem[];
-
     ngOnInit(): void {
         this.initializeCommands();
-        this.getBook();        
+        this.getBook();
     }
 
     download(): void {
-        this.bookService.download(this.Book.id).subscribe((response: HttpResponse<Blob>) => {
+        this.bookService.download(this.book.id).subscribe((response: HttpResponse<Blob>) => {
             const wrapper = this.windowWrapper;
             const objectUrl = wrapper.createObjectURL(response.body);
 
-            var link = document.createElement('a');
+            const link = document.createElement('a');
             link.href = objectUrl;
             link.download = HttpHelper.getFileNameFromHttpResponse<Blob>(response);
             link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
 
-            setTimeout(function () {
+            setTimeout(() => {
                 wrapper.revokeObjectURL(objectUrl);
                 link.remove();
             }, 100);
         },
-        error => this.messageService.add({severity:'error', summary:'Error of downloading the book'}));
+        error => this.messageService.add({severity: 'error', summary: 'Error of downloading the book'}));
     }
 
     edit(): void {
-        this.router.navigateByUrl(`/books/${this.Book.id}/edit`);
+        this.router.navigateByUrl(`/books/${this.book.id}/edit`);
     }
 
     private getBook(): void {
         const id = +this.route.snapshot.paramMap.get('id');
 
         this.bookService.getBook(id).subscribe((book: IBook) => {
-            this.Book = book;
+            this.book = book;
         });
     }
 
@@ -69,7 +70,7 @@ export class BookDetails implements OnInit {
     }
 
     private updateMetadata(): void {
-        this.indexService.indexBook(this.Book.id).subscribe(()=>{
+        this.indexService.indexBook(this.book.id).subscribe(() => {
             this.getBook();
         });
     }
@@ -78,11 +79,11 @@ export class BookDetails implements OnInit {
         this.confirmationService.confirm({
             message: 'Are you sure that you want to delete this book file?',
             accept: () => {
-                this.bookService.delete(this.Book.id).subscribe(
+                this.bookService.delete(this.book.id).subscribe(
                     x => null,
-                    error => this.messageService.add({severity:'error', summary:'Book was not deleted'}),
+                    error => this.messageService.add({severity: 'error', summary: 'Book was not deleted'}),
                     () => this.router.navigateByUrl('/')
-                )
+                );
             }
         });
     }
