@@ -49,7 +49,7 @@ describe('LibraryListComponent', () => {
     }));
 
     it('ngOnInit should set libraries', () => {
-        expect(component.Libraries).toEqual(libraries);
+        expect(component.libraries).toEqual(libraries);
     });
 
     describe('delete: ', () => {

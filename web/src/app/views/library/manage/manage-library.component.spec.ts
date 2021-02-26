@@ -59,8 +59,8 @@ describe('ManageLibraryComponent', () => {
     }));
 
     it('ngOnInit should set Folders and CurrentPath', () => {
-        expect(component.Folders).toEqual(testPath.folders);
-        expect(component.CurrentPath).toEqual(testPath.path);
+        expect(component.folders).toEqual(testPath.folders);
+        expect(component.currentPath).toEqual(testPath.path);
     });
 
     describe('save', () => {
@@ -115,14 +115,14 @@ describe('ManageLibraryComponent', () => {
         it('should join the path and open folder', () => {
             const currentPath = '\\myfolder';
 
-            component.CurrentPath = currentPath;
+            component.currentPath = currentPath;
             component.openFolder(folderPath);
 
             expect(fileManagerService.getPaths).toHaveBeenCalledWith(`${currentPath}\\${folderPath}`);
         });
 
         it('should use path args if currentPath is null', () => {
-            component.CurrentPath = null;
+            component.currentPath = null;
             component.openFolder(folderPath);
 
             expect(fileManagerService.getPaths).toHaveBeenCalledWith(folderPath);
@@ -131,7 +131,7 @@ describe('ManageLibraryComponent', () => {
 
     describe('back', () => {
         it('should not go back if current path is null', () => {
-            component.CurrentPath = null;
+            component.currentPath = null;
 
             component.back();
 
@@ -139,7 +139,7 @@ describe('ManageLibraryComponent', () => {
         });
 
         it('should not go back if current path is root', () => {
-            component.CurrentPath = '\\';
+            component.currentPath = '\\';
 
             component.back();
 
@@ -147,7 +147,7 @@ describe('ManageLibraryComponent', () => {
         });
 
         it('should go back', () => {
-            component.CurrentPath = '\\folder';
+            component.currentPath = '\\folder';
 
             component.back();
 
