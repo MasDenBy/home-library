@@ -14,7 +14,7 @@ import { Observable } from 'rxjs';
 import { BookDetailsComponent } from './book-details.component';
 import { BookService } from '../services/book.service';
 import { ImageService, IndexService, WindowWrapper } from '../../../common';
-import { IBook } from '../models/book.model';
+import { IBook, IMetadata } from '../models/book.model';
 import { HttpResponse } from '@angular/common/http';
 
 describe('BookDetailsComponent', () => {
@@ -24,7 +24,8 @@ describe('BookDetailsComponent', () => {
         description: '',
         file: { image: '', id: 1, libraryId: 1, path: '' },
         id,
-        title: ''
+        title: '',
+        metadata: {} as IMetadata
     };
 
     let fixture: ComponentFixture<BookDetailsComponent>;
@@ -91,7 +92,8 @@ describe('BookDetailsComponent', () => {
                 description: '',
                 file: { image: '', id: 1, libraryId: 1, path: '' },
                 id,
-                title: 'Updated book'
+                title: 'Updated book',
+                metadata: null
             };
 
             bookService.getBook.and.returnValue(new Observable(observer => {

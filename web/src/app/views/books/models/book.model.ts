@@ -4,6 +4,7 @@ export interface IBook {
     description: string;
     authors: string;
     file: IFile;
+    metadata: IMetadata;
 }
 
 export interface IFile {
@@ -22,4 +23,10 @@ export interface BookSearchDto {
     pattern: string;
     offset: number;
     count: number;
+}
+export interface IMetadata {
+    id: number;
+    isbn: string;
+    pages: number;
+    year: string;
 }

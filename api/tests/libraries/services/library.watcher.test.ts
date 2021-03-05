@@ -36,9 +36,9 @@ describe('LibraryWatcher', () => {
         test('add new file', () => {
             // Act
             watcher.run(library);
-    
+
             fsWatcherMock.emit('add', testPath);
-    
+
             // Assert
             verify(bookServiceMock.createFromFile(testPath, library)).once();
         });
@@ -46,9 +46,9 @@ describe('LibraryWatcher', () => {
         test('delete file', () => {
             // Act
             watcher.run(library);
-    
+
             fsWatcherMock.emit('unlink', testPath);
-    
+
             // Assert
             verify(bookServiceMock.deleteByFilePath(testPath)).once();
         });

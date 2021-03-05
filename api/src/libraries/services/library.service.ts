@@ -49,7 +49,7 @@ export class LibraryService {
         const entity = new Library();
         entity.id = dto.id;
         entity.path = dto.path;
-        
+
         return entity;
     }
 }

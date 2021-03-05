@@ -65,7 +65,6 @@ export class FileSystemWrapper {
             } catch (ex) {
                 debugLog(ex);
             }
-            
         }
 
         return result;

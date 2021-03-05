@@ -4,6 +4,7 @@ export interface BookDto {
     description: string;
     authors: string;
     file: FileDto;
+    metadata: MetadataDto;
 }
 
 export interface FileDto {
@@ -11,4 +12,11 @@ export interface FileDto {
     path: string;
     image: string;
     libraryId: number;
+}
+
+export interface MetadataDto {
+    id: number;
+    isbn: string;
+    pages: number;
+    year: string;
 }

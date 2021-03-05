@@ -37,7 +37,7 @@ describe('OpenLibraryService', () => {
 
         test('if found ISBN items are null should return null', async () => {
             // Arrange
-            axiosMock.get.mockResolvedValue(<AxiosResponse<SearchResponseDto>>{ 
+            axiosMock.get.mockResolvedValue(<AxiosResponse<SearchResponseDto>>{
                 data: {
                     numFound: 1,
                     docs: [{ isbn: null }]
@@ -53,7 +53,7 @@ describe('OpenLibraryService', () => {
 
         test('if found zero ISBN items should return null', async () => {
             // Arrange
-            axiosMock.get.mockResolvedValue(<AxiosResponse<SearchResponseDto>>{ 
+            axiosMock.get.mockResolvedValue(<AxiosResponse<SearchResponseDto>>{
                 data: {
                     numFound: 1,
                     docs: [{ isbn: [] }]
@@ -71,7 +71,7 @@ describe('OpenLibraryService', () => {
             // Arrange
             const firstIsbn = 'first';
 
-            axiosMock.get.mockResolvedValue(<AxiosResponse<SearchResponseDto>>{ 
+            axiosMock.get.mockResolvedValue(<AxiosResponse<SearchResponseDto>>{
                 data: {
                     numFound: 1,
                     docs: [{ isbn: [firstIsbn, 'second'] }]
@@ -111,7 +111,7 @@ describe('OpenLibraryService', () => {
             const response = {};
             response[`isbn:${isbn}`] = <BookInfo>{ details: { title: 'title' } };
 
-            axiosMock.get.mockResolvedValue(<AxiosResponse<unknown>>{ 
+            axiosMock.get.mockResolvedValue(<AxiosResponse<unknown>>{
                 data: response
             });
 

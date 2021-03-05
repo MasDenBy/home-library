@@ -90,7 +90,7 @@ describe('/libraries', () => {
 
         // Assert
         expect(result).toBeInstanceOf(results.OkResult);
-        
+
         verify(libraryServiceMock.index(id)).once();
     });
 });

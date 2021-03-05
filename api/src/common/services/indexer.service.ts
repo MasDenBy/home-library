@@ -22,5 +22,5 @@ export class IndexerService {
 
             await this.bookService.createFromFile(file, library);
         }
-    }   
+    }
 }

@@ -22,7 +22,7 @@ export class LibrariesController extends ApiController {
     @httpGet('/:id')
     public async getById(@requestParam('id') id: number): Promise<JsonResult> {
         const library = await this.libraryService.getById(id);
-        
+
         return this.json(library);
     }
 
@@ -36,7 +36,7 @@ export class LibrariesController extends ApiController {
     @httpDelete('/:id')
     public async delete(@requestParam('id') id: number): Promise<HttpResponseMessage> {
         await this.libraryService.deleteById(id);
-        
+
         return this.noContent();
     }
 
