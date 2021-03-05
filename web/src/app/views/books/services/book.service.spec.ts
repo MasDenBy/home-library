@@ -12,7 +12,8 @@ describe('BookService', () => {
         description: '',
         file: null,
         id: 1,
-        title: ''
+        title: '',
+        metadata: null
     };
     const offset = 10;
     const count = 20;

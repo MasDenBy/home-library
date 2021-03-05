@@ -33,6 +33,6 @@ describe('IndexerService', () => {
         // Assert
         verify(fsMock.readFiles(anyString())).once();
         verify(bookServiceMock.createFromFile(anyString(), lib1)).twice();
-        verify(watcherMock.run(lib1)).once();  
+        verify(watcherMock.run(lib1)).once();
     });
 });

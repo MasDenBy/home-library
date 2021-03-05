@@ -2,7 +2,7 @@ import { mock, instance, verify, when, anyOfClass, anything, anyString, objectCo
 import { ReadStream } from 'typeorm/platform/PlatformTools';
 
 import { BookDataObject } from '../../../src/books/dataaccess/book.dataobject';
-import { BookDto } from '../../../src/books/dto/book.dto';
+import { BookDto, MetadataDto } from '../../../src/books/dto/book.dto';
 import { BookSearchDto } from '../../../src/books/dto/book.search.dto';
 import { BookService } from '../../../src/books/services/book.service';
 import { Book } from '../../../src/common/dataaccess/entities/book.entity';
@@ -28,7 +28,7 @@ describe('BookService', () => {
         openlibraryMock = mock(OpenLibraryService);
         imageServiceMock = mock(ImageService);
 
-        service = new BookService(instance(dataObjectMock), instance(fsMock), instance(openlibraryMock), 
+        service = new BookService(instance(dataObjectMock), instance(fsMock), instance(openlibraryMock),
             instance(imageServiceMock));
     });
 
@@ -77,7 +77,7 @@ describe('BookService', () => {
 
     test('getById', async () => {
         // Arrange
-        const book = <Book>{ file: { imageName: 'image.png'} };
+        const book = <Book>{ file: { imageName: 'image.png'}, metadata: { isbn: 'isbn' } };
 
         when(dataObjectMock.findByIdWithReferences(id)).thenResolve(book);
 
@@ -89,18 +89,37 @@ describe('BookService', () => {
         verify(imageServiceMock.getImageContent(book.file.imageName)).once();
     });
 
-    test('update', async () => {
-        // Arrange
+    describe('update', () => {
         const dto = <BookDto> { id:10, authors: null, description: null, title: null };
 
-        when(dataObjectMock.findByIdWithReferences(dto.id)).thenResolve(<Book>{});
+        test('works', async () => {
+            // Arrange
 
-        // Act
-        await service.update(dto.id, dto);
+            when(dataObjectMock.findByIdWithReferences(dto.id)).thenResolve(<Book>{
+                metadata: {} as MetadataDto
+            });
 
-        // Assert
-        verify(dataObjectMock.findByIdWithReferences(dto.id)).once();
-        verify(dataObjectMock.update(anything())).once();
+            // Act
+            await service.update(dto.id, dto);
+
+            // Assert
+            verify(dataObjectMock.findByIdWithReferences(dto.id)).once();
+            verify(dataObjectMock.update(anything())).once();
+        });
+
+        test('should create metadata if it is null', async () => {
+            // Arrange
+            dto.metadata = { isbn: 'isbn', id: 0, pages:100, year: '1987' };
+
+            when(dataObjectMock.findByIdWithReferences(dto.id)).thenResolve(<Book>{});
+
+            // Act
+            await service.update(dto.id, dto);
+
+            // Assert
+            verify(dataObjectMock.findByIdWithReferences(dto.id)).once();
+            verify(dataObjectMock.update(objectContaining({metadata: {}} as Book))).once();
+        });
     });
 
     test('deleteById', async () => {
@@ -158,10 +177,10 @@ describe('BookService', () => {
         test('deleteByFilePath', async () => {
             // Arrange
             const path = 'file.dat';
-    
+
             // Act
             await service.deleteByFilePath(path);
-    
+
             // Assert
             verify(dataObjectMock.deleteByFilePath(path)).once();
         });
@@ -259,10 +278,10 @@ describe('BookService', () => {
                         authors: authorName,
                         description: bookInfo.details.description.value,
                         title: bookInfo.details.title,
-                        metadata: { 
+                        metadata: {
                             isbn: isbn,
                             pages: bookInfo.details.number_of_pages,
-                            year: bookInfo.details.publish_date 
+                            year: bookInfo.details.publish_date
                         },
                         file: {
                             imageName: newImageName

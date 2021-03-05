@@ -15,7 +15,8 @@ describe('BookEditComponent', () => {
         description: '',
         file: null,
         id,
-        title: ''
+        title: '',
+        metadata: null
     };
 
     let fixture: ComponentFixture<BookEditComponent>;

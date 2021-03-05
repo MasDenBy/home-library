@@ -33,7 +33,7 @@ describe('Config', () => {
 
         // Act
         const config = new Config();
-        
+
         // Assert
         expect(config.port).toBe(1000);
         expect(config.database.host).toBe('host');

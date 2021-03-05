@@ -103,7 +103,7 @@ export class BookDataObject extends DataObject {
 
         const file = await connection.getRepository(File).findOne({ path: path });
         const book = await connection.getRepository(Book).findOne({ file: file });
-        
+
         await this.deleteById(book.id);
     }
 }

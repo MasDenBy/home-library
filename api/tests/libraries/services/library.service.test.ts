@@ -80,12 +80,12 @@ describe('LibraryService', () => {
             // Arrange
             const id = 2;
             const lib = <Library>{ id: id };
-    
+
             when(dataObjectMock.findById(Library, id)).thenResolve(lib);
-            
+
             // Act
             await service.index(id);
-    
+
             // Assert
             verify(indexerMock.index(lib)).once();
         });
@@ -93,12 +93,12 @@ describe('LibraryService', () => {
         test('library do not exist, then index does not fire', async () => {
             // Arrange
             const id = 2;
-    
+
             when(dataObjectMock.findById(Library, id)).thenResolve(null);
-            
+
             // Act
             await service.index(id);
-    
+
             // Assert
             verify(indexerMock.index(anything())).never();
         });

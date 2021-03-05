@@ -37,17 +37,18 @@ export class App {
             });
         });
     }
-    
+
     public run(): express.Application {
         const app = this.server.build();
         app.listen(this.container.resolve(Config).port);
 
         return app;
     }
+
     public async watchLibraries(): Promise<void> {
         const libraries = await this.container.resolve(LibraryService).list();
         const watcher = this.container.resolve(LibraryWatcher);
-        
+
         libraries.forEach(lib => watcher.run(lib));
     }
 }

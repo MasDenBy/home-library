@@ -32,7 +32,7 @@ describe('FileManagerService', () => {
         test('path is null get root path', async () => {
             // Arrange
             const fullPath = '/root/';
-            
+
             when(fmMock.osRoot()).thenReturn(fullPath);
             when(fmMock.readDirectory(fullPath)).thenResolve([]);
 

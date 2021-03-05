@@ -8,6 +8,20 @@
             <input type="text" pInputText [(ngModel)]="book.title">
             <h3>Authors</h3>
             <input type="text" pInputText [(ngModel)]="book.authors">
+            <div class="p-grid">
+                <div class="p-col">
+                    <h3>ISBN</h3>
+                    <input type="text" pInputText [(ngModel)]="book.metadata.isbn">
+                </div>
+                <div class="p-col">
+                    <h3>Pages</h3>
+                    <input type="text" pInputText [(ngModel)]="book.metadata.pages">
+                </div>
+                <div class="p-col">
+                    <h3>Year</h3>
+                    <input type="text" pInputText [(ngModel)]="book.metadata.year">
+                </div>
+            </div>
             <h3>Description</h3>
             <p-editor [(ngModel)]="book.description">
                 <p-header>

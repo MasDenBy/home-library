@@ -29,14 +29,14 @@ export class DatabaseWrapper {
                 password: this.config.database.password,
                 database: this.config.database.name,
                 entities: [
-                    Book,  
+                    Book,
                     File,
                     Library,
                     Metadata
                 ],
                 synchronize: true
             });
-    
+
             await connection.connect();
         }
 

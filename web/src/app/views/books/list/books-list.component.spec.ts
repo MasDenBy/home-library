@@ -16,7 +16,7 @@ describe('BooksListComponent', () => {
     const page: IPage = {
         count: 2,
         data: [
-            { authors: '', description: '', file: null, id: 1, title: '' }
+            { authors: '', description: '', file: null, id: 1, title: '', metadata: null }
         ]
     };
 

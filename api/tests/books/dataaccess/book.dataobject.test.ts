@@ -100,9 +100,9 @@ describe('BookDataObject', () => {
 
     describe('update', () => {
         const entity = <Book> {
-            id:1, 
-            authors: 'authors', 
-            description: 'description', 
+            id:1,
+            authors: 'authors',
+            description: 'description',
             title: 'title',
             file: <File>{},
             metadata: <Metadata>{}
@@ -114,13 +114,13 @@ describe('BookDataObject', () => {
 
         beforeEach(() => {
             entityManagerMock = mock(EntityManager);
-    
+
             queryRunnerMock = mock<QueryRunner>();
             when(queryRunnerMock.manager).thenReturn(instance(entityManagerMock));
-    
+
             connectionMock = mock<Connection>();
             when(connectionMock.createQueryRunner()).thenReturn(instance(queryRunnerMock));
-    
+
             when(databaseMock.getConnection()).thenResolve(resolvableInstance(connectionMock));
         });
 
@@ -133,8 +133,8 @@ describe('BookDataObject', () => {
         test('if successfull should commit transaction', async () => {
             // Act
             await dataObject.update(entity);
-    
-            // Assert            
+
+            // Assert
             verify(queryRunnerMock.commitTransaction()).once();
             verify(queryRunnerMock.rollbackTransaction()).never();
             verify(entityManagerMock.save(anything())).thrice();
@@ -146,7 +146,7 @@ describe('BookDataObject', () => {
 
             // Act
             await dataObject.update(entity);
-    
+
             // Assert
             verify(queryRunnerMock.commitTransaction()).never();
             verify(queryRunnerMock.rollbackTransaction()).once();

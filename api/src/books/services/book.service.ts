@@ -11,8 +11,11 @@ import { ImageService } from "../../common/services/image.service";
 import { OpenLibraryService } from "../../common/services/openlibrary";
 import { BookDataObject } from '../dataaccess/book.dataobject';
 
-import { BookDto, FileDto } from "../dto/book.dto";
+import { BookDto, FileDto, MetadataDto } from "../dto/book.dto";
 import { BookSearchDto } from "../dto/book.search.dto";
+
+import debug from 'debug';
+const debugLog: debug.IDebugger = debug('app:book.service');
 
 @injectable()
 export class BookService {
@@ -61,16 +64,25 @@ export class BookService {
 
     public async getById(id: number): Promise<BookDto> {
         const book = await this.dataObject.findByIdWithReferences(id);
-        
+
         return await this.toDto(book);
     }
 
     public async update(id: number, dto: BookDto): Promise<void> {
         const book = await this.dataObject.findByIdWithReferences(id);
 
+        debugLog(dto);
+
         book.authors = dto.authors;
         book.description = dto.description;
         book.title = dto.title;
+
+        if(dto.metadata) {
+            book.metadata = book.metadata ?? new Metadata();
+            book.metadata.isbn = dto.metadata.isbn;
+            book.metadata.pages = dto.metadata.pages;
+            book.metadata.year = dto.metadata.year;
+        }
 
         return await this.dataObject.update(book);
     }
@@ -110,7 +122,7 @@ export class BookService {
         book.authors = bookInfo.details.authors.map(x => x.name).join(', ');
         book.description = bookInfo.details.description?.value;
         book.title = bookInfo.details.title;
-        
+
         if(!book.metadata) {
             book.metadata = new Metadata();
         }
@@ -124,7 +136,7 @@ export class BookService {
 
             book.file.imageName = await this.imageService.download(bookInfo.thumbnail_url);
 
-            if(oldName) 
+            if(oldName)
                 this.imageService.remove(oldName);
         }
 
@@ -146,6 +158,15 @@ export class BookService {
 
         if(entity.file.imageName) {
             dto.file.image = await this.imageService.getImageContent(entity.file.imageName);
+        }
+
+        if(entity.metadata) {
+            dto.metadata = <MetadataDto> {
+                id: entity.metadata.id,
+                isbn: entity.metadata.isbn,
+                pages: entity.metadata.pages,
+                year: entity.metadata.year
+            };
         }
 
         return dto;

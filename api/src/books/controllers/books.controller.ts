@@ -17,21 +17,21 @@ export class BooksController extends ApiController {
     @httpGet('/')
     public async list(@queryParam('offset') offset: number, @queryParam('count') count: number): Promise<JsonResult> {
         const page = await this.bookService.list(offset, count);
-        
+
         return this.json(page);
     }
 
     @httpPost('/search')
     public async search(request: express.Request): Promise<JsonResult> {
         const books = await this.bookService.search(request.body);
-        
+
         return this.json(books);
     }
 
     @httpGet('/:id')
     public async getBookById(@requestParam('id') id: number): Promise<JsonResult> {
         const book = await this.bookService.getById(id);
-        
+
         return this.json(book);
     }
 
@@ -52,7 +52,7 @@ export class BooksController extends ApiController {
     @httpGet('/:id/file')
     public async getBookFile(@requestParam('id') id: number, @response() response: Response): Promise<void> {
         const file = await this.bookService.getFile(id);
-        
+
         await this.fileResponse(file, response);
     }
 
