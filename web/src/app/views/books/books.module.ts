@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { EditorModule } from 'primeng/editor';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -28,6 +29,7 @@ import { ImageService, SessionStorage, WindowWrapper } from '../../common';
         BooksRoutingModule,
         DataViewModule,
         InputTextModule,
+        InputNumberModule,
         EditorModule,
         SplitButtonModule,
         ConfirmDialogModule,
