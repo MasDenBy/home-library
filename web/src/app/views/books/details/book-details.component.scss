@@ -19,3 +19,11 @@
 .description {
     line-height: 2.2rem;
 }
+.published {
+    font-weight: 300;
+
+    .year {
+        font-weight: bold;
+    }
+}
+.pages {font-weight: bold;}

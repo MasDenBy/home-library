@@ -93,7 +93,7 @@ describe('BookDetailsComponent', () => {
                 file: { image: '', id: 1, libraryId: 1, path: '' },
                 id,
                 title: 'Updated book',
-                metadata: null
+                metadata: { id: 0, isbn: '', pages: 150, year: '' }
             };
 
             bookService.getBook.and.returnValue(new Observable(observer => {

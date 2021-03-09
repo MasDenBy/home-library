@@ -17,6 +17,6 @@ export interface FileDto {
 export interface MetadataDto {
     id: number;
     isbn: string;
-    pages: number;
+    pages: number | null;
     year: string;
 }

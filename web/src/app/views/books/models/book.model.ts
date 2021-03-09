@@ -27,6 +27,6 @@ export interface BookSearchDto {
 export interface IMetadata {
     id: number;
     isbn: string;
-    pages: number;
+    pages: number | null;
     year: string;
 }

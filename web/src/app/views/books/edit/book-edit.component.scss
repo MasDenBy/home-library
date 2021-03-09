@@ -8,8 +8,11 @@
 }
 
 :host{
-    ::ng-deep .ui-inputtext {
-        width: 100%;
+    ::ng-deep {
+        .ui-inputtext,
+        .ui-inputnumber {
+            width: 100%;
+        }
     }
 }
 

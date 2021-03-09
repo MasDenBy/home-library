@@ -80,7 +80,7 @@ export class BookService {
         if(dto.metadata) {
             book.metadata = book.metadata ?? new Metadata();
             book.metadata.isbn = dto.metadata.isbn;
-            book.metadata.pages = dto.metadata.pages;
+            book.metadata.pages = dto.metadata.pages || null;
             book.metadata.year = dto.metadata.year;
         }
 
