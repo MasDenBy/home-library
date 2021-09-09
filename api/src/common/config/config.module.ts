@@ -7,6 +7,7 @@ import { Config } from "./config";
     imports: [
         ConfigModule.forRoot()
     ],
-    providers: [Config]
+    providers: [Config],
+    exports: [Config]
 })
-export class CommonModule {}
+export class ConfigurationModule {}
