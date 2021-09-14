@@ -35,7 +35,7 @@ describe('LibraryService', () => {
         const id = 1;
         const path = 'test';
         const dto = <LibraryDto>{ path: path };
-        const library = <Library>{ id: id };
+        const library = <Library>{ id: id, path: 'test' };
 
         when(dataStoreMock.save(anyOfClass(Library))).thenResolve(library);
 

@@ -28,8 +28,8 @@ class Config {
                 : 'dist/**/*.entity{.ts,.js}'],
             migrationsTableName: 'migrations',
             migrations: [this.isProduction 
-                ? join(root.path, '**', 'common/database/migrations/*{.ts,.js}') 
-                : 'dist/common/database/migrations/*{.ts,.js}'],
+                ? join(root.path, '**', 'core/database/migrations/*{.ts,.js}') 
+                : 'dist/core/database/migrations/*{.ts,.js}'],
             cli: {
                 migrationsDir: 'src/common/database/migrations'
             },
