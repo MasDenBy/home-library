@@ -1,47 +1,52 @@
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { join } from "path";
+import * as root from 'app-root-path';
 
-@Injectable()
-export class Config {
-    private readonly databaseConfig: DatabaseConfiguration;
+require('dotenv').config();
 
-    constructor(private configService: ConfigService) {
-        this.databaseConfig = new DatabaseConfiguration(this.configService);
+class Config {
+    constructor(private env: { [k: string]: string | undefined }) { }
+
+    private get isProduction(): boolean {
+        return this.getValue('NODE_ENV', false) === "production";
     }
 
     public get port(): number {
-        return this.configService.get<number>("PORT");
+        return +this.getValue("PORT");
     }
 
-    public get database(): DatabaseConfiguration {
-        return this.databaseConfig;
+    public get typeOrmConfig(): TypeOrmModuleOptions {
+        return {
+            type: 'mariadb',
+            host: this.getValue('DB_HOST'),
+            port: +this.getValue('DB_PORT'),
+            username: this.getValue('DB_USERNAME'),
+            password: this.getValue('DB_PASSWORD'),
+            database: this.getValue('DB_NAME'),
+            entities: [this.isProduction 
+                ? join(root.path, '**', '*.entity.{ts,js}') 
+                : 'dist/**/*.entity{.ts,.js}'],
+            migrationsTableName: 'migrations',
+            migrations: [this.isProduction 
+                ? join(root.path, '**', 'common/database/migrations/*{.ts,.js}') 
+                : 'dist/common/database/migrations/*{.ts,.js}'],
+            cli: {
+                migrationsDir: 'src/common/database/migrations'
+            },
+            synchronize: false
+        }
+    }
+
+    private getValue(key: string, throwOnMissing = true): string {
+        const value = this.env[key];
+        if (!value && throwOnMissing) {
+            throw new Error(`config error - missing env.${key}`);
+        }
+
+        return value;
     }
 }
 
-class DatabaseConfiguration {
-    constructor(private configService: ConfigService) {}
+const config = new Config(process.env);
 
-    public get host(): string {
-        return this.configService.get('DB_HOST');
-    }
-
-    public get port(): number {
-        return this.configService.get<number>('DB_PORT');
-    }
-
-    public get userName(): string {
-        return this.configService.get('DB_USERNAME');
-    }
-
-    public get password(): string {
-        return this.configService.get('DB_PASSWORD');
-    }
-
-    public get databaseName(): string {
-        return this.configService.get('DB_DATABASE');
-    }
-
-    public get synchronize(): boolean {
-        return this.configService.get<boolean>('DB_SYNCHRONIZE');
-    }
-}
+export { config };
