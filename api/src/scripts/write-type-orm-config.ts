@@ -1,4 +1,4 @@
-import { config } from '../common/config/config';
+import { config } from '../core/config/config';
 import fs = require('fs');
 
 fs.writeFileSync('ormconfig.json',

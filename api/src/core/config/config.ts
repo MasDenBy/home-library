@@ -31,7 +31,7 @@ class Config {
                 ? join(root.path, '**', 'core/database/migrations/*{.ts,.js}') 
                 : 'dist/core/database/migrations/*{.ts,.js}'],
             cli: {
-                migrationsDir: 'src/common/database/migrations'
+                migrationsDir: 'src/core/database/migrations'
             },
             synchronize: false
         }

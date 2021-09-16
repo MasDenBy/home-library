@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { config } from './common/config/config';
+import { config } from './core/config/config';
 
 function initSwagger(app: INestApplication): void {
   const apiDocument = new DocumentBuilder()

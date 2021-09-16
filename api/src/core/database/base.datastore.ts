@@ -1,7 +1,7 @@
 import { Connection, DeleteResult, EntityTarget } from "typeorm";
 
 export abstract class BaseDataStore<T> {
-    constructor(private connection: Connection, private target: EntityTarget<T>) {}
+    constructor(protected connection: Connection, private target: EntityTarget<T>) {}
 
     public list(): Promise<T[]> {
         return this.repository.find() as Promise<T[]>;
@@ -12,10 +12,14 @@ export abstract class BaseDataStore<T> {
     }
 
     public delete(id: number): Promise<DeleteResult> {
+        return this.deleteByEntity(this.target, id);
+    }
+
+    public deleteByEntity<TEntity>(target: EntityTarget<TEntity>, id: number): Promise<DeleteResult> {
         return this.connection
             .createQueryBuilder()
             .delete()
-            .from(this.target)
+            .from(target)
             .where('id = :id', { id: id })
             .execute();
     }
@@ -28,7 +32,7 @@ export abstract class BaseDataStore<T> {
         return this.repository.save(entity);
     }
 
-    private get repository() {
+    public get repository() {
         return this.connection.getRepository(this.target);
     }
 }

@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
 import { FileSystemWrapper } from './services/fs.wrapper';
+import { ImageService } from './services/image.service';
 
 @Module({
     providers: [
-        FileSystemWrapper
+        FileSystemWrapper,
+        ImageService
     ],
     exports: [
-        FileSystemWrapper
+        FileSystemWrapper,
+        ImageService
     ]
 })
 export class CommonModule {}
