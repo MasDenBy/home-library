@@ -18,6 +18,7 @@ function initSwagger(app: INestApplication): void {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
 
   initSwagger(app);
 

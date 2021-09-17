@@ -1,10 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { LibraryDataStore } from "../database/library.datastore";
 import { LibraryDto } from "../library.dto";
+import { IndexerService } from "./indexer.service";
 
 @Injectable()
 export class LibraryService {
-    constructor(private libraryDataStore: LibraryDataStore) {}
+    constructor(private libraryDataStore: LibraryDataStore,
+        private indexer: IndexerService) {}
 
     public list(): Promise<LibraryDto[]> {
         return this.libraryDataStore.list()
@@ -26,5 +28,13 @@ export class LibraryService {
 
     public async deleteById(id: number): Promise<unknown> {
         return await this.libraryDataStore.delete(id);
+    }
+
+    public async index(id: number): Promise<void> {
+        const lib = await this.libraryDataStore.findById(id);
+
+        if(lib) {
+            await this.indexer.index(lib);
+        }
     }
 }

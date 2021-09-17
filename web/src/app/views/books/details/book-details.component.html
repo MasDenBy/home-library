@@ -9,9 +9,11 @@
     <div class="p-col-10">
         <h2>{{book.title}}</h2>
         <h3>{{book.authors}}</h3>
-        <span *ngIf="book.metadata.year" class="published">Published in <span class="year">{{book.metadata.year}}</span></span>
-        <span *ngIf="book.metadata.year && book.metadata.pages"> - </span>
-        <span *ngIf="book.metadata.pages" class="pages">{{book.metadata.pages}} pages</span>
+        <div *ngIf="book.metadata">
+            <span *ngIf="book.metadata.year" class="published">Published in <span class="year">{{book.metadata.year}}</span></span>
+            <span *ngIf="book.metadata.year && book.metadata.pages"> - </span>
+            <span *ngIf="book.metadata.pages" class="pages">{{book.metadata.pages}} pages</span>
+        </div>
         <div class="description" [innerHTML]="book.description"></div>
     </div>
 </div>

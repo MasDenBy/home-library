@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { nanoid } from 'nanoid'
-import path from 'path';
+import { join } from 'path';
 
 import { FileSystemWrapper } from "./fs.wrapper";
 
@@ -19,7 +19,9 @@ export class ImageService {
         const imagesDirectoryPath = this.fs.pathFromAppRoot(this.imagesDirectoryName);
         this.fs.checkOrCreateDirectory(imagesDirectoryPath);
 
-        await this.fs.writeFile(response.data, path.join(imagesDirectoryPath, name));
+        const fileName = join(imagesDirectoryPath, name);
+
+        await this.fs.writeFile(response.data, fileName);
 
         return name;
     }
@@ -39,6 +41,6 @@ export class ImageService {
 
     private getImagePath(imageName: string): string {
         const imagesDirectoryPath = this.fs.pathFromAppRoot(this.imagesDirectoryName);
-        return path.join(imagesDirectoryPath, imageName);
+        return join(imagesDirectoryPath, imageName);
     }
 }

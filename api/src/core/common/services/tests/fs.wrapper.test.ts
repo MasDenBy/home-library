@@ -4,7 +4,7 @@ import { createReadStream, lstatSync, ReadStream, Stats, existsSync, mkdirSync, 
 
 import { mock, instance, when } from 'ts-mockito';
 
-import { FileSystemWrapper } from './fs.wrapper';
+import { FileSystemWrapper } from '../fs.wrapper';
 
 jest.mock('path');
 jest.mock('util');

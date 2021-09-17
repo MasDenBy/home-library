@@ -40,7 +40,7 @@ export class BookDataStore extends BaseDataStore<Book> {
             .leftJoinAndSelect(`${this.alias}.file`, 'file')
             .skip(offset)
             .take(count)
-            .getMany()
+            .getMany();
     }
 
     public async searchBooks(pattern: string, offset: number, count: number): Promise<[Book[], number]> {

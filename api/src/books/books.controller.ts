@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { BookService } from './services/book.service';
 import { BookDto } from './dto/book.dto';
-import { Body, Controller, Delete, Get, Param, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from '@nestjs/common';
 import { IPage } from '../core/common/dto/page.dto';
 import { BookSearchDto } from './dto/book.search.dto';
 import { Stream } from 'stream';
@@ -11,7 +11,7 @@ export class BooksController {
     constructor(private bookService: BookService) {}
 
     @Get()
-    public list(@Param('offset') offset: number, @Param('count') count: number): Promise<IPage<BookDto>> {
+    public list(@Query('offset') offset: number, @Query('count') count: number): Promise<IPage<BookDto>> {
         return this.bookService.list(offset, count);
     }
 

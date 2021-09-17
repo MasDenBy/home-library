@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CommonModule } from 'src/core/common/common.module';
-import { OpenLibraryModule } from 'src/core/openlibrary/openlibrary.module';
+import { CommonModule } from '../core/common/common.module';
+import { OpenLibraryModule } from '../core/openlibrary/openlibrary.module';
 import { BooksController } from './books.controller';
 import { BookDataStore } from './database/book.datastore';
 
@@ -22,6 +22,7 @@ import { BookService } from './services/book.service';
     ],
     controllers: [
         BooksController
-    ]
+    ],
+    exports:[ BookService ]
 })
 export class BooksModule {}

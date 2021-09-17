@@ -24,7 +24,7 @@ export class BookService {
         return await this.dataStore.deleteById(id);
     }
 
-    public async deleteByFilePath(path: string): Promise<void> {
+    public deleteByFilePath(path: string): Promise<void> {
         return this.dataStore.deleteByFilePath(path);
     }
 
@@ -82,7 +82,7 @@ export class BookService {
         return await this.dataStore.update(book);
     }
 
-    public async createFromFile(path: string, library: Library): Promise<void> {
+    public async createFromFile(path: string, library: Library): Promise<number> {
         const book = <Book> {
             title: this.fs.basename(path),
             file: <File> {
@@ -91,7 +91,7 @@ export class BookService {
             }
         }
 
-        await this.dataStore.addBook(book);
+        return await this.dataStore.addBook(book);
     }
 
     public async getFile(id: number): Promise<[Stream, string]> {
@@ -113,6 +113,8 @@ export class BookService {
         if(!isbn) return;
 
         const bookInfo = await this.openLibraryService.findByIsbn(isbn);
+
+        if (bookInfo == null) return;
 
         book.authors = bookInfo.details.authors.map(x => x.name).join(', ');
         book.description = bookInfo.details.description?.value;

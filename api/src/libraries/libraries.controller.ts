@@ -31,4 +31,10 @@ export class LibrariesController {
     public async delete(@Param('id') id: number) {
         await this.libraryService.deleteById(id);
     }
+
+    @Get(':id/index')
+    @ApiResponse({status: 200})
+    public async index(@Param('id') id: number): Promise<void> {
+        await this.libraryService.index(id);
+    }
 }

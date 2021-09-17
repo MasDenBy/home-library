@@ -69,16 +69,14 @@ describe('/libraries', () => {
         verify(libraryServiceMock.deleteById(testId)).once();
     });
 
-    // test('index', async () => {
-    //     // Arrange
-    //     const id = 5;
+    test('index', async () => {
+        // Arrange
+        const id = 5;
 
-    //     // Act
-    //     const result = await controller.index(id);
+        // Act
+        await controller.index(id);
 
-    //     // Assert
-    //     expect(result).toBeInstanceOf(results.OkResult);
-
-    //     verify(libraryServiceMock.index(id)).once();
-    // });
+        // Assert
+        verify(libraryServiceMock.index(id)).once();
+    });
 });
