@@ -6,7 +6,7 @@ import { Book } from "../database/book.entity";
 import { File } from "../database/file.entity";
 import { Library } from "../../libraries/database/library.entity";
 import { Metadata } from "../database/metadata.entity";
-import { IPage } from "../../core/common/dto/page.dto";
+import { PageDto } from "../../core/common/dto/page.dto";
 import { FileSystemWrapper } from "../../core/common/services/fs.wrapper";
 import { ImageService } from "../../core/common/services/image.service";
 import { OpenLibraryService } from "../../core/openlibrary/openlibrary.service";
@@ -28,7 +28,7 @@ export class BookService {
         return this.dataStore.deleteByFilePath(path);
     }
 
-    public async list(offset: number, count: number): Promise<IPage<BookDto>> {
+    public async list(offset: number, count: number): Promise<PageDto<BookDto>> {
         const books = await this.dataStore.getBooks(offset, count);
         const totalCount = await this.dataStore.count();
 
@@ -38,13 +38,13 @@ export class BookService {
             dtos.push(await this.toDto(books[index]));
         }
 
-        return <IPage<BookDto>> {
+        return <PageDto<BookDto>> {
             data: dtos,
             count: totalCount
         }
     }
 
-    public async search(dto: BookSearchDto): Promise<IPage<BookDto>> {
+    public async search(dto: BookSearchDto): Promise<PageDto<BookDto>> {
         const searchResult = await this.dataStore.searchBooks(dto.pattern, dto.offset, dto.count);
 
         const dtos = [];
@@ -53,7 +53,7 @@ export class BookService {
             dtos.push(await this.toDto(searchResult[0][index]));
         }
 
-        return <IPage<BookDto>> {
+        return <PageDto<BookDto>> {
             data: dtos,
             count: searchResult[1]
         }

@@ -7,7 +7,7 @@ import { BookSearchDto } from './dto/book.search.dto';
 import { BookService } from './services/book.service';
 import { BookDto } from './dto/book.dto';
 import { PassThrough } from 'stream';
-import { IPage } from '../core/common/dto/page.dto';
+import { PageDto } from '../core/common/dto/page.dto';
 
 describe('BooksController', () => {
     const id = 10;
@@ -25,7 +25,7 @@ describe('BooksController', () => {
         const offset = 10;
         const count = 20;
 
-        when(bookServiceMock.list(offset, count)).thenResolve(<IPage<BookDto>> {});
+        when(bookServiceMock.list(offset, count)).thenResolve(<PageDto<BookDto>> {});
 
         // Act
         await controller.list(offset, count);
@@ -38,7 +38,7 @@ describe('BooksController', () => {
         // Arrange
         const dto = <BookSearchDto> { pattern: 'book', offset: 0, count: 10 };
 
-        when(bookServiceMock.search(dto)).thenResolve(<IPage<BookDto>> {});
+        when(bookServiceMock.search(dto)).thenResolve(<PageDto<BookDto>> {});
 
         // Act
         const result = await controller.search(dto);

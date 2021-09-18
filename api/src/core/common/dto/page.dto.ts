@@ -1,4 +1,4 @@
-export interface IPage<TData> {
+export class PageDto<TData> {
     count: number;
     data: TData[];
 }

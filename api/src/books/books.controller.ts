@@ -1,26 +1,32 @@
+import { Stream } from 'stream';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { BookService } from './services/book.service';
 import { BookDto } from './dto/book.dto';
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from '@nestjs/common';
-import { IPage } from '../core/common/dto/page.dto';
+import { PageDto } from '../core/common/dto/page.dto';
 import { BookSearchDto } from './dto/book.search.dto';
-import { Stream } from 'stream';
+import { ApiOkPageDtoResponse } from '../core/common/decorators/pagedto.decorator';
 
+@ApiTags('books')
 @Controller("/books")
 export class BooksController {
     constructor(private bookService: BookService) {}
 
     @Get()
-    public list(@Query('offset') offset: number, @Query('count') count: number): Promise<IPage<BookDto>> {
+    @ApiOkPageDtoResponse(BookDto)
+    public list(@Query('offset') offset: number, @Query('count') count: number): Promise<PageDto<BookDto>> {
         return this.bookService.list(offset, count);
     }
 
     @Post('/search')
-    public search(@Body() dto: BookSearchDto): Promise<IPage<BookDto>> {
+    @ApiOkPageDtoResponse(BookDto)
+    public search(@Body() dto: BookSearchDto): Promise<PageDto<BookDto>> {
         return this.bookService.search(dto);
     }
 
     @Get(':id')
+    @ApiOkResponse({type: BookDto})
     public getBookById(@Param('id') id: number): Promise<BookDto> {
         return this.bookService.getById(id);
     }

@@ -1,8 +1,9 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post } from "@nestjs/common";
-import { ApiResponse } from "@nestjs/swagger";
+import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { LibraryDto } from "./library.dto";
 import { LibraryService } from "./services/library.service";
 
+@ApiTags('libraries')
 @Controller('libraries')
 export class LibrariesController {
     constructor(private libraryService: LibraryService) {}
