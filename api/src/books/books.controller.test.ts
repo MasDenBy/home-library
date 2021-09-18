@@ -10,99 +10,99 @@ import { PassThrough } from 'stream';
 import { PageDto } from '../core/common/dto/page.dto';
 
 describe('BooksController', () => {
-    const id = 10;
+  const id = 10;
 
-    let controller: BooksController;
-    let bookServiceMock: BookService;
+  let controller: BooksController;
+  let bookServiceMock: BookService;
 
-    beforeEach(() => {
-        bookServiceMock = mock(BookService);
-        controller = new BooksController(instance(bookServiceMock));
-    });
+  beforeEach(() => {
+    bookServiceMock = mock(BookService);
+    controller = new BooksController(instance(bookServiceMock));
+  });
 
-    test('list', async () => {
-        // Arrange
-        const offset = 10;
-        const count = 20;
+  test('list', async () => {
+    // Arrange
+    const offset = 10;
+    const count = 20;
 
-        when(bookServiceMock.list(offset, count)).thenResolve(<PageDto<BookDto>> {});
+    when(bookServiceMock.list(offset, count)).thenResolve(<PageDto<BookDto>>{});
 
-        // Act
-        await controller.list(offset, count);
+    // Act
+    await controller.list(offset, count);
 
-        // Assert
-        verify(bookServiceMock.list(offset, count)).once();
-    });
+    // Assert
+    verify(bookServiceMock.list(offset, count)).once();
+  });
 
-    test('search', async () => {
-        // Arrange
-        const dto = <BookSearchDto> { pattern: 'book', offset: 0, count: 10 };
+  test('search', async () => {
+    // Arrange
+    const dto = <BookSearchDto>{ pattern: 'book', offset: 0, count: 10 };
 
-        when(bookServiceMock.search(dto)).thenResolve(<PageDto<BookDto>> {});
+    when(bookServiceMock.search(dto)).thenResolve(<PageDto<BookDto>>{});
 
-        // Act
-        const result = await controller.search(dto);
+    // Act
+    await controller.search(dto);
 
-        // Assert
-        verify(bookServiceMock.search(dto)).once();
-    });
+    // Assert
+    verify(bookServiceMock.search(dto)).once();
+  });
 
-    test('getBookById', async () => {
-        // Arrange
-        when(bookServiceMock.getById(id)).thenResolve(<BookDto>{});
+  test('getBookById', async () => {
+    // Arrange
+    when(bookServiceMock.getById(id)).thenResolve(<BookDto>{});
 
-        // Act
-        await controller.getBookById(id);
+    // Act
+    await controller.getBookById(id);
 
-        // Assert
-        verify(bookServiceMock.getById(id)).once();
-    });
+    // Assert
+    verify(bookServiceMock.getById(id)).once();
+  });
 
-    test('put', async () => {
-        // Arrange
-        const dto = <BookDto> { authors: null, description: null, title: null };
+  test('put', async () => {
+    // Arrange
+    const dto = <BookDto>{ authors: null, description: null, title: null };
 
-        // Act
-        const result = await controller.put(id, dto);
+    // Act
+    await controller.put(id, dto);
 
-        // Assert
-        verify(bookServiceMock.update(id, anything())).once();
-    });
+    // Assert
+    verify(bookServiceMock.update(id, anything())).once();
+  });
 
-    test('removeBook', async () => {
-        // Act
-        await controller.removeBook(id);
+  test('removeBook', async () => {
+    // Act
+    await controller.removeBook(id);
 
-        // Assert
-        verify(bookServiceMock.deleteById(id)).once();
-    });
+    // Assert
+    verify(bookServiceMock.deleteById(id)).once();
+  });
 
-    test('getBookFile', async () => {
-        // Arrange
-        const fileName = 'file.name';
+  test('getBookFile', async () => {
+    // Arrange
+    const fileName = 'file.name';
 
-        const responseMock = mock<Response>();
+    const responseMock = mock<Response>();
 
-        const streamMock = new PassThrough();
-        streamMock.push("data");
-        streamMock.end();
+    const streamMock = new PassThrough();
+    streamMock.push('data');
+    streamMock.end();
 
-        when(bookServiceMock.getFile(id)).thenResolve([streamMock, fileName]);
+    when(bookServiceMock.getFile(id)).thenResolve([streamMock, fileName]);
 
-        // Act
-        await controller.getBookFile(id, instance(responseMock));
+    // Act
+    await controller.getBookFile(id, instance(responseMock));
 
-        // Assert
-        verify(bookServiceMock.getFile(id)).once();
-    });
+    // Assert
+    verify(bookServiceMock.getFile(id)).once();
+  });
 
-    test('index', async () => {
-        // Arrange
+  test('index', async () => {
+    // Arrange
 
-        // Act
-        await controller.index(id);
+    // Act
+    await controller.index(id);
 
-        // Assert
-        verify(bookServiceMock.index(id)).once();
-    });
+    // Assert
+    verify(bookServiceMock.index(id)).once();
+  });
 });

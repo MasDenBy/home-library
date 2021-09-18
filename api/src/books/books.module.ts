@@ -11,18 +11,13 @@ import { Metadata } from './database/metadata.entity';
 import { BookService } from './services/book.service';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Book, File, Metadata]),
-        OpenLibraryModule,
-        CommonModule
-    ],
-    providers: [
-        BookDataStore,
-        BookService
-    ],
-    controllers: [
-        BooksController
-    ],
-    exports:[ BookService ]
+  imports: [
+    TypeOrmModule.forFeature([Book, File, Metadata]),
+    OpenLibraryModule,
+    CommonModule,
+  ],
+  providers: [BookDataStore, BookService],
+  controllers: [BooksController],
+  exports: [BookService],
 })
 export class BooksModule {}

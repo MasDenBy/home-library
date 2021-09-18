@@ -5,26 +5,26 @@ import { FolderDto } from './folder.dto';
 import { FileManagerService } from './services/filemanager.service';
 
 describe('FileManagerController', () => {
-    let controller: FileManagerController;
-    let service: FileManagerService;
+  let controller: FileManagerController;
+  let service: FileManagerService;
 
-    beforeEach(() => {
-        service = mock(FileManagerService);
-        controller = new FileManagerController(instance(service));
-    });
+  beforeEach(() => {
+    service = mock(FileManagerService);
+    controller = new FileManagerController(instance(service));
+  });
 
-    test('list', async () => {
-        // Arrange
-        const path = '/';
+  test('list', async () => {
+    // Arrange
+    const path = '/';
 
-        when(service.directoryList(path)).thenResolve(<FolderDto>{});
+    when(service.directoryList(path)).thenResolve(<FolderDto>{});
 
-        // Act
-        const result = await controller.list(path);
+    // Act
+    const result = await controller.list(path);
 
-        // Assert
-        expect(result).not.toBeNull();
+    // Assert
+    expect(result).not.toBeNull();
 
-        verify(service.directoryList(path)).once();
-    });
+    verify(service.directoryList(path)).once();
+  });
 });

@@ -6,19 +6,19 @@ import { Library } from '../database/library.entity';
 
 @Injectable()
 export class LibraryWatcher {
-    constructor(private bookService: BookService) { }
+  constructor(private bookService: BookService) {}
 
-    public run(library: Library): void {
-        const watcher = watch(library.path, {
-            ignoreInitial: true
-        });
+  public run(library: Library): void {
+    const watcher = watch(library.path, {
+      ignoreInitial: true,
+    });
 
-        watcher
-            .on('add', async path => {
-                await this.bookService.createFromFile(path, library);
-            })
-            .on('unlink', async path => {
-                await this.bookService.deleteByFilePath(path);
-            });
-    }
+    watcher
+      .on('add', async (path) => {
+        await this.bookService.createFromFile(path, library);
+      })
+      .on('unlink', async (path) => {
+        await this.bookService.deleteByFilePath(path);
+      });
+  }
 }

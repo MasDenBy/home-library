@@ -4,45 +4,45 @@ import { FileSystemWrapper } from '../../core/common/services/fs.wrapper';
 import { FileManagerService } from './filemanager.service';
 
 describe('FileManagerService', () => {
-    let service: FileManagerService;
-    let fmMock: FileSystemWrapper;
+  let service: FileManagerService;
+  let fmMock: FileSystemWrapper;
 
-    beforeEach(() => {
-        fmMock = mock(FileSystemWrapper);
-        service = new FileManagerService(instance(fmMock));
+  beforeEach(() => {
+    fmMock = mock(FileSystemWrapper);
+    service = new FileManagerService(instance(fmMock));
+  });
+
+  describe('directoryList', () => {
+    test('path is not null get folders', async () => {
+      // Arrange
+      const path = '/';
+
+      when(fmMock.readDirectory(path)).thenResolve([]);
+
+      // Act
+      await service.directoryList(path);
+
+      // Assert
+      verify(fmMock.osRoot()).never();
+      verify(fmMock.readDirectory(path)).once();
     });
 
-    describe('directoryList', () => {
-        test('path is not null get folders', async () => {
-            // Arrange
-            const path = '/';
+    test('path is null get root path', async () => {
+      // Arrange
+      const fullPath = '/root/';
 
-            when(fmMock.readDirectory(path)).thenResolve([]);
+      when(fmMock.osRoot()).thenReturn(fullPath);
+      when(fmMock.readDirectory(fullPath)).thenResolve([]);
 
-            // Act
-            await service.directoryList(path);
+      // Act
+      const result = await service.directoryList(null);
 
-            // Assert
-            verify(fmMock.osRoot()).never();
-            verify(fmMock.readDirectory(path)).once();
-        });
+      // Assert
+      expect(result.path).toBe(fullPath);
+      expect(result.folders).not.toBeNull();
 
-        test('path is null get root path', async () => {
-            // Arrange
-            const fullPath = '/root/';
-
-            when(fmMock.osRoot()).thenReturn(fullPath);
-            when(fmMock.readDirectory(fullPath)).thenResolve([]);
-
-            // Act
-            const result = await service.directoryList(null);
-
-            // Assert
-            expect(result.path).toBe(fullPath);
-            expect(result.folders).not.toBeNull();
-
-            verify(fmMock.osRoot()).once();
-            verify(fmMock.readDirectory(fullPath)).once();
-        });
+      verify(fmMock.osRoot()).once();
+      verify(fmMock.readDirectory(fullPath)).once();
     });
+  });
 });

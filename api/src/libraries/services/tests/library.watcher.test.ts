@@ -10,47 +10,47 @@ import { EventEmitter } from 'events';
 jest.mock('chokidar');
 
 describe('LibraryWatcher', () => {
-    let watcher: LibraryWatcher;
-    let bookServiceMock: BookService;
+  let watcher: LibraryWatcher;
+  let bookServiceMock: BookService;
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+
+    bookServiceMock = mock(BookService);
+    watcher = new LibraryWatcher(instance(bookServiceMock));
+  });
+
+  describe('run', () => {
+    const library = <Library>{ path: 'test' };
+    const testPath = 'path';
+
+    let watchMock: jest.MockedFunction<typeof watch>;
+    let fsWatcherMock: EventEmitter;
 
     beforeEach(() => {
-        jest.resetAllMocks();
-
-        bookServiceMock = mock(BookService);
-        watcher = new LibraryWatcher(instance(bookServiceMock));
+      fsWatcherMock = new EventEmitter();
+      watchMock = watch as jest.MockedFunction<typeof watch>;
+      watchMock.mockReturnValue(fsWatcherMock as never);
     });
 
-    describe('run', () => {
-        const library = <Library>{ path: 'test' };
-        const testPath = 'path';
+    test('add new file', () => {
+      // Act
+      watcher.run(library);
 
-        let watchMock: jest.MockedFunction<typeof watch>;
-        let fsWatcherMock: EventEmitter;
+      fsWatcherMock.emit('add', testPath);
 
-        beforeEach(() => {
-            fsWatcherMock = new EventEmitter();
-            watchMock = watch as jest.MockedFunction<typeof watch>;
-            watchMock.mockReturnValue(fsWatcherMock as never);
-        });
+      // Assert
+      verify(bookServiceMock.createFromFile(testPath, library)).once();
+    });
 
-        test('add new file', () => {
-            // Act
-            watcher.run(library);
+    test('delete file', () => {
+      // Act
+      watcher.run(library);
 
-            fsWatcherMock.emit('add', testPath);
+      fsWatcherMock.emit('unlink', testPath);
 
-            // Assert
-            verify(bookServiceMock.createFromFile(testPath, library)).once();
-        });
-
-        test('delete file', () => {
-            // Act
-            watcher.run(library);
-
-            fsWatcherMock.emit('unlink', testPath);
-
-            // Assert
-            verify(bookServiceMock.deleteByFilePath(testPath)).once();
-        });
-    })
+      // Assert
+      verify(bookServiceMock.deleteByFilePath(testPath)).once();
+    });
+  });
 });

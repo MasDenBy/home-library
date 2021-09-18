@@ -1,5 +1,21 @@
-import { mock, instance, when, verify, deepEqual, anyString, anything, objectContaining } from 'ts-mockito';
-import { Connection, DeleteQueryBuilder, Repository, SelectQueryBuilder, QueryRunner, EntityManager } from 'typeorm';
+import {
+  mock,
+  instance,
+  when,
+  verify,
+  deepEqual,
+  anyString,
+  anything,
+  objectContaining,
+} from 'ts-mockito';
+import {
+  Connection,
+  DeleteQueryBuilder,
+  Repository,
+  SelectQueryBuilder,
+  QueryRunner,
+  EntityManager,
+} from 'typeorm';
 
 import { BookDataStore } from './book.datastore';
 import { Book } from './book.entity';
@@ -8,214 +24,280 @@ import { Metadata } from './metadata.entity';
 //import { resolvableInstance } from '../../__helpers__/ts-mockito.helper';
 
 describe('BookDataStore', () => {
-    const id = 10;
+  const id = 10;
 
-    let dataStore: BookDataStore;
-    let connectionMock: Connection;
-    let bookRepositoryMock: Repository<Book>;
+  let dataStore: BookDataStore;
+  let connectionMock: Connection;
+  let bookRepositoryMock: Repository<Book>;
+
+  beforeEach(() => {
+    bookRepositoryMock = mock<Repository<Book>>();
+    connectionMock = mock(Connection);
+    when(connectionMock.getRepository(Book)).thenReturn(
+      instance(bookRepositoryMock),
+    );
+
+    dataStore = new BookDataStore(instance(connectionMock));
+  });
+
+  test('addBook', async () => {
+    // Arrange
+    const entity = new Book();
+    const savedEntity = { id: 1 } as Book;
+
+    when(bookRepositoryMock.save(entity)).thenResolve(savedEntity);
+
+    // Act
+    const id = await dataStore.addBook(entity);
+
+    // Assert
+    expect(id).toBe(savedEntity.id);
+
+    verify(bookRepositoryMock.save(deepEqual(entity))).once();
+  });
+
+  test('getBooks', async () => {
+    // Arrange
+    const offset = 10;
+    const count = 20;
+
+    const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.skip(offset)).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.take(count)).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.getMany()).thenResolve([new Book()]);
+
+    when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(
+      instance(selectQueryBuilder),
+    );
+
+    // Act
+    await dataStore.getBooks(offset, count);
+
+    // Assert
+    verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
+    verify(selectQueryBuilder.skip(offset)).once();
+    verify(selectQueryBuilder.take(count)).once();
+    verify(selectQueryBuilder.getMany()).once();
+  });
+
+  test('searchBooks', async () => {
+    // Arrange
+    const offset = 10;
+    const count = 20;
+    const pattern = 'book';
+
+    const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
+    when(selectQueryBuilder.where(anyString(), anything())).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.orWhere(anyString(), anything())).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.skip(offset)).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.take(count)).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.getMany()).thenResolve([new Book()]);
+
+    when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(
+      instance(selectQueryBuilder),
+    );
+
+    // Act
+    await dataStore.searchBooks(pattern, offset, count);
+
+    // Assert
+    verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
+    verify(selectQueryBuilder.where(anyString(), anything())).once();
+    verify(selectQueryBuilder.orWhere(anyString(), anything())).twice();
+    verify(selectQueryBuilder.skip(offset)).once();
+    verify(selectQueryBuilder.take(count)).once();
+    verify(selectQueryBuilder.getMany()).once();
+    verify(selectQueryBuilder.getCount()).once();
+  });
+
+  describe('update', () => {
+    const entity = <Book>{
+      id: 1,
+      authors: 'authors',
+      description: 'description',
+      title: 'title',
+      file: <File>{},
+      metadata: <Metadata>{},
+    };
+
+    let queryRunnerMock: QueryRunner;
+    let entityManagerMock: EntityManager;
 
     beforeEach(() => {
-        bookRepositoryMock = mock<Repository<Book>>();
-        connectionMock = mock(Connection);
-        when(connectionMock.getRepository(Book)).thenReturn(instance(bookRepositoryMock));
+      entityManagerMock = mock(EntityManager);
 
-        dataStore = new BookDataStore(instance(connectionMock));
+      queryRunnerMock = mock<QueryRunner>();
+      when(queryRunnerMock.manager).thenReturn(instance(entityManagerMock));
+
+      when(connectionMock.createQueryRunner()).thenReturn(
+        instance(queryRunnerMock),
+      );
     });
 
-    test('addBook', async () => {
-        // Arrange
-        const entity = new Book();
-        const savedEntity = { id: 1 } as Book;
-
-        when(bookRepositoryMock.save(entity)).thenResolve(savedEntity);
-
-        // Act
-        const id = await dataStore.addBook(entity);
-
-        // Assert
-        expect(id).toBe(savedEntity.id);
-
-        verify(bookRepositoryMock.save(deepEqual(entity))).once();
+    afterEach(() => {
+      verify(queryRunnerMock.connect()).once();
+      verify(queryRunnerMock.startTransaction()).once();
+      verify(queryRunnerMock.release()).once();
     });
 
-    test('getBooks', async () => {
-        // Arrange
-        const offset = 10;
-        const count = 20;
+    test('if successfull should commit transaction', async () => {
+      // Act
+      await dataStore.update(entity);
 
-        const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
-        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.skip(offset)).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.take(count)).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.getMany()).thenResolve([new Book()]);
-
-        when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(instance(selectQueryBuilder));
-
-        // Act
-        await dataStore.getBooks(offset, count);
-
-        // Assert
-        verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
-        verify(selectQueryBuilder.skip(offset)).once();
-        verify(selectQueryBuilder.take(count)).once();
-        verify(selectQueryBuilder.getMany()).once();
+      // Assert
+      verify(queryRunnerMock.commitTransaction()).once();
+      verify(queryRunnerMock.rollbackTransaction()).never();
+      verify(entityManagerMock.save(anything())).thrice();
     });
 
-    test('searchBooks', async () => {
-        // Arrange
-        const offset = 10;
-        const count = 20;
-        const pattern = 'book';
+    test('if error should rollback transaction', async () => {
+      // Arrange
+      when(entityManagerMock.save(anything())).thenThrow(new Error());
 
-        const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
-        when(selectQueryBuilder.where(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.orWhere(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.skip(offset)).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.take(count)).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.getMany()).thenResolve([new Book()]);
+      // Act
+      await dataStore.update(entity);
 
-        when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(instance(selectQueryBuilder));
-
-        // Act
-        await dataStore.searchBooks(pattern, offset, count);
-
-        // Assert
-        verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
-        verify(selectQueryBuilder.where(anyString(), anything())).once();
-        verify(selectQueryBuilder.orWhere(anyString(), anything())).twice();
-        verify(selectQueryBuilder.skip(offset)).once();
-        verify(selectQueryBuilder.take(count)).once();
-        verify(selectQueryBuilder.getMany()).once();
-        verify(selectQueryBuilder.getCount()).once();
+      // Assert
+      verify(queryRunnerMock.commitTransaction()).never();
+      verify(queryRunnerMock.rollbackTransaction()).once();
     });
+  });
 
-    describe('update', () => {
-        const entity = <Book> {
-            id:1,
-            authors: 'authors',
-            description: 'description',
-            title: 'title',
-            file: <File>{},
-            metadata: <Metadata>{}
-        };
+  test('findByIdWithReferences', async () => {
+    // Arrange
+    const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(
+      selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata'),
+    ).thenReturn(instance(selectQueryBuilder));
+    when(selectQueryBuilder.where(anyString(), anything())).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.getOne()).thenResolve(new Book());
 
-        let queryRunnerMock: QueryRunner;
-        let entityManagerMock: EntityManager;
+    when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(
+      instance(selectQueryBuilder),
+    );
 
-        beforeEach(() => {
-            entityManagerMock = mock(EntityManager);
+    // Act
+    const result = await dataStore.findByIdWithReferences(id);
 
-            queryRunnerMock = mock<QueryRunner>();
-            when(queryRunnerMock.manager).thenReturn(instance(entityManagerMock));
+    // Assert
+    expect(result).not.toBeNull();
 
-            when(connectionMock.createQueryRunner()).thenReturn(instance(queryRunnerMock));
-        });
+    verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
+    verify(selectQueryBuilder.where(anyString(), anything())).once();
+    verify(selectQueryBuilder.getOne()).once();
+  });
 
-        afterEach(() => {
-            verify(queryRunnerMock.connect()).once();
-            verify(queryRunnerMock.startTransaction()).once();
-            verify(queryRunnerMock.release()).once();
-        });
+  test('deleteById', async () => {
+    // Arrange
+    const deleteQueryBuilder = mock<DeleteQueryBuilder<Book>>();
+    when(deleteQueryBuilder.from(anything())).thenReturn(
+      instance(deleteQueryBuilder),
+    );
+    when(
+      deleteQueryBuilder.where('id = :id', objectContaining({ id: id })),
+    ).thenReturn(instance(deleteQueryBuilder));
 
-        test('if successfull should commit transaction', async () => {
-            // Act
-            await dataStore.update(entity);
-
-            // Assert
-            verify(queryRunnerMock.commitTransaction()).once();
-            verify(queryRunnerMock.rollbackTransaction()).never();
-            verify(entityManagerMock.save(anything())).thrice();
-        });
-
-        test('if error should rollback transaction', async () => {
-            // Arrange
-            when(entityManagerMock.save(anything())).thenThrow(new Error());
-
-            // Act
-            await dataStore.update(entity);
-
-            // Assert
-            verify(queryRunnerMock.commitTransaction()).never();
-            verify(queryRunnerMock.rollbackTransaction()).once();
-        });
+    const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(
+      selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata'),
+    ).thenReturn(instance(selectQueryBuilder));
+    when(selectQueryBuilder.where(anyString(), anything())).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.getOne()).thenResolve(<Book>{
+      id: id,
+      file: { id: id },
     });
+    when(selectQueryBuilder.delete()).thenReturn(instance(deleteQueryBuilder));
 
-    test('findByIdWithReferences', async () => {
-        // Arrange
-        const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
-        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata')).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.where(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.getOne()).thenResolve(new Book());
+    when(connectionMock.createQueryBuilder()).thenReturn(
+      instance(selectQueryBuilder),
+    );
 
-        when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(instance(selectQueryBuilder));
+    when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(
+      instance(selectQueryBuilder),
+    );
 
-        // Act
-        const result = await dataStore.findByIdWithReferences(id);
+    // Act
+    await dataStore.deleteById(id);
 
-        // Assert
-        expect(result).not.toBeNull();
+    // Assert
+    verify(deleteQueryBuilder.from(anything())).twice();
+    verify(deleteQueryBuilder.where(anyString(), anything())).twice();
+    verify(deleteQueryBuilder.execute()).twice();
+  });
 
-        verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
-        verify(selectQueryBuilder.where(anyString(), anything())).once();
-        verify(selectQueryBuilder.getOne()).once();
+  test('deleteByFilePath', async () => {
+    // Arrange
+    const deleteQueryBuilder = mock<DeleteQueryBuilder<Book>>();
+    when(deleteQueryBuilder.from(anything())).thenReturn(
+      instance(deleteQueryBuilder),
+    );
+    when(
+      deleteQueryBuilder.where('id = :id', objectContaining({ id: id })),
+    ).thenReturn(instance(deleteQueryBuilder));
+
+    const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(
+      selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata'),
+    ).thenReturn(instance(selectQueryBuilder));
+    when(selectQueryBuilder.where(anyString(), anything())).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(selectQueryBuilder.getOne()).thenResolve(<Book>{
+      id: id,
+      file: { id: id },
     });
+    when(selectQueryBuilder.delete()).thenReturn(instance(deleteQueryBuilder));
 
-    test('deleteById', async () => {
-        // Arrange
-        const deleteQueryBuilder = mock<DeleteQueryBuilder<Book>>();
-        when(deleteQueryBuilder.from(anything())).thenReturn(instance(deleteQueryBuilder));
-        when(deleteQueryBuilder.where('id = :id', objectContaining({id: id}))).thenReturn(instance(deleteQueryBuilder));
+    when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(bookRepositoryMock.findOne(anything())).thenResolve(<Book>{ id: id });
 
-        const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
-        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata')).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.where(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.getOne()).thenResolve(<Book>{ id: id, file: { id: id } });
-        when(selectQueryBuilder.delete()).thenReturn(instance(deleteQueryBuilder));
+    const repositoryFile = mock<Repository<File>>();
+    when(repositoryFile.findOne(anything())).thenResolve(<File>{});
 
-        when(connectionMock.createQueryBuilder()).thenReturn(instance(selectQueryBuilder));
+    when(connectionMock.createQueryBuilder()).thenReturn(
+      instance(selectQueryBuilder),
+    );
+    when(connectionMock.getRepository(File)).thenReturn(repositoryFile);
 
-        when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(instance(selectQueryBuilder));
+    // Act
+    await dataStore.deleteByFilePath('path');
 
-        // Act
-        await dataStore.deleteById(id);
-
-        // Assert
-        verify(deleteQueryBuilder.from(anything())).twice();
-        verify(deleteQueryBuilder.where(anyString(), anything())).twice();
-        verify(deleteQueryBuilder.execute()).twice();
-    });
-
-    test('deleteByFilePath', async () => {
-        // Arrange
-        const deleteQueryBuilder = mock<DeleteQueryBuilder<Book>>();
-        when(deleteQueryBuilder.from(anything())).thenReturn(instance(deleteQueryBuilder));
-        when(deleteQueryBuilder.where('id = :id', objectContaining({id: id}))).thenReturn(instance(deleteQueryBuilder));
-
-        const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
-        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata')).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.where(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
-        when(selectQueryBuilder.getOne()).thenResolve(<Book>{ id: id, file: { id: id } });
-        when(selectQueryBuilder.delete()).thenReturn(instance(deleteQueryBuilder));
-
-        when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(instance(selectQueryBuilder));
-        when(bookRepositoryMock.findOne(anything())).thenResolve(<Book>{ id: id });
-
-        const repositoryFile = mock<Repository<File>>();
-        when(repositoryFile.findOne(anything())).thenResolve(<File>{});
-
-        when(connectionMock.createQueryBuilder()).thenReturn(instance(selectQueryBuilder));
-        when(connectionMock.getRepository(File)).thenReturn(repositoryFile);
-
-        // Act
-        await dataStore.deleteByFilePath('path');
-
-        // Assert
-        verify(deleteQueryBuilder.from(anything())).twice();
-        verify(deleteQueryBuilder.where(anyString(), anything())).twice();
-        verify(deleteQueryBuilder.execute()).twice();
-    });
+    // Assert
+    verify(deleteQueryBuilder.from(anything())).twice();
+    verify(deleteQueryBuilder.where(anyString(), anything())).twice();
+    verify(deleteQueryBuilder.execute()).twice();
+  });
 });

@@ -7,61 +7,63 @@ import { ImageService } from '../image.service';
 jest.mock('axios');
 
 describe('ImageService', () => {
-    let service: ImageService;
-    let fsMock: FileSystemWrapper;
+  let service: ImageService;
+  let fsMock: FileSystemWrapper;
 
-    beforeEach(() => {
-        jest.clearAllMocks();
+  beforeEach(() => {
+    jest.clearAllMocks();
 
-        fsMock = mock(FileSystemWrapper);
-        service = new ImageService(instance(fsMock));
+    fsMock = mock(FileSystemWrapper);
+    service = new ImageService(instance(fsMock));
+  });
+
+  test('download', async () => {
+    // Arrange
+    const axiosMock = axios as jest.Mocked<typeof axios>;
+    axiosMock.get.mockResolvedValue(<AxiosResponse<unknown>>{ data: 'data' });
+
+    when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
+
+    // Act
+    const name = await service.download('myfile-S.jpg');
+
+    // Assert
+    expect(name).not.toBeNull();
+
+    expect(axiosMock.get).toHaveBeenCalledWith('myfile-M.jpg', {
+      responseType: 'arraybuffer',
     });
 
-    test('download', async () => {
-        // Arrange
-        const axiosMock = axios as jest.Mocked<typeof axios>;
-        axiosMock.get.mockResolvedValue(<AxiosResponse<unknown>>{ data: 'data' });
+    verify(fsMock.pathFromAppRoot(anyString())).once();
+    verify(fsMock.checkOrCreateDirectory(anyString())).once();
+    verify(fsMock.writeFile(anything(), anyString())).once();
+  });
 
-        when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
+  test('remove', async () => {
+    // Arrange
+    when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
 
-        // Act
-        const name = await service.download('myfile-S.jpg');
+    // Act
+    await service.remove('myfile-S.jpg');
 
-        // Assert
-        expect(name).not.toBeNull();
+    // Assert
+    verify(fsMock.pathFromAppRoot(anyString())).once();
+    verify(fsMock.deleteFile(anyString())).once();
+  });
 
-        expect(axiosMock.get).toHaveBeenCalledWith('myfile-M.jpg', { responseType: 'arraybuffer' });
+  test('getImageContent', async () => {
+    // Arrange
+    const fileName = 'myfile.png';
 
-        verify(fsMock.pathFromAppRoot(anyString())).once();
-        verify(fsMock.checkOrCreateDirectory(anyString())).once();
-        verify(fsMock.writeFile(anything(), anyString())).once();
-    });
+    when(fsMock.readFile(anyString())).thenResolve(Buffer.from('content'));
+    when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
 
-    test('remove', async () => {
-        // Arrange
-        when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
+    // Act
+    const content = await service.getImageContent(fileName);
 
-        // Act
-        await service.remove('myfile-S.jpg');
+    // Assert
+    expect(content).not.toBeNull();
 
-        // Assert
-        verify(fsMock.pathFromAppRoot(anyString())).once();
-        verify(fsMock.deleteFile(anyString())).once();
-    });
-
-    test('getImageContent', async () => {
-        // Arrange
-        const fileName = 'myfile.png';
-
-        when(fsMock.readFile(anyString())).thenResolve(Buffer.from("content"));
-        when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
-
-        // Act
-        const content = await service.getImageContent(fileName);
-
-        // Assert
-        expect(content).not.toBeNull();
-
-        verify(fsMock.readFile(anyString())).once();
-    });
+    verify(fsMock.readFile(anyString())).once();
+  });
 });

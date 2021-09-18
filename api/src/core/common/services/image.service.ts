@@ -1,46 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { nanoid } from 'nanoid'
+import { nanoid } from 'nanoid';
 import { join } from 'path';
 
-import { FileSystemWrapper } from "./fs.wrapper";
+import { FileSystemWrapper } from './fs.wrapper';
 
 @Injectable()
 export class ImageService {
-    private readonly imagesDirectoryName: string = 'assets/images';
-    constructor(private fs: FileSystemWrapper){}
+  private readonly imagesDirectoryName: string = 'assets/images';
+  constructor(private fs: FileSystemWrapper) {}
 
-    public async download(url: string): Promise<string> {
-        const mediumSizeUrl = url.replace('-S.', '-M.');
-        const name = nanoid();
+  public async download(url: string): Promise<string> {
+    const mediumSizeUrl = url.replace('-S.', '-M.');
+    const name = nanoid();
 
-        const response = await axios.get(mediumSizeUrl, { responseType: 'arraybuffer' });
+    const response = await axios.get(mediumSizeUrl, {
+      responseType: 'arraybuffer',
+    });
 
-        const imagesDirectoryPath = this.fs.pathFromAppRoot(this.imagesDirectoryName);
-        this.fs.checkOrCreateDirectory(imagesDirectoryPath);
+    const imagesDirectoryPath = this.fs.pathFromAppRoot(
+      this.imagesDirectoryName,
+    );
+    this.fs.checkOrCreateDirectory(imagesDirectoryPath);
 
-        const fileName = join(imagesDirectoryPath, name);
+    const fileName = join(imagesDirectoryPath, name);
 
-        await this.fs.writeFile(response.data, fileName);
+    await this.fs.writeFile(response.data, fileName);
 
-        return name;
-    }
+    return name;
+  }
 
-    public remove(imageName: string): void {
-        const fullPath = this.getImagePath(imageName);
+  public remove(imageName: string): void {
+    const fullPath = this.getImagePath(imageName);
 
-        this.fs.deleteFile(fullPath);
-    }
+    this.fs.deleteFile(fullPath);
+  }
 
-    public async getImageContent(imageName: string): Promise<string> {
-        const imagePath = this.getImagePath(imageName);
-        const buffer = await this.fs.readFile(imagePath);
+  public async getImageContent(imageName: string): Promise<string> {
+    const imagePath = this.getImagePath(imageName);
+    const buffer = await this.fs.readFile(imagePath);
 
-        return buffer.toString('base64');
-    }
+    return buffer.toString('base64');
+  }
 
-    private getImagePath(imageName: string): string {
-        const imagesDirectoryPath = this.fs.pathFromAppRoot(this.imagesDirectoryName);
-        return join(imagesDirectoryPath, imageName);
-    }
+  private getImagePath(imageName: string): string {
+    const imagesDirectoryPath = this.fs.pathFromAppRoot(
+      this.imagesDirectoryName,
+    );
+    return join(imagesDirectoryPath, imageName);
+  }
 }

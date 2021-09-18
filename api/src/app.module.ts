@@ -11,7 +11,7 @@ import { LibrariesModule } from './libraries/libraries.module';
     CommonModule,
     DatabaseModule,
     FileManagerModule,
-    LibrariesModule
-  ]
+    LibrariesModule,
+  ],
 })
 export class AppModule {}

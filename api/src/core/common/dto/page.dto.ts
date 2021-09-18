@@ -1,4 +1,4 @@
 export class PageDto<TData> {
-    count: number;
-    data: TData[];
+  count: number;
+  data: TData[];
 }

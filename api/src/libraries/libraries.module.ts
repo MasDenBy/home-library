@@ -10,19 +10,8 @@ import { LibraryService } from './services/library.service';
 import { LibraryWatcher } from './services/library.watcher';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Library]),
-        CommonModule,
-        BooksModule
-    ],
-    providers: [
-        LibraryDataStore,
-        LibraryService,
-        IndexerService,
-        LibraryWatcher
-    ],
-    controllers: [
-        LibrariesController
-    ]
+  imports: [TypeOrmModule.forFeature([Library]), CommonModule, BooksModule],
+  providers: [LibraryDataStore, LibraryService, IndexerService, LibraryWatcher],
+  controllers: [LibrariesController],
 })
 export class LibrariesModule {}
