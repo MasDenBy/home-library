@@ -1,10 +1,25 @@
 {
-  "name": "api",
+  "name": "masden-home-library-api",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Ihar Maiseyeu",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "GPL",
+  "bugs": {
+    "url": "https://github.com/MasDenBy/home-library/issues"
+  },
+  "homepage": "https://github.com/MasDenBy/home-library#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MasDenBy/home-library.git"
+  },
+  "keywords": [
+    "nodejs",
+    "homelibrary",
+    "synology",
+    "ts",
+    "typescript"
+  ],
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
