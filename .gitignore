@@ -351,3 +351,4 @@ MigrationBackup/
 dist
 **/.env
 /api/coverage
+/api/assets/images

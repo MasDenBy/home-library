@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { BookService } from '../services/book.service';
 import { ImageService } from '../../../common';
-import { IBook } from '../models/book.model';
+import { IBook, IMetadata } from '../models/book.model';
 
 @Component({
     templateUrl: './book-edit.component.html',
@@ -23,6 +23,10 @@ export class BookEditComponent implements OnInit {
         const id = +this.route.snapshot.paramMap.get('id');
 
         this.bookService.getBook(id).subscribe((book: IBook) => {
+            if(book.metadata == null) {
+                book.metadata = {} as IMetadata;
+            }
+
             this.book = book;
         });
     }

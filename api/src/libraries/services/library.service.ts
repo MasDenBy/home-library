@@ -1,55 +1,42 @@
-import { injectable } from 'inversify';
-import { LibraryDataObject } from '../dataaccess/library.dataobject';
-import { Library } from '../../common/dataaccess/entities/library.entity';
-import { IndexerService } from '../../common/services/indexer.service';
-import { LibraryDto } from '../dto/library.dto';
+import { Injectable } from '@nestjs/common';
+import { LibraryDataStore } from '../database/library.datastore';
+import { LibraryDto } from '../library.dto';
+import { IndexerService } from './indexer.service';
 
-@injectable()
+@Injectable()
 export class LibraryService {
-    constructor(private libraryDataObject: LibraryDataObject, private indexer: IndexerService) { }
+  constructor(
+    private libraryDataStore: LibraryDataStore,
+    private indexer: IndexerService,
+  ) {}
 
-    public list(): Promise<Library[]> {
-        return this.libraryDataObject.list(Library);
+  public list(): Promise<LibraryDto[]> {
+    return this.libraryDataStore
+      .list()
+      .then((items) => items.map((x) => LibraryDto.fromEntity(x)));
+  }
+
+  public async save(dto: LibraryDto): Promise<number> {
+    const entity = LibraryDto.toEntity(dto);
+
+    return await this.libraryDataStore.save(entity).then((x) => x.id);
+  }
+
+  public async getById(id: number): Promise<LibraryDto> {
+    const entity = await this.libraryDataStore.findById(id);
+
+    return LibraryDto.fromEntity(entity);
+  }
+
+  public async deleteById(id: number): Promise<unknown> {
+    return await this.libraryDataStore.delete(id);
+  }
+
+  public async index(id: number): Promise<void> {
+    const lib = await this.libraryDataStore.findById(id);
+
+    if (lib) {
+      await this.indexer.index(lib);
     }
-
-    public async save(dto: LibraryDto): Promise<number> {
-        const entity = LibraryService.toEntity(dto);
-
-        return await this.libraryDataObject.save(entity);
-    }
-
-    public async getById(id: number): Promise<LibraryDto> {
-        const entity = await this.libraryDataObject.findById<Library>(Library, id);
-
-        return LibraryService.toDto(entity);
-    }
-
-    public async deleteById(id: number): Promise<unknown> {
-        return await this.libraryDataObject.delete(Library, id);
-    }
-
-    public async index(id: number): Promise<void> {
-        const lib = await this.libraryDataObject.findById(Library, id) as Library;
-
-        if(lib) {
-            await this.indexer.index(lib);
-        }
-    }
-
-    private static toDto(entity: Library): LibraryDto {
-        const dto: LibraryDto = {
-            id: entity.id,
-            path: entity.path
-        };
-
-        return dto;
-    }
-
-    private static toEntity(dto: LibraryDto): Library {
-        const entity = new Library();
-        entity.id = dto.id;
-        entity.path = dto.path;
-
-        return entity;
-    }
+  }
 }
