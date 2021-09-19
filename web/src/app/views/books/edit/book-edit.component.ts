@@ -24,7 +24,7 @@ export class BookEditComponent implements OnInit {
 
         this.bookService.getBook(id).subscribe((book: IBook) => {
             if(book.metadata == null) {
-                book.metadata = <IMetadata>{};
+                book.metadata = {} as IMetadata;
             }
 
             this.book = book;
