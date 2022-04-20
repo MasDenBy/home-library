@@ -1,7 +1,12 @@
-import { config } from '../core/config/config';
+import configuration from '../core/config/configuration';
 import fs = require('fs');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('dotenv').config();
+
+console.log(configuration().port);
 
 fs.writeFileSync(
   'ormconfig.json',
-  JSON.stringify(config.typeOrmConfig, null, 2),
+  JSON.stringify(configuration().typeOrmConfig, null, 2),
 );

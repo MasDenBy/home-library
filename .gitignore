@@ -352,3 +352,4 @@ dist
 **/.env
 /api/coverage
 /api/assets/images
+/api/ormconfig.json
