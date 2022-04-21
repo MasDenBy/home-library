@@ -34,10 +34,7 @@
     "test:coverage": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "pretypeorm": "(del ormconfig.json || :) && ts-node -r tsconfig-paths/register src/scripts/write-type-orm-config.ts",
-    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "typeorm:migration:generate": "npm run typeorm -- migration:generate -n",
-    "typeorm:migration:run": "npm run typeorm -- migration:run"
+    "pretypeorm": "(del ormconfig.json || :) && node dist/scripts/write-type-orm-config.js"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
@@ -47,6 +44,7 @@
     "@nestjs/swagger": "^5.0.9",
     "@nestjs/typeorm": "^8.0.2",
     "app-root-path": "^3.0.0",
+    "chokidar": "^3.5.2",
     "mysql": "^2.18.1",
     "nanoid": "^3.1.31",
     "reflect-metadata": "^0.1.13",
