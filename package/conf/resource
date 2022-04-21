@@ -1,0 +1,37 @@
+{
+	"webservice": {
+		"services": [{
+			"service": "homelibrary",
+			"display_name": "Home Library",
+			"support_alias": true,
+			"support_server": true,
+			"type": "static",
+			"root": "homelibrary/web",
+			"icon": "ui/images/{0}.png",
+			"connect_timeout": 60,
+			"read_timeout": 3600,
+			"send_timeout": 60
+		}],
+		"portals": [{
+			"service": "homelibrary",
+			"type": "alias",
+			"name": "homelibrary",
+			"display_name": "Home Library",
+			"alias": "homelibrary",
+			"app": "by.masden.homelibrary"
+		}],
+		"migrate": {
+			"vhost": [{
+				"root": "homelibrary/web",
+				"service": "homelibrary"
+			}]
+		},
+		"pkg_dir_prepare": [{
+			"source": "/var/packages/HomeLibrary/target/src",
+			"target": "homelibrary",
+			"mode": "0755",
+			"group": "http",
+			"user": "homelibrary"
+		}]
+	}
+}

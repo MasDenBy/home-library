@@ -1,0 +1,14 @@
+{
+    ".url": {
+        "by.masden.homelibrary": {
+            "type": "url",
+            "allUsers": true,
+            "title": "Home Library",
+            "desc": "Home Library",
+            "icon": "images/{0}.png",
+            "port": "9000",
+            "protocol": "http",
+            "url": "/web/index.html"
+        }
+    }
+}
