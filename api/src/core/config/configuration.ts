@@ -9,8 +9,8 @@ export default () => ({
     type: 'mariadb',
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT, 10),
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
+    username: process.env.DB_USER_NAME,
+    password: process.env.DB_USER_PASSWORD,
     database: process.env.DB_NAME,
     entities: [
       process.env.NODE_ENV === 'production'
