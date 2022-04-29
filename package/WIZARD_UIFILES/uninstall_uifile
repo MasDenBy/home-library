@@ -1,0 +1,49 @@
+[
+	{
+		"step_title": "Clear package data",
+		"items": [
+			{
+				"type": "singleselect",
+				"desc": "Keep or delete the database.",
+				"subitems": [
+					{
+						"key": "pkgwizard_keep_db",
+						"desc": "<b>Uninstall only.</b> Keep existing files for future re-installation.",
+						"defaultValue": true
+					},
+					{
+						"key": "pkgwizard_remove_db",
+						"desc": "<b style=\"color: red\">Erase all of the package data files. (Not Recoverable)</b>",
+						"defaultValue": false
+					}
+				]
+			}
+		]
+	},
+	{
+		"step_title": "MariaDB 10 configuration if you have chosen to erase all data on the previous step please fill, otherwise skip",
+		"items": [
+			{
+				"type": "textfield",
+				"desc": "MariaDB 10 user with admin privileges (ex. root)",
+				"subitems": [
+					{
+						"key": "pkgwizard_db_user_admin",
+						"desc": "User Name",
+						"defaultValue": "root"
+					}
+				]
+			},
+			{
+				"type": "password",
+				"subitems": [
+					{
+						"indent": 1,
+						"key": "pkgwizard_db_password_admin",
+						"desc": "Password"
+					}
+				]
+			}
+		]
+	}
+]

@@ -1,0 +1,55 @@
+{
+	"webservice": {
+		"services": [{
+			"service": "homelibrary",
+			"display_name": "Home Library",
+			"support_alias": true,
+			"support_server": true,
+			"type": "static",
+			"root": "homelibrary",
+			"icon": "ui/images/{0}.png",
+			"connect_timeout": 60,
+			"read_timeout": 3600,
+			"send_timeout": 60
+		}],
+		"portals": [{
+			"service": "homelibrary",
+			"type": "alias",
+			"name": "homelibrary",
+			"display_name": "Home Library",
+			"alias": "homelibrary",
+			"app": "by.masden.homelibrary"
+		}],
+		"migrate": {
+			"vhost": [{
+				"root": "homelibrary/web",
+				"service": "homelibrary"
+			}]
+		},
+		"pkg_dir_prepare": [{
+			"source": "/var/packages/HomeLibrary/target/system/web",
+			"target": "homelibrary",
+			"mode": "0755",
+			"group": "http",
+			"user": "homelibrary"
+		}]
+	},
+	"mariadb10-db": {
+		"admin-account-m10": "{{pkgwizard_db_user_admin}}",
+		"admin-pw-m10": "{{pkgwizard_db_password_admin}}",
+		"create-db": {
+			"flag": true,
+			"db-name": "<db-name>",
+			"db-collision": "skip"
+		},
+		"grant-user": {
+			"flag": true,
+			"db-name": "<db-name>",
+			"user-name" : "<db-user>",
+			"host" : "localhost",
+			"user-pw": "<db-user-password>"
+		},
+		"drop-db-uninst": "{{pkgwizard_remove_db}}",
+		"drop-user-uninst": "{{pkgwizard_remove_db}}"
+	}
+}
