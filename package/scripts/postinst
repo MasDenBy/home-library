@@ -1,3 +1,10 @@
 #!/bin/sh
 
+APP_NAME=HomeLibrary
+APP_DIR=/var/packages/$APP_NAME/target
+
+cd $APP_DIR/system/api &&
+npm install --only=prod &&
+npm run typeorm migration:run
+
 exit 0

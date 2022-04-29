@@ -16,9 +16,8 @@ create_package_tgz() {
 
 	### install needed file into PKG_DIR
 	cp -av ui $package_tgz_dir
-	cp -av src $package_tgz_dir
-	#cp -av port_conf $package_tgz_dir
-	chown -R http:http $package_tgz_dir/src
+	cp -av system $package_tgz_dir
+	chown -R http:http $package_tgz_dir/system/web
 
 	### create package.tgz $1: source_dir $2: dest_dir
 	pkg_make_package $package_tgz_dir "${PKG_DIR}"
@@ -27,8 +26,8 @@ create_package_tgz() {
 create_spk() {
 	cp -av scripts $PKG_DIR/scripts
 	cp -av conf $PKG_DIR
-	#cp -av port_conf $PKG_DIR
 	cp -av ui $PKG_DIR
+	cp -av WIZARD_UIFILES $PKG_DIR
 	cp -av LICENSE $PKG_DIR
 	cp -av ui/images/72.png  $PKG_DIR/PACKAGE_ICON.PNG
 	cp -av ui/images/256.png $PKG_DIR/PACKAGE_ICON_256.PNG

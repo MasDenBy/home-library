@@ -1,0 +1,36 @@
+[
+	{
+		"step_title": "MariaDB 10 configuration",
+		"items": [
+			{
+				"type": "textfield",
+				"desc": "MariaDB 10 user with admin privileges (ex. root)",
+				"subitems": [
+					{
+						"key": "pkgwizard_db_user_admin",
+						"desc": "User Name",
+						"defaultValue": "root",
+						"validator": {
+							"allowBlank": false,
+							"minLength": 2
+						}
+					}
+				]
+			},
+			{
+				"type": "password",
+				"subitems": [
+					{
+						"indent": 1,
+						"key": "pkgwizard_db_password_admin",
+						"desc": "Password",
+						"validator": {
+							"allowBlank": false,
+							"minLength": 2
+						}
+					}
+				]
+			}
+		]
+	}
+]
