@@ -36,7 +36,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "pretypeorm": "(del ormconfig.json || :) && node dist/scripts/write-type-orm-config.js",
-    "typeorm": "./node_modules/.bin/typeorm"
+    "migration": "./node_modules/.bin/typeorm migration:run"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
@@ -50,11 +50,13 @@
     "forever": "^4.0.3",
     "mysql": "^2.18.1",
     "nanoid": "^3.1.31",
+    "nest-winston": "^1.6.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "swagger-ui-express": "^4.1.6",
-    "typeorm": "^0.2.37"
+    "typeorm": "^0.2.37",
+    "winston": "^3.7.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",

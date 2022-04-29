@@ -1,8 +1,11 @@
 import { INestApplication } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+
 import { AppModule } from './app.module';
+import configuration from './core/config/configuration';
 
 function initSwagger(app: INestApplication): void {
   const apiDocument = new DocumentBuilder()
@@ -16,15 +19,44 @@ function initSwagger(app: INestApplication): void {
   SwaggerModule.setup('api', app, document);
 }
 
+function createLogger(config) {
+  const transports: any = [
+    new winston.transports.File({
+      filename: config.logging.filename,
+      level: config.logging.level,
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+      )
+    })
+  ];
+
+  if (process.env.NODE_ENV !== 'production') {
+    transports.push(new winston.transports.Console({
+      level: 'debug',
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.ms(),
+        nestWinstonModuleUtilities.format.nestLike('api', { prettyPrint: true }),
+      )
+    }));
+  }
+
+  return WinstonModule.createLogger({
+    transports: transports
+  });
+}
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const config = configuration();
+
+  const app = await NestFactory.create(AppModule, {
+    logger: createLogger(config)
+  });
   app.enableCors();
 
   initSwagger(app);
 
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT');
-
-  await app.listen(port);
+  await app.listen(config.port);
 }
 bootstrap();

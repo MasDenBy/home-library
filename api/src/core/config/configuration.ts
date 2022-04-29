@@ -28,4 +28,8 @@ export default () => ({
     },
     synchronize: false,
   } as TypeOrmModuleOptions,
+  logging: {
+    filename: process.env.LOG_FILE,
+    level: process.env.LOG_LEVEL
+  }
 });
