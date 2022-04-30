@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import {
   createReadStream,
@@ -18,6 +18,8 @@ import * as root from 'app-root-path';
 
 @Injectable()
 export class FileSystemWrapper {
+  constructor(private logger: Logger) {}
+
   public async readFiles(folderPath: string): Promise<string[]> {
     const readdirAsync = promisify(readdir);
     const items = await readdirAsync(folderPath);
@@ -68,7 +70,7 @@ export class FileSystemWrapper {
           result.push(items[itemIndex]);
         }
       } catch (ex) {
-        // Need to log exception!!!
+        this.logger.error(ex);
       }
     }
 

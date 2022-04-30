@@ -13,6 +13,7 @@ import {
 import { mock, instance, when } from 'ts-mockito';
 
 import { FileSystemWrapper } from '../fs.wrapper';
+import { Logger } from '@nestjs/common';
 
 jest.mock('path');
 jest.mock('util');
@@ -27,10 +28,12 @@ describe('FileSystemWrapper', () => {
   const testFileName = 'file.name';
 
   let wrapper: FileSystemWrapper;
+  let logger: Logger;
 
   beforeEach(() => {
     jest.resetAllMocks();
-    wrapper = new FileSystemWrapper();
+    logger = mock(Logger);
+    wrapper = new FileSystemWrapper(instance(logger));
   });
 
   test('readFiles', async () => {
