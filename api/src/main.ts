@@ -1,7 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
+import {
+  utilities as nestWinstonModuleUtilities,
+  WinstonModule,
+} from 'nest-winston';
 import * as winston from 'winston';
 
 import { AppModule } from './app.module';
@@ -26,24 +29,28 @@ function createLogger(config) {
       level: config.logging.level,
       format: winston.format.combine(
         winston.format.timestamp(),
-        winston.format.json()
-      )
-    })
+        winston.format.json(),
+      ),
+    }),
   ];
 
   if (process.env.NODE_ENV !== 'production') {
-    transports.push(new winston.transports.Console({
-      level: 'debug',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.ms(),
-        nestWinstonModuleUtilities.format.nestLike('api', { prettyPrint: true }),
-      )
-    }));
+    transports.push(
+      new winston.transports.Console({
+        level: 'debug',
+        format: winston.format.combine(
+          winston.format.timestamp(),
+          winston.format.ms(),
+          nestWinstonModuleUtilities.format.nestLike('api', {
+            prettyPrint: true,
+          }),
+        ),
+      }),
+    );
   }
 
   return WinstonModule.createLogger({
-    transports: transports
+    transports: transports,
   });
 }
 
@@ -51,7 +58,7 @@ async function bootstrap() {
   const config = configuration();
 
   const app = await NestFactory.create(AppModule, {
-    logger: createLogger(config)
+    logger: createLogger(config),
   });
   app.enableCors();
 

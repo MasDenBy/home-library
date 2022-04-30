@@ -1,8 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-import { join } from 'path';
-import * as root from 'app-root-path';
-
 export default () => ({
   port: parseInt(process.env.PORT, 10) || 9000,
   typeOrmConfig: {
@@ -12,17 +9,9 @@ export default () => ({
     username: process.env.DB_USER_NAME,
     password: process.env.DB_USER_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [
-      process.env.NODE_ENV === 'production'
-        ? join(root.path, '**', '*.entity.{ts,js}')
-        : 'dist/**/*.entity{.ts,.js}',
-    ],
+    entities: ['dist/**/*.entity{.ts,.js}'],
     migrationsTableName: 'migrations',
-    migrations: [
-      process.env.NODE_ENV === 'production'
-        ? join(root.path, '**', 'core/database/migrations/*{.ts,.js}')
-        : 'dist/core/database/migrations/*{.ts,.js}',
-    ],
+    migrations: ['dist/core/database/migrations/*{.ts,.js}'],
     cli: {
       migrationsDir: 'src/core/database/migrations',
     },
@@ -30,6 +19,6 @@ export default () => ({
   } as TypeOrmModuleOptions,
   logging: {
     filename: process.env.LOG_FILE,
-    level: process.env.LOG_LEVEL
-  }
+    level: process.env.LOG_LEVEL,
+  },
 });

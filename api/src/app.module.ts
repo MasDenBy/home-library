@@ -21,6 +21,6 @@ import configuration from './core/config/configuration';
     FileManagerModule,
     LibrariesModule,
   ],
-  providers: [Logger]
+  providers: [Logger],
 })
 export class AppModule {}
