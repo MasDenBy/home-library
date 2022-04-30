@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import axios, { AxiosResponse } from 'axios';
 import { mock, instance, when, verify, anyString, anything } from 'ts-mockito';
 
@@ -9,12 +10,16 @@ jest.mock('axios');
 describe('ImageService', () => {
   let service: ImageService;
   let fsMock: FileSystemWrapper;
+  let configService: ConfigService;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
     fsMock = mock(FileSystemWrapper);
-    service = new ImageService(instance(fsMock));
+    configService = mock(ConfigService);
+    service = new ImageService(instance(fsMock), instance(configService));
+
+    when(configService.get<string>('IMAGE_DIR')).thenReturn('images');
   });
 
   test('download', async () => {

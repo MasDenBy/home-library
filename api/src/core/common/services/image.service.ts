@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { nanoid } from 'nanoid';
 import { join } from 'path';
@@ -7,8 +8,10 @@ import { FileSystemWrapper } from './fs.wrapper';
 
 @Injectable()
 export class ImageService {
-  private readonly imagesDirectoryName: string = 'assets/images';
-  constructor(private fs: FileSystemWrapper) {}
+  constructor(
+    private fs: FileSystemWrapper,
+    private configService: ConfigService,
+  ) {}
 
   public async download(url: string): Promise<string> {
     const mediumSizeUrl = url.replace('-S.', '-M.');
@@ -18,9 +21,7 @@ export class ImageService {
       responseType: 'arraybuffer',
     });
 
-    const imagesDirectoryPath = this.fs.pathFromAppRoot(
-      this.imagesDirectoryName,
-    );
+    const imagesDirectoryPath = this.fs.pathFromAppRoot(this.imagesDirectory);
     this.fs.checkOrCreateDirectory(imagesDirectoryPath);
 
     const fileName = join(imagesDirectoryPath, name);
@@ -43,10 +44,12 @@ export class ImageService {
     return buffer.toString('base64');
   }
 
+  private get imagesDirectory() {
+    return this.configService.get<string>('IMAGE_DIR');
+  }
+
   private getImagePath(imageName: string): string {
-    const imagesDirectoryPath = this.fs.pathFromAppRoot(
-      this.imagesDirectoryName,
-    );
+    const imagesDirectoryPath = this.fs.pathFromAppRoot(this.imagesDirectory);
     return join(imagesDirectoryPath, imageName);
   }
 }
