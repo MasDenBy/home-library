@@ -1,3 +1,5 @@
+import { join } from 'path-browserify';
+
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -39,7 +41,7 @@ export class ManageLibraryComponent implements OnInit {
         let followingPath;
 
         if (this.currentPath) {
-            followingPath = this.currentPath.length === 1 ? `\\${path}` : `${this.currentPath}\\${path}`;
+            followingPath = join(this.currentPath, path);
         } else {
             followingPath = path;
         }
@@ -52,8 +54,9 @@ export class ManageLibraryComponent implements OnInit {
             return;
         }
 
-        const index = this.currentPath.lastIndexOf('\\');
-        const path = index === 0 ? '\\' : this.currentPath.substring(0, index);
+        const separator = this.currentPath[0];
+        const index = this.currentPath.lastIndexOf(separator);
+        const path = index === 0 ? separator : this.currentPath.substring(0, index);
 
         this.openPath(path);
     }

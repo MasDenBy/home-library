@@ -17,7 +17,7 @@ import { ManageLibraryComponent } from './manage-library.component';
 import { LibraryService } from '../services/library.service';
 
 describe('ManageLibraryComponent', () => {
-    const testPath: IPath = { path: '\\', folders: ['a', 'b']};
+    const testPath: IPath = { path: '/', folders: ['a', 'b']};
 
     let component: ManageLibraryComponent;
     let fixture: ComponentFixture<ManageLibraryComponent>;
@@ -106,19 +106,19 @@ describe('ManageLibraryComponent', () => {
     describe('openFolder', () => {
         const folderPath = 'path';
 
-        it('should add \\ to folder if current is root', () => {
+        it('should add / to folder if current is root', () => {
             component.openFolder(folderPath);
 
-            expect(fileManagerService.getPaths).toHaveBeenCalledWith(`\\${folderPath}`);
+            expect(fileManagerService.getPaths).toHaveBeenCalledWith(`/${folderPath}`);
         });
 
         it('should join the path and open folder', () => {
-            const currentPath = '\\myfolder';
+            const currentPath = '/myfolder';
 
             component.currentPath = currentPath;
             component.openFolder(folderPath);
 
-            expect(fileManagerService.getPaths).toHaveBeenCalledWith(`${currentPath}\\${folderPath}`);
+            expect(fileManagerService.getPaths).toHaveBeenCalledWith(`${currentPath}/${folderPath}`);
         });
 
         it('should use path args if currentPath is null', () => {
@@ -139,7 +139,7 @@ describe('ManageLibraryComponent', () => {
         });
 
         it('should not go back if current path is root', () => {
-            component.currentPath = '\\';
+            component.currentPath = '/';
 
             component.back();
 
@@ -147,11 +147,11 @@ describe('ManageLibraryComponent', () => {
         });
 
         it('should go back', () => {
-            component.currentPath = '\\folder';
+            component.currentPath = '/folder';
 
             component.back();
 
-            expect(fileManagerService.getPaths).toHaveBeenCalledWith('\\');
+            expect(fileManagerService.getPaths).toHaveBeenCalledWith('/');
         });
     });
 });
