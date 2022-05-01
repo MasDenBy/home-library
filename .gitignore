@@ -353,3 +353,4 @@ dist
 /api/coverage
 /api/assets/images
 /api/ormconfig.json
+api/.env.production
