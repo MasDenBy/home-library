@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { FolderDto } from './folder.dto';
 import { FileManagerService } from './services/filemanager.service';
@@ -10,7 +10,7 @@ export class FileManagerController {
 
   @Get()
   @ApiOkResponse({ type: FolderDto })
-  public async list(@Param('path') path: string): Promise<FolderDto> {
+  public async list(@Query('path') path: string): Promise<FolderDto> {
     return await this.fileManagerService.directoryList(path);
   }
 }
