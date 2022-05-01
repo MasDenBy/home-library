@@ -35,7 +35,7 @@
     "test:coverage": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "pretypeorm": "(del ormconfig.json || :) && node dist/scripts/write-type-orm-config.js",
+    "premigration": "(del ormconfig.json || :) && node dist/scripts/write-type-orm-config.js",
     "migration": "./node_modules/.bin/typeorm migration:run"
   },
   "dependencies": {
