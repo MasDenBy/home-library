@@ -70,7 +70,9 @@ export class FileSystemWrapper {
           result.push(items[itemIndex]);
         }
       } catch (ex) {
-        this.logger.error(ex);
+        if (ex.code !== 'EPERM' && ex.code !== 'EBUSY') {
+          this.logger.error(ex);
+        }
       }
     }
 

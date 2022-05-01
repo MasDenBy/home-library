@@ -10,7 +10,7 @@ import {
   unlinkSync,
 } from 'fs';
 
-import { mock, instance, when } from 'ts-mockito';
+import { mock, instance, when, anything, verify } from 'ts-mockito';
 
 import { FileSystemWrapper } from '../fs.wrapper';
 import { Logger } from '@nestjs/common';
@@ -121,25 +121,66 @@ describe('FileSystemWrapper', () => {
     expect(createReadStreamMock).toHaveBeenCalledWith(fileName);
   });
 
-  test('readDirectory', async () => {
-    // Arrange
-    const readdirAsyncMock = jest.fn();
-    readdirAsyncMock.mockReturnValueOnce(['folder2', 'folder']);
+  describe('readDirectory', () => {
+    let readdirAsyncMock: jest.Mock<any, any>;
+    let promisifyMock: jest.MockedFunction<typeof promisify>;
+    let lstatSyncMock: jest.MockedFunction<typeof lstatSync>;
 
-    const promisifyMock = promisify as jest.MockedFunction<typeof promisify>;
-    promisifyMock.mockReturnValue(readdirAsyncMock);
+    beforeEach(() => {
+      readdirAsyncMock = jest.fn();
+      readdirAsyncMock.mockReturnValueOnce(['folder2', 'folder']);
 
-    const dirStats = mock(Stats);
-    when(dirStats.isDirectory()).thenReturn(true);
+      promisifyMock = promisify as jest.MockedFunction<typeof promisify>;
+      promisifyMock.mockReturnValue(readdirAsyncMock);
 
-    const lstatSyncMock = lstatSync as jest.MockedFunction<typeof lstatSync>;
-    lstatSyncMock.mockReturnValue(instance(dirStats));
+      lstatSyncMock = lstatSync as jest.MockedFunction<typeof lstatSync>;
+    });
 
-    // Act
-    const result = await wrapper.readDirectory('folder');
+    test('successfully return folders', async () => {
+      // Arrange
+      const dirStats = mock(Stats);
+      when(dirStats.isDirectory()).thenReturn(true);
+  
+      lstatSyncMock.mockReturnValue(instance(dirStats));
+  
+      // Act
+      const result = await wrapper.readDirectory('folder');
+  
+      // Assert
+      expect(result.length).toBe(2);
+    });
 
-    // Assert
-    expect(result.length).toBe(2);
+    test('when the folder does not accessible then do not log the exception', async () => {
+      // Arrange
+      lstatSyncMock.mockImplementationOnce(() => {
+        throw { code: 'EPERM' };
+      });
+      lstatSyncMock.mockImplementationOnce(() => {
+        throw { code: 'EBUSY' };
+      });
+
+      // Act
+      const result = await wrapper.readDirectory('folder');
+  
+      // Assert
+      expect(result.length).toBe(0);
+      verify(logger.error(anything())).never();
+    });
+
+    test('when exception occurs then log the exception', async () => {
+      // Arrange
+      const expectedError = new Error('test');
+
+      lstatSyncMock.mockImplementationOnce(() => {
+        throw expectedError;
+      });
+
+      // Act
+      await wrapper.readDirectory('folder');
+  
+      // Assert
+      verify(logger.error(expectedError)).once();
+    });
   });
 
   test('osRoot', () => {

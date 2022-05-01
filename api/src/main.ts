@@ -23,7 +23,7 @@ function initSwagger(app: INestApplication): void {
 }
 
 function createLogger(config) {
-  const transports: any = [
+  const transports: winston.transport[] = [
     new winston.transports.File({
       filename: config.logging.filename,
       level: config.logging.level,
