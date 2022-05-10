@@ -44,7 +44,7 @@ describe('FileSystemWrapper', () => {
     beforeEach(() => {
       readdirAsyncMock = jest.fn();
       readdirAsyncMock.mockReturnValueOnce(['file1.pdf', 'folder']);
-      readdirAsyncMock.mockReturnValueOnce([]);
+      readdirAsyncMock.mockReturnValueOnce(['#recycle']);
 
       promisifyMock = promisify as jest.MockedFunction<typeof promisify>;
       promisifyMock.mockReturnValue(readdirAsyncMock);
@@ -166,10 +166,13 @@ describe('FileSystemWrapper', () => {
     let readdirAsyncMock: jest.Mock<any, any>;
     let promisifyMock: jest.MockedFunction<typeof promisify>;
     let lstatSyncMock: jest.MockedFunction<typeof lstatSync>;
+    let readdirAsyncMockFunc = () => null;
 
     beforeEach(() => {
+      readdirAsyncMockFunc = () => ['folder2', 'folder'];
+
       readdirAsyncMock = jest.fn();
-      readdirAsyncMock.mockReturnValueOnce(['folder2', 'folder']);
+      readdirAsyncMock.mockImplementation(() => readdirAsyncMockFunc());
 
       promisifyMock = promisify as jest.MockedFunction<typeof promisify>;
       promisifyMock.mockReturnValue(readdirAsyncMock);
@@ -177,8 +180,14 @@ describe('FileSystemWrapper', () => {
       lstatSyncMock = lstatSync as jest.MockedFunction<typeof lstatSync>;
     });
 
-    test('successfully return folders', async () => {
+    test.each([
+      { folders: ['folder2', 'folder', 'folder3'], expected: 3 },
+      { folders: ['folder2', 'folder', 'folder3', '#recycle'], expected: 3 },
+      { folders: ['#recycle'], expected: 0 }
+    ])('successfully return folders', async ({folders, expected}) => {
       // Arrange
+      readdirAsyncMockFunc = () => folders;
+
       const dirStats = mock(Stats);
       when(dirStats.isDirectory()).thenReturn(true);
   
@@ -188,7 +197,7 @@ describe('FileSystemWrapper', () => {
       const result = await wrapper.readDirectory('folder');
   
       // Assert
-      expect(result.length).toBe(2);
+      expect(result.length).toBe(expected);
     });
 
     test('when the folder does not accessible then do not log the exception', async () => {
