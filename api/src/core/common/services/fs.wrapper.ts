@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import {
   createReadStream,
@@ -28,7 +28,9 @@ export class FileSystemWrapper {
 
     for (const itemIndex in items) {
       const fullPath = join(folderPath, items[itemIndex]);
-      const itemInfo: Stats = lstatSync(fullPath);
+      const itemInfo: Stats = this.getPathInfo(fullPath);
+
+      if(itemInfo == null) continue;
 
       if (itemInfo.isDirectory()) {
         const files = await this.readFiles(fullPath);
@@ -63,16 +65,12 @@ export class FileSystemWrapper {
 
     for (const itemIndex in items) {
       const fullPath = join(folderPath, items[itemIndex]);
-      try {
-        const itemInfo: Stats = lstatSync(fullPath);
+      const itemInfo: Stats = this.getPathInfo(fullPath);
 
-        if (itemInfo.isDirectory()) {
-          result.push(items[itemIndex]);
-        }
-      } catch (ex) {
-        if (ex.code !== 'EPERM' && ex.code !== 'EBUSY') {
-          this.logger.error(ex);
-        }
+      if (itemInfo == null) continue;
+
+      if (itemInfo.isDirectory()) {
+        result.push(items[itemIndex]);
       }
     }
 
@@ -108,5 +106,17 @@ export class FileSystemWrapper {
     const readFileAsync = promisify(readFile);
 
     return await readFileAsync(filePath);
+  }
+
+  private getPathInfo(path: string): Stats {
+    try {
+      return lstatSync(path);
+    } catch (ex) {
+      if (ex.code !== 'EPERM' && ex.code !== 'EBUSY') {
+        this.logger.error(ex);
+      }
+    }
+
+    return null;
   }
 }
