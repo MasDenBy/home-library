@@ -36,31 +36,72 @@ describe('FileSystemWrapper', () => {
     wrapper = new FileSystemWrapper(instance(logger));
   });
 
-  test('readFiles', async () => {
-    // Arrange
-    const readdirAsyncMock = jest.fn();
-    readdirAsyncMock.mockReturnValueOnce(['file1.pdf', 'folder']);
-    readdirAsyncMock.mockReturnValueOnce([]);
+  describe('readFiles', () => {
+    let readdirAsyncMock: jest.Mock<any, any>;
+    let promisifyMock: jest.MockedFunction<typeof promisify>;
+    let lstatSyncMock: jest.MockedFunction<typeof lstatSync>;
 
-    const promisifyMock = promisify as jest.MockedFunction<typeof promisify>;
-    promisifyMock.mockReturnValue(readdirAsyncMock);
+    beforeEach(() => {
+      readdirAsyncMock = jest.fn();
+      readdirAsyncMock.mockReturnValueOnce(['file1.pdf', 'folder']);
+      readdirAsyncMock.mockReturnValueOnce([]);
 
-    const fileStats = mock(Stats);
-    when(fileStats.isDirectory()).thenReturn(false);
-    when(fileStats.isFile()).thenReturn(true);
+      promisifyMock = promisify as jest.MockedFunction<typeof promisify>;
+      promisifyMock.mockReturnValue(readdirAsyncMock);
 
-    const dirStats = mock(Stats);
-    when(dirStats.isDirectory()).thenReturn(true);
+      lstatSyncMock = lstatSync as jest.MockedFunction<typeof lstatSync>;
+    });
 
-    const lstatSyncMock = lstatSync as jest.MockedFunction<typeof lstatSync>;
-    lstatSyncMock.mockReturnValueOnce(instance(fileStats));
-    lstatSyncMock.mockReturnValueOnce(instance(dirStats));
+    test('successfully return files', async () => {
+      // Arrange
+      const fileStats = mock(Stats);
+      when(fileStats.isDirectory()).thenReturn(false);
+      when(fileStats.isFile()).thenReturn(true);
+  
+      const dirStats = mock(Stats);
+      when(dirStats.isDirectory()).thenReturn(true);
+  
+      lstatSyncMock.mockReturnValueOnce(instance(fileStats));
+      lstatSyncMock.mockReturnValueOnce(instance(dirStats));
+  
+      // Act
+      const result = await wrapper.readFiles('folder');
+  
+      // Assert
+      expect(result.length).toBe(1);
+    });
 
-    // Act
-    const result = await wrapper.readFiles('folder');
+    test('when the file/folder does not accessible then do not log the exception', async () => {
+      // Arrange
+      lstatSyncMock.mockImplementationOnce(() => {
+        throw { code: 'EPERM' };
+      });
+      lstatSyncMock.mockImplementationOnce(() => {
+        throw { code: 'EBUSY' };
+      });
 
-    // Assert
-    expect(result.length).toBe(1);
+      // Act
+      const result = await wrapper.readFiles('folder');
+  
+      // Assert
+      expect(result.length).toBe(0);
+      verify(logger.error(anything())).never();
+    });
+
+    test('when exception occurs then log the exception', async () => {
+      // Arrange
+      const expectedError = new Error('test');
+
+      lstatSyncMock.mockImplementationOnce(() => {
+        throw expectedError;
+      });
+
+      // Act
+      await wrapper.readFiles('folder');
+  
+      // Assert
+      verify(logger.error(expectedError)).once();
+    });
   });
 
   test('basename', () => {
