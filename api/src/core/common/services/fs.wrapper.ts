@@ -18,7 +18,7 @@ import * as root from 'app-root-path';
 
 @Injectable()
 export class FileSystemWrapper {
-  private readonly excludedFolders: string[] = ['#recycle'];
+  private readonly excludedFolders: string[] = ['#recycle', '@eaDir'];
 
   constructor(private logger: Logger) {}
 
