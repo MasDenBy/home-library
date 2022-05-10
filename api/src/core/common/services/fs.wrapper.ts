@@ -18,6 +18,8 @@ import * as root from 'app-root-path';
 
 @Injectable()
 export class FileSystemWrapper {
+  private readonly excludedFolders: string[] = ['#recycle'];
+
   constructor(private logger: Logger) {}
 
   public async readFiles(folderPath: string): Promise<string[]> {
@@ -26,8 +28,8 @@ export class FileSystemWrapper {
 
     const result: string[] = [];
 
-    for (const itemIndex in items) {
-      const fullPath = join(folderPath, items[itemIndex]);
+    for (const item of this.excludeFolders(items)) {
+      const fullPath = join(folderPath, item);
       const itemInfo: Stats = this.getPathInfo(fullPath);
 
       if(itemInfo == null) continue;
@@ -63,14 +65,14 @@ export class FileSystemWrapper {
 
     const result: string[] = [];
 
-    for (const itemIndex in items) {
-      const fullPath = join(folderPath, items[itemIndex]);
+    for (const item of this.excludeFolders(items)) {
+      const fullPath = join(folderPath, item);
       const itemInfo: Stats = this.getPathInfo(fullPath);
 
       if (itemInfo == null) continue;
 
       if (itemInfo.isDirectory()) {
-        result.push(items[itemIndex]);
+        result.push(item);
       }
     }
 
@@ -118,5 +120,15 @@ export class FileSystemWrapper {
     }
 
     return null;
+  }
+
+  private excludeFolders(paths: string[]): string[] {
+    return paths.filter(path => {
+      for (let folder of this.excludedFolders) {
+        if (path.includes(folder)) return false;
+      }
+
+      return true;
+    });
   }
 }
