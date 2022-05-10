@@ -4,6 +4,8 @@
             <img [src]="imageService.prepareBase64Image(book.file.image)">
         </div>
         <div class="p-col-10">
+            <h3>Path</h3>
+            <input type="text" pInputText [(ngModel)]="book.file.path" disabled="true">
             <h3>Title</h3>
             <input type="text" pInputText [(ngModel)]="book.title">
             <h3>Authors</h3>
