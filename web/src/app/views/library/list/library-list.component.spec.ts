@@ -1,4 +1,4 @@
-import { TestBed, ComponentFixture, async } from '@angular/core/testing';
+import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { By } from '@angular/platform-browser';
 
@@ -21,7 +21,7 @@ describe('LibraryListComponent', () => {
     let fixture: ComponentFixture<LibraryListComponent>;
     let libraryService: jasmine.SpyObj<LibraryService>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [LibraryListComponent],
             imports: [

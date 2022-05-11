@@ -1,7 +1,7 @@
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TestBed, ComponentFixture, async, fakeAsync } from '@angular/core/testing';
+import { TestBed, ComponentFixture, fakeAsync, waitForAsync } from '@angular/core/testing';
 
 
 import {ListboxModule} from 'primeng/listbox';
@@ -26,7 +26,7 @@ describe('ManageLibraryComponent', () => {
     let indexService: jasmine.SpyObj<IndexService>;
     let router: jasmine.SpyObj<Router>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [ManageLibraryComponent],
             imports: [
