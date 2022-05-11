@@ -28,8 +28,21 @@ describe('IndexerService', () => {
     const lib1 = <Library>{ path: '/lib1' };
 
     when(fsMock.readFiles(lib1.path)).thenResolve([
-      'filename.book',
-      'second.book',
+      'book1.docx',
+      'book2.doc',
+      'book3.epub',
+      'book4.pdf',
+      'book5.djvu',
+      'book6.txt',
+      'book7.fb2',
+      'book8.azw3',
+      'book9.mobi',
+      'book10.azw4',
+      'book11.azw',
+      'book12.rtf',
+      'fake.book',
+      'incorrect.mp3',
+      'format.fb3'
     ]);
 
     // Act
@@ -37,7 +50,7 @@ describe('IndexerService', () => {
 
     // Assert
     verify(fsMock.readFiles(anyString())).once();
-    verify(bookServiceMock.createFromFile(anyString(), lib1)).twice();
+    verify(bookServiceMock.createFromFile(anyString(), lib1)).times(12);
     verify(watcherMock.run(lib1)).once();
   });
 });

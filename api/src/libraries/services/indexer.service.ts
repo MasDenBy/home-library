@@ -6,6 +6,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class IndexerService {
+  private readonly bookFileExtensions: string[] = ['.docx', '.doc', '.epub', '.pdf', '.djvu', '.txt', '.fb2', '.azw3', '.mobi', '.azw4', '.azw', '.rtf'];
   constructor(
     private fs: FileSystemWrapper,
     private bookService: BookService,
@@ -20,11 +21,16 @@ export class IndexerService {
   private async processLibrary(library: Library): Promise<void> {
     const files = await this.fs.readFiles(library.path);
 
-    for (const index in files) {
-      const file = files[index];
-
+    for (const file of files.filter(x => this.isBook(x))) {
       const id = await this.bookService.createFromFile(file, library);
       this.bookService.index(id);
     }
+  }
+
+  private isBook(fileName: string): boolean {
+    var ext = fileName.substring(fileName.lastIndexOf('.'))
+                      .toLowerCase();
+
+    return this.bookFileExtensions.includes(ext);
   }
 }
