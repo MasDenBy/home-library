@@ -3,6 +3,7 @@
 header {
     background-color: $color-main-background;
     min-height: 55px;
+    margin-bottom: 0.1rem;
     .branding {
         float: left;
         display: none;
@@ -13,7 +14,7 @@ header {
         }
     } 
     .branding a {
-        font-size: 3.5rem;
+        font-size: 2.3rem;
         overflow: hidden;
         margin: 0;
         color: $offwhite;
@@ -49,9 +50,13 @@ header {
     .actions {
         float: right;
         width: 4%;
-        padding-top: 17px;
+        padding-top: 15px;
         i {
-            font-size: 1.75em;
+            font-size: 1.75rem;
+        }
+        a {
+            color: $color-primary;
+            text-decoration: none;
         }
     }
 }

@@ -1,3 +1,5 @@
+@import "../../../../styles/variables.scss";
+
 .book-image {
     padding-top: 20px; 
     img {
@@ -9,9 +11,14 @@
 
 :host{
     ::ng-deep {
-        .ui-inputtext,
-        .ui-inputnumber {
+        .p-inputtext {
             width: 100%;
+        }
+        p-inputnumber {
+            display: grid;
+        }
+        .p-editor-container .p-editor-toolbar {
+            background: $color-main-background;
         }
     }
 }
@@ -21,4 +28,11 @@
     button {
         margin-right: 10px;
     }
+}
+
+h5 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.7em;
+    font-weight: 900;
 }

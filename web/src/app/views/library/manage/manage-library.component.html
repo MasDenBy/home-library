@@ -1,4 +1,4 @@
-<h1>Add Library Folder</h1>
+<h3>Add Library Folder</h3>
 
 <div class="row-100">
     <input type="text" pInputText [(ngModel)]="currentPath"/>
@@ -8,9 +8,13 @@
 <div class="row-100">
     <p-listbox [options]="folders">
         <ng-template let-folder let-i="index" pTemplate="item">
-            <div class="ui-helper-clearfix">
-                <span>{{folder}}</span>
-                <button pButton (click)="openFolder(folder)" type="button" icon="pi pi-angle-double-right" iconPos="left" style="float:right;"></button>
+            <div class="grid grid-nogutter">
+                <div class="col-11 path">
+                    <span>{{folder}}</span>
+                </div>
+                <div class="col open">
+                    <button pButton (click)="openFolder(folder)" type="button" icon="pi pi-angle-double-right" iconPos="left"></button>
+                </div>
             </div>
         </ng-template>
     </p-listbox>

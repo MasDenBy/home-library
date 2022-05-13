@@ -1,23 +1,35 @@
 @import "../../../../styles/mixins.scss";
 
 :host{
-    ::ng-deep .ui-listbox {
-        width: 100%;
-    }
-    .ui-helper-clearfix span {
-        vertical-align: -webkit-baseline-middle;
+    ::ng-deep {
+        .ui-listbox,
+        .grid {
+            width: 100%;
+        }
+        .p-listbox-item .col {
+            padding: 0;
+        }
     }
 }
 
 .page-header-action {
     @include clearfix;
-    h1 {
+    h3 {
         float: left;
+        margin-top: 1rem;
     }
     button {
         float: right; 
         position: relative; 
         top: 20px; 
-        right: 15px;
+        right: 9px;
     }
+}
+
+.delete button {
+    float: right;
+    margin-right: 0.5rem;
+}
+.path {
+    padding-top: 0.5rem;
 }

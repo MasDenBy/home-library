@@ -60,7 +60,7 @@ describe('LibraryListComponent', () => {
 
             fixture.detectChanges();
 
-            const reject = fixture.debugElement.query(By.css('.ui-dialog-footer')).children[1].nativeElement;
+            const reject = fixture.debugElement.query(By.css('.p-dialog-footer')).children[0].nativeElement;
             reject.click();
 
             expect(libraryService.delete).not.toHaveBeenCalledWith(id);
@@ -75,14 +75,14 @@ describe('LibraryListComponent', () => {
 
             fixture.detectChanges();
 
-            const confirm = fixture.debugElement.query(By.css('.ui-dialog-footer')).children[0].nativeElement;
+            const confirm = fixture.debugElement.query(By.css('.p-dialog-footer')).children[1].nativeElement;
             confirm.click();
 
             fixture.detectChanges();
 
-            const toastMessage = fixture.debugElement.query(By.css('.ui-toast-message'));
+            const toastMessage = fixture.debugElement.query(By.css('.p-toast-message'));
             expect(toastMessage.nativeElement).toBeTruthy();
-            expect(toastMessage.nativeElement.classList).toContain('ui-toast-message-success');
+            expect(toastMessage.nativeElement.classList).toContain('p-toast-message-success');
 
             expect(libraryService.delete).toHaveBeenCalledWith(id);
         });
@@ -96,14 +96,14 @@ describe('LibraryListComponent', () => {
 
             fixture.detectChanges();
 
-            const confirm = fixture.debugElement.query(By.css('.ui-dialog-footer')).children[0].nativeElement;
+            const confirm = fixture.debugElement.query(By.css('.p-dialog-footer')).children[1].nativeElement;
             confirm.click();
 
             fixture.detectChanges();
 
-            const toastMessage = fixture.debugElement.query(By.css('.ui-toast-message'));
+            const toastMessage = fixture.debugElement.query(By.css('.p-toast-message'));
             expect(toastMessage.nativeElement).toBeTruthy();
-            expect(toastMessage.nativeElement.classList).toContain('ui-toast-message-error');
+            expect(toastMessage.nativeElement.classList).toContain('p-toast-message-error');
 
             expect(libraryService.delete).toHaveBeenCalledWith(id);
         });
