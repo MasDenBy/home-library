@@ -108,11 +108,11 @@ describe('BookDetailsComponent', () => {
 
             fixture.detectChanges();
 
-            const dropDownEl = fixture.debugElement.query(By.css('.ui-splitbutton-menubutton')).nativeElement;
+            const dropDownEl = fixture.debugElement.query(By.css('.p-splitbutton-menubutton')).nativeElement;
             dropDownEl.click();
             fixture.detectChanges();
 
-            const menuEl = fixture.debugElement.query(By.css('.ui-menuitem')).children[0].nativeElement;
+            const menuEl = fixture.debugElement.query(By.css('.p-menuitem')).children[0].nativeElement;
             menuEl.click();
             fixture.detectChanges();
 
@@ -131,17 +131,17 @@ describe('BookDetailsComponent', () => {
             component.ngOnInit();
             fixture.detectChanges();
 
-            const dropDownEl = fixture.debugElement.query(By.css('.ui-splitbutton-menubutton')).nativeElement;
+            const dropDownEl = fixture.debugElement.query(By.css('.p-splitbutton-menubutton')).nativeElement;
             dropDownEl.click();
             fixture.detectChanges();
 
-            const deleteCommand = fixture.debugElement.query(By.css('.ui-menuitem:nth-child(2)')).children[0].nativeElement;
+            const deleteCommand = fixture.debugElement.query(By.css('.p-menuitem:nth-child(2)')).children[0].nativeElement;
             deleteCommand.click();
             fixture.detectChanges();
         });
 
         it('should not delete if not accept', () => {
-            const reject = fixture.debugElement.query(By.css('.ui-dialog-footer')).children[1].nativeElement;
+            const reject = fixture.debugElement.query(By.css('.p-dialog-footer')).children[0].nativeElement;
             reject.click();
 
             expect(bookService.delete).not.toHaveBeenCalledWith(id);
@@ -153,7 +153,7 @@ describe('BookDetailsComponent', () => {
                 observer.complete();
             }));
 
-            const confirm = fixture.debugElement.query(By.css('.ui-dialog-footer')).children[0].nativeElement;
+            const confirm = fixture.debugElement.query(By.css('.p-dialog-footer')).children[1].nativeElement;
             confirm.click();
 
             fixture.detectChanges();
@@ -167,14 +167,14 @@ describe('BookDetailsComponent', () => {
                 observer.error();
             }));
 
-            const confirm = fixture.debugElement.query(By.css('.ui-dialog-footer')).children[0].nativeElement;
+            const confirm = fixture.debugElement.query(By.css('.p-dialog-footer')).children[1].nativeElement;
             confirm.click();
 
             fixture.detectChanges();
 
-            const toastMessage = fixture.debugElement.query(By.css('.ui-toast-message'));
+            const toastMessage = fixture.debugElement.query(By.css('.p-toast-message'));
             expect(toastMessage.nativeElement).toBeTruthy();
-            expect(toastMessage.nativeElement.classList).toContain('ui-toast-message-error');
+            expect(toastMessage.nativeElement.classList).toContain('p-toast-message-error');
 
             expect(bookService.delete).toHaveBeenCalledWith(id);
         });
@@ -221,9 +221,9 @@ describe('BookDetailsComponent', () => {
 
             expect(bookService.download).toHaveBeenCalledWith(book.id);
 
-            const toastMessage = fixture.debugElement.query(By.css('.ui-toast-message'));
+            const toastMessage = fixture.debugElement.query(By.css('.p-toast-message'));
             expect(toastMessage.nativeElement).toBeTruthy();
-            expect(toastMessage.nativeElement.classList).toContain('ui-toast-message-error');
+            expect(toastMessage.nativeElement.classList).toContain('p-toast-message-error');
         });
     });
 });

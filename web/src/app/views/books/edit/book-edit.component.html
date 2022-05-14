@@ -1,42 +1,42 @@
-<div *ngIf="book">
-    <div class="p-grid">
-        <div class="p-col-2 book-image">
+<div class="row-100 pd-1" *ngIf="book">
+    <div class="grid">
+        <div class="col-2 book-image">
             <img [src]="imageService.prepareBase64Image(book.file.image)">
         </div>
-        <div class="p-col-10">
-            <h3>Path</h3>
-            <input type="text" pInputText [(ngModel)]="book.file.path" disabled="true">
-            <h3>Title</h3>
-            <input type="text" pInputText [(ngModel)]="book.title">
-            <h3>Authors</h3>
-            <input type="text" pInputText [(ngModel)]="book.authors">
-            <div class="p-grid">
-                <div class="p-col">
-                    <h3>ISBN</h3>
-                    <input type="text" pInputText [(ngModel)]="book.metadata.isbn">
+        <div class="col-10">
+            <h5>Path</h5>
+            <input type="text" pInputText [(ngModel)]="book.file.path" disabled="true" class="p-inputtext-sm">
+            <h5>Title</h5>
+            <input type="text" pInputText [(ngModel)]="book.title" class="p-inputtext-sm">
+            <h5>Authors</h5>
+            <input type="text" pInputText [(ngModel)]="book.authors" class="p-inputtext-sm">
+            <div class="grid">
+                <div class="col">
+                    <h5>ISBN</h5>
+                    <input type="text" pInputText [(ngModel)]="book.metadata.isbn" class="p-inputtext-sm">
                 </div>
-                <div class="p-col">
-                    <h3>Pages</h3>
-                    <p-inputNumber [(ngModel)]="book.metadata.pages"></p-inputNumber>
+                <div class="col">
+                    <h5>Pages</h5>
+                    <p-inputNumber [(ngModel)]="book.metadata.pages" class="p-inputtext-sm" min="1"></p-inputNumber>
                 </div>
-                <div class="p-col">
-                    <h3>Year</h3>
-                    <input type="text" pInputText [(ngModel)]="book.metadata.year">
+                <div class="col">
+                    <h5>Year</h5>
+                    <input type="text" pInputText [(ngModel)]="book.metadata.year" class="p-inputtext-sm">
                 </div>
             </div>
-            <h3>Description</h3>
+            <h5>Description</h5>
             <p-editor [(ngModel)]="book.description">
-                <p-header>
-                    <span class="ql-formats">
+                <ng-template pTemplate="header">
+                    <span class="ql-format-group">
                         <button class="ql-bold" aria-label="Bold"></button>
                         <button class="ql-italic" aria-label="Italic"></button>
                         <button class="ql-underline" aria-label="Underline"></button>
                     </span>
-                </p-header>
+                </ng-template>
             </p-editor>
             <div class="actions">
                 <button pButton label="Save" (click)="save()" type="button"></button>
-                <button pButton label="Cancel" [routerLink]="['/books', book.id]" type="button" class="ui-button-secondary"></button>
+                <button pButton label="Cancel" [routerLink]="['/books', book.id]" type="button" class="p-button-secondary"></button>
             </div>
         </div>
     </div>

@@ -1,16 +1,17 @@
+@import '../../../../styles/styles.scss';
+
 .book {
     margin-bottom: 30px;
     text-align: center;
     .book-header {
         padding: 0 15px;
         .author {
-            font-size: 14px;
             font-weight: 400;
             padding: 0;
             color: #333;
             text-transform: capitalize;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 0.2rem;
         }
         h3 {
             margin: 0;
@@ -22,6 +23,7 @@
                 font-size: 16px;
                 font-weight: 600;
                 margin-bottom: 18px;
+                color: $color-primary;
             }
         }
     }
@@ -35,7 +37,18 @@
 }
 
 :host{
-    ::ng-deep .ui-dataview-header {
-        display: none;
+    ::ng-deep {
+        .ui-dataview-header {
+            display: none;
+        }
+
+        .p-dataview .p-dataview-content {
+            background: transparent;
+        }
+
+        .p-paginator {
+            background: transparent;
+            border: 0;
+        }
     }
 }

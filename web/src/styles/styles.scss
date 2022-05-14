@@ -2,10 +2,6 @@
 @import "variables";
 @import "primeng";
 
-html {
-    font-size: 62.5%;
-}
-
 body {
     margin: 0;
     padding: 0;
@@ -17,5 +13,18 @@ body {
 
 .row-100 { 
     width: 100%;
-    padding: 2px;
+    padding: 0.1rem;
+}
+
+.pd-1 {padding: 1rem;}
+
+:host{
+    ::ng-deep {
+        .p-listbox-item:nth-child(even) {
+            background: $green-100;
+        }
+        .p-listbox-item:nth-child(odd) {
+            background: $green-200;
+        }
+    }
 }
