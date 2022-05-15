@@ -23,7 +23,7 @@ describe('ImageService', () => {
         it('should return no image when image is null', () => {
             const image = service.prepareBase64Image(null);
 
-            expect(image).toEqual('/assets/images/no_image.png');
+            expect(image).toEqual('assets/images/no_image.png');
         });
 
         it('should bypassSecurityTrustResourceUrl when image is not null', () => {
