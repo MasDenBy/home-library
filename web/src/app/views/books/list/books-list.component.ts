@@ -5,6 +5,8 @@ import { IPage } from '../models/book.model';
 import { BookService } from '../services/book.service';
 import { ImageService, SessionStorage } from '../../../common';
 import { Constants } from '../../../constants';
+import { tap } from 'rxjs/operators';
+import { LoadingService } from '../../../common/components/loading/loading.service';
 
 @Component({
     templateUrl: './books-list.component.html',
@@ -21,6 +23,7 @@ export class BooksListComponent implements OnInit {
         private route: ActivatedRoute,
         private bookService: BookService,
         private sessionStorage: SessionStorage,
+        private readonly loadingService: LoadingService,
         public imageService: ImageService) { }
 
     ngOnInit(): void {
@@ -38,12 +41,14 @@ export class BooksListComponent implements OnInit {
     }
 
     private retrieveBooks(offset: number, count: number): void {
-        const observable = this.pattern
+        const page$ = (this.pattern
             ? this.bookService.search(this.pattern, offset, count)
-            : this.bookService.getBooks(offset, count);
+            : this.bookService.getBooks(offset, count))
+            .pipe(
+                tap(page => this.page = page)
+            );
 
-        observable.subscribe((page: IPage) => {
-            this.page = page;
-        });
+        this.loadingService.showLoaderUntilCompleted(page$)
+                .subscribe();
     }
 }

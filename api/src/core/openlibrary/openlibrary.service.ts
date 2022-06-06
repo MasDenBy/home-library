@@ -5,7 +5,7 @@ import { BookInfo, SearchResponseDto } from './openlibrary.dto';
 
 @Injectable()
 export class OpenLibraryService {
-  constructor(private readonly logger: Logger) { }
+  constructor(private readonly logger: Logger) {}
   private readonly serviceUrl: string = 'http://openlibrary.org';
 
   public async search(pattern: string): Promise<string> {
@@ -15,8 +15,11 @@ export class OpenLibraryService {
           pattern,
         )}`,
       );
-  
-      if (response.data.numFound > 0 && response.data.docs[0].isbn?.length > 0) {
+
+      if (
+        response.data.numFound > 0 &&
+        response.data.docs[0].isbn?.length > 0
+      ) {
         return response.data.docs[0].isbn[0];
       }
     } catch (error) {
@@ -31,7 +34,7 @@ export class OpenLibraryService {
       const response = await axios.get(
         `${this.serviceUrl}/api/books?bibkeys=isbn:${isbn}&jscmd=details&format=json`,
       );
-  
+
       if (response.data) {
         return response.data[`isbn:${isbn}`] as BookInfo;
       }
