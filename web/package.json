@@ -10,7 +10,7 @@
     "coverage": "ng test --no-watch --code-coverage",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "release": "ng build --configuration production --base-href /homelibrary --deploy-url /homelibrary/"
+    "release": "ng build --configuration production --base-href /homelibrary/ --deploy-url /homelibrary/"
   },
   "private": true,
   "dependencies": {
