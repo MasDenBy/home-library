@@ -42,7 +42,7 @@ describe('IndexerService', () => {
       'book12.rtf',
       'fake.book',
       'incorrect.mp3',
-      'format.fb3'
+      'format.fb3',
     ]);
 
     // Act

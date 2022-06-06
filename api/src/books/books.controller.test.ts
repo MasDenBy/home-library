@@ -22,16 +22,20 @@ describe('BooksController', () => {
 
   test('list', async () => {
     // Arrange
-    const offset = 10;
-    const count = 20;
+    const queryDto = {
+      offset: 10,
+      count: 20,
+    };
 
-    when(bookServiceMock.list(offset, count)).thenResolve(<PageDto<BookDto>>{});
+    when(bookServiceMock.list(queryDto.offset, queryDto.count)).thenResolve(
+      <PageDto<BookDto>>{},
+    );
 
     // Act
-    await controller.list(offset, count);
+    await controller.list(queryDto);
 
     // Assert
-    verify(bookServiceMock.list(offset, count)).once();
+    verify(bookServiceMock.list(queryDto.offset, queryDto.count)).once();
   });
 
   test('search', async () => {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { nanoid } from 'nanoid';
@@ -11,6 +11,7 @@ export class ImageService {
   constructor(
     private fs: FileSystemWrapper,
     private configService: ConfigService,
+    private readonly logger: Logger,
   ) {}
 
   public async download(url: string): Promise<string> {
@@ -38,10 +39,16 @@ export class ImageService {
   }
 
   public async getImageContent(imageName: string): Promise<string> {
-    const imagePath = this.getImagePath(imageName);
-    const buffer = await this.fs.readFile(imagePath);
+    try {
+      const imagePath = this.getImagePath(imageName);
+      const buffer = await this.fs.readFile(imagePath);
 
-    return buffer.toString('base64');
+      return buffer.toString('base64');
+    } catch (ex) {
+      this.logger.error(ex);
+    }
+
+    return null;
   }
 
   private get imagesDirectory() {

@@ -8,6 +8,10 @@ import { AppComponent } from './app.component';
 
 import { BooksModule } from './views/books';
 import { LibraryModule } from './views/library';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
+import { LoadingComponent } from './common/components/loading/loading.component';
+import { LoadingService } from './common/components/loading/loading.service';
 
 import {
   FileManagerService,
@@ -17,7 +21,8 @@ import {
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserModule,
@@ -25,12 +30,14 @@ import {
     HttpClientModule,
     BrowserAnimationsModule,
     BooksModule,
-    LibraryModule
+    LibraryModule,
+    ProgressSpinnerModule
   ],
   providers: [
     FileManagerService,
     HttpService,
-    IndexService
+    IndexService,
+    LoadingService
   ],
   bootstrap: [AppComponent]
 })

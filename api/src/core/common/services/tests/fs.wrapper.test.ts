@@ -57,16 +57,16 @@ describe('FileSystemWrapper', () => {
       const fileStats = mock(Stats);
       when(fileStats.isDirectory()).thenReturn(false);
       when(fileStats.isFile()).thenReturn(true);
-  
+
       const dirStats = mock(Stats);
       when(dirStats.isDirectory()).thenReturn(true);
-  
+
       lstatSyncMock.mockReturnValueOnce(instance(fileStats));
       lstatSyncMock.mockReturnValueOnce(instance(dirStats));
-  
+
       // Act
       const result = await wrapper.readFiles('folder');
-  
+
       // Assert
       expect(result.length).toBe(1);
     });
@@ -82,7 +82,7 @@ describe('FileSystemWrapper', () => {
 
       // Act
       const result = await wrapper.readFiles('folder');
-  
+
       // Assert
       expect(result.length).toBe(0);
       verify(logger.error(anything())).never();
@@ -98,7 +98,7 @@ describe('FileSystemWrapper', () => {
 
       // Act
       await wrapper.readFiles('folder');
-  
+
       // Assert
       verify(logger.error(expectedError)).once();
     });
@@ -183,19 +183,19 @@ describe('FileSystemWrapper', () => {
     test.each([
       { folders: ['folder2', 'folder', 'folder3'], expected: 3 },
       { folders: ['folder2', 'folder', 'folder3', '#recycle'], expected: 3 },
-      { folders: ['#recycle'], expected: 0 }
-    ])('successfully return folders', async ({folders, expected}) => {
+      { folders: ['#recycle'], expected: 0 },
+    ])('successfully return folders', async ({ folders, expected }) => {
       // Arrange
       readdirAsyncMockFunc = () => folders;
 
       const dirStats = mock(Stats);
       when(dirStats.isDirectory()).thenReturn(true);
-  
+
       lstatSyncMock.mockReturnValue(instance(dirStats));
-  
+
       // Act
       const result = await wrapper.readDirectory('folder');
-  
+
       // Assert
       expect(result.length).toBe(expected);
     });
@@ -211,7 +211,7 @@ describe('FileSystemWrapper', () => {
 
       // Act
       const result = await wrapper.readDirectory('folder');
-  
+
       // Assert
       expect(result.length).toBe(0);
       verify(logger.error(anything())).never();
@@ -227,7 +227,7 @@ describe('FileSystemWrapper', () => {
 
       // Act
       await wrapper.readDirectory('folder');
-  
+
       // Assert
       verify(logger.error(expectedError)).once();
     });

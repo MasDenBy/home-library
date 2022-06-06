@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosResponse } from 'axios';
 import { mock, instance, when, verify, anyString, anything } from 'ts-mockito';
@@ -11,13 +12,20 @@ describe('ImageService', () => {
   let service: ImageService;
   let fsMock: FileSystemWrapper;
   let configService: ConfigService;
+  let logger: Logger;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
     fsMock = mock(FileSystemWrapper);
     configService = mock(ConfigService);
-    service = new ImageService(instance(fsMock), instance(configService));
+    logger = mock(Logger);
+
+    service = new ImageService(
+      instance(fsMock),
+      instance(configService),
+      instance(logger),
+    );
 
     when(configService.get<string>('IMAGE_DIR')).thenReturn('images');
   });
@@ -56,19 +64,35 @@ describe('ImageService', () => {
     verify(fsMock.deleteFile(anyString())).once();
   });
 
-  test('getImageContent', async () => {
-    // Arrange
+  describe('getImageContent', () => {
     const fileName = 'myfile.png';
+    test('return Base64 string if success', async () => {
+      // Arrange
+      when(fsMock.readFile(anyString())).thenResolve(Buffer.from('content'));
+      when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
 
-    when(fsMock.readFile(anyString())).thenResolve(Buffer.from('content'));
-    when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
+      // Act
+      const content = await service.getImageContent(fileName);
 
-    // Act
-    const content = await service.getImageContent(fileName);
+      // Assert
+      expect(content).not.toBeNull();
 
-    // Assert
-    expect(content).not.toBeNull();
+      verify(fsMock.readFile(anyString())).once();
+    });
 
-    verify(fsMock.readFile(anyString())).once();
+    test('log exception if failure', async () => {
+      // Arrange
+      const error = new Error('File does not exist');
+
+      when(fsMock.pathFromAppRoot(anyString())).thenThrow(error);
+
+      // Act
+      const content = await service.getImageContent(fileName);
+
+      // Assert
+      expect(content).toBeNull();
+
+      verify(logger.error(error)).once();
+    });
   });
 });

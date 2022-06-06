@@ -10,6 +10,8 @@ import { BookService } from '../services/book.service';
 import { IPage } from '../models/book.model';
 import { ImageService, SessionStorage } from '../../../common';
 import { Constants } from '../../../constants';
+import { LoadingService } from '../../../common/components/loading/loading.service';
+import { LoadingComponent } from '../../../common/components/loading/loading.component';
 
 describe('BooksListComponent', () => {
     const pattern = 'cool book';
@@ -24,6 +26,7 @@ describe('BooksListComponent', () => {
     let component: BooksListComponent;
     let bookService: jasmine.SpyObj<BookService>;
     let sessionStorage: jasmine.SpyObj<SessionStorage>;
+
     const paramMap: jasmine.SpyObj<ParamMap> = jasmine.createSpyObj('ParamMap', ['get']);
 
     beforeEach(() => {
@@ -31,7 +34,7 @@ describe('BooksListComponent', () => {
             imports: [
                 DataViewModule
             ],
-            declarations: [BooksListComponent],
+            declarations: [BooksListComponent, LoadingComponent],
             providers: [
                 { provide: BookService, useValue: jasmine.createSpyObj('BookService', ['getBooks', 'search']) },
                 { provide: SessionStorage, useValue: jasmine.createSpyObj('SessionStorage', ['getItem', 'setItem'])},
@@ -43,6 +46,7 @@ describe('BooksListComponent', () => {
                         }
                     },
                 },
+                { provide: LoadingService, useValue: new LoadingService() },
                 ImageService
             ]
         });

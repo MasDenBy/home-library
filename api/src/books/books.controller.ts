@@ -17,6 +17,7 @@ import { BookDto } from './dto/book.dto';
 import { PageDto } from '../core/common/dto/page.dto';
 import { BookSearchDto } from './dto/book.search.dto';
 import { ApiOkPageDtoResponse } from '../core/common/decorators/pagedto.decorator';
+import { ListQueryDto } from './dto/list.query.dto';
 
 @ApiTags('books')
 @Controller('/books')
@@ -25,11 +26,8 @@ export class BooksController {
 
   @Get()
   @ApiOkPageDtoResponse(BookDto)
-  public list(
-    @Query('offset') offset: number,
-    @Query('count') count: number,
-  ): Promise<PageDto<BookDto>> {
-    return this.bookService.list(offset, count);
+  public list(@Query() query: ListQueryDto): Promise<PageDto<BookDto>> {
+    return this.bookService.list(query.offset, query.count);
   }
 
   @Post('/search')

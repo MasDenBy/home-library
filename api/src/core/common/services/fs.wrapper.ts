@@ -32,7 +32,7 @@ export class FileSystemWrapper {
       const fullPath = join(folderPath, item);
       const itemInfo: Stats = this.getPathInfo(fullPath);
 
-      if(itemInfo == null) continue;
+      if (itemInfo == null) continue;
 
       if (itemInfo.isDirectory()) {
         const files = await this.readFiles(fullPath);
@@ -123,8 +123,8 @@ export class FileSystemWrapper {
   }
 
   private excludeFolders(paths: string[]): string[] {
-    return paths.filter(path => {
-      for (let folder of this.excludedFolders) {
+    return paths.filter((path) => {
+      for (const folder of this.excludedFolders) {
         if (path.includes(folder)) return false;
       }
 

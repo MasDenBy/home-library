@@ -1,8 +1,4 @@
-import {
-  mock,
-  instance,
-  verify
-} from 'ts-mockito';
+import { mock, instance, verify } from 'ts-mockito';
 
 import axios, { AxiosResponse } from 'axios';
 
