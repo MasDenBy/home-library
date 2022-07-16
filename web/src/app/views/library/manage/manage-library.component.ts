@@ -15,9 +15,9 @@ import { IPath } from 'src/app/models';
     providers: [MessageService]
 })
 export class ManageLibraryComponent implements OnInit {
-    private root: string;
     folders: string[];
     currentPath: string;
+    private root: string;
 
     constructor(
         private fileManagerService: FileManagerService,
@@ -57,14 +57,16 @@ export class ManageLibraryComponent implements OnInit {
 
         const separator = '/';
         const parts = this.currentPath.split(separator);
-        
-        if(parts.length > 1)
+
+        if(parts.length > 1) {
             parts.pop();
-        
+        }
+
         let path = parts.join(separator);
 
-        if(path.length < this.root.length)
+        if(path.length < this.root.length) {
             path = this.root;
+        }
 
         this.openPath(path);
     }
