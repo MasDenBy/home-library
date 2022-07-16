@@ -1,11 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Library } from './database/library.entity';
+import { IsNotEmpty, IsNumber } from 'class-validator';
+import { Library } from '../database/library.entity';
 
 export class LibraryDto implements Readonly<LibraryDto> {
   @ApiProperty({ required: false, type: Number })
+  @IsNumber()
   id: number;
 
   @ApiProperty({ required: true, type: String })
+  @IsNotEmpty()
   path: string;
 
   public static fromEntity(entity: Library): LibraryDto {

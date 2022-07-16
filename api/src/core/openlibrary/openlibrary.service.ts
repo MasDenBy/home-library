@@ -11,9 +11,7 @@ export class OpenLibraryService {
   public async search(pattern: string): Promise<string> {
     try {
       const response = await axios.get<SearchResponseDto>(
-        `${this.serviceUrl}/search.json?q=${OpenLibraryService.preparePattern(
-          pattern,
-        )}`,
+        `${this.serviceUrl}/search.json?q=${encodeURI(pattern)}`,
       );
 
       if (
@@ -43,9 +41,5 @@ export class OpenLibraryService {
     }
 
     return null;
-  }
-
-  private static preparePattern(pattern: string) {
-    return pattern.replace(' ', '+');
   }
 }

@@ -1,7 +1,7 @@
 import { mock, instance, when, verify } from 'ts-mockito';
 import { LibrariesController } from './libraries.controller';
 import { LibraryService } from './services/library.service';
-import { LibraryDto } from './library.dto';
+import { LibraryDto } from './dto/library.dto';
 
 describe('/libraries', () => {
   let controller: LibrariesController;

@@ -8,6 +8,7 @@ import {
   existsSync,
   mkdirSync,
   unlinkSync,
+  rmSync,
 } from 'fs';
 
 import { mock, instance, when, anything, verify } from 'ts-mockito';
@@ -288,6 +289,40 @@ describe('FileSystemWrapper', () => {
 
     // Assert
     expect(unlinkSyncMock).toHaveBeenCalledWith(testFileName);
+  });
+
+  describe('deleteFolder', () => {
+    const path = "folder/file.pdf";
+
+    let existsSyncMock: jest.MockedFunction<typeof existsSync>;
+    let rmSyncMock: jest.MockedFunction<typeof rmSync>;
+
+    beforeEach(() => {
+      existsSyncMock = existsSync as jest.MockedFunction<typeof existsSync>;
+      rmSyncMock = rmSync as jest.MockedFunction<typeof rmSync>;
+    });
+
+    test('if folder does not exist skip it', () => {
+      // Arrange
+      existsSyncMock.mockReturnValue(false);
+
+      // Act
+      wrapper.deleteFolder(path);
+
+      // Assert
+      expect(rmSyncMock).not.toBeCalled();
+    });
+
+    test('if folder exists remove it', () => {
+      // Arrange
+      existsSyncMock.mockReturnValue(true);
+
+      // Act
+      wrapper.deleteFolder(path);
+
+      // Assert
+      expect(rmSyncMock).toBeCalledTimes(1);
+    })
   });
 
   test('readFile', async () => {

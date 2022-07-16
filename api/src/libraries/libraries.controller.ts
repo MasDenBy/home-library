@@ -8,7 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { LibraryDto } from './library.dto';
+import { LibraryDto } from './dto/library.dto';
 import { LibraryService } from './services/library.service';
 
 @ApiTags('libraries')

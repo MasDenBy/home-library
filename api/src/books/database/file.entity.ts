@@ -8,7 +8,7 @@ export class File extends BaseEntity {
   @Column({ length: 500 })
   path: string;
 
-  @Column({ length: 21, nullable: true })
+  @Column({ length: 30, nullable: true })
   imageName: string;
 
   @ManyToOne(() => Library, (library) => library.files, { cascade: true })

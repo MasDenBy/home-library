@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import {
   mock,
   instance,
@@ -29,6 +30,7 @@ describe('BookDataStore', () => {
   let dataStore: BookDataStore;
   let connectionMock: Connection;
   let bookRepositoryMock: Repository<Book>;
+  let loggerMock: Logger;
 
   beforeEach(() => {
     bookRepositoryMock = mock<Repository<Book>>();
@@ -37,7 +39,9 @@ describe('BookDataStore', () => {
       instance(bookRepositoryMock),
     );
 
-    dataStore = new BookDataStore(instance(connectionMock));
+    loggerMock = mock(Logger);
+
+    dataStore = new BookDataStore(instance(connectionMock), instance(loggerMock));
   });
 
   test('addBook', async () => {
@@ -65,6 +69,9 @@ describe('BookDataStore', () => {
     when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(
       instance(selectQueryBuilder),
     );
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'library')).thenReturn(
+      instance(selectQueryBuilder),
+    );
     when(selectQueryBuilder.skip(offset)).thenReturn(
       instance(selectQueryBuilder),
     );
@@ -82,6 +89,7 @@ describe('BookDataStore', () => {
 
     // Assert
     verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
+    verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'library')).once();
     verify(selectQueryBuilder.skip(offset)).once();
     verify(selectQueryBuilder.take(count)).once();
     verify(selectQueryBuilder.getMany()).once();
@@ -103,6 +111,9 @@ describe('BookDataStore', () => {
     when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(
       instance(selectQueryBuilder),
     );
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'library')).thenReturn(
+      instance(selectQueryBuilder),
+    );
     when(selectQueryBuilder.skip(offset)).thenReturn(
       instance(selectQueryBuilder),
     );
@@ -120,6 +131,7 @@ describe('BookDataStore', () => {
 
     // Assert
     verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
+    verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'library')).once();
     verify(selectQueryBuilder.where(anyString(), anything())).once();
     verify(selectQueryBuilder.orWhere(anyString(), anything())).twice();
     verify(selectQueryBuilder.skip(offset)).once();
@@ -184,18 +196,15 @@ describe('BookDataStore', () => {
   test('findByIdWithReferences', async () => {
     // Arrange
     const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
-    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(
-      instance(selectQueryBuilder),
-    );
-    when(
-      selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata'),
-    ).thenReturn(instance(selectQueryBuilder));
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'library')).thenReturn(instance(selectQueryBuilder));
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata')).thenReturn(instance(selectQueryBuilder));
     when(selectQueryBuilder.where(anyString(), anything())).thenReturn(
       instance(selectQueryBuilder),
     );
     when(selectQueryBuilder.getOne()).thenResolve(new Book());
 
-    when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(
+    when(bookRepositoryMock.createQueryBuilder('book')).thenReturn(
       instance(selectQueryBuilder),
     );
 
@@ -206,51 +215,75 @@ describe('BookDataStore', () => {
     expect(result).not.toBeNull();
 
     verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
+    verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'library')).once();
+    verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata')).once();
     verify(selectQueryBuilder.where(anyString(), anything())).once();
     verify(selectQueryBuilder.getOne()).once();
   });
 
-  test('deleteById', async () => {
-    // Arrange
-    const deleteQueryBuilder = mock<DeleteQueryBuilder<Book>>();
-    when(deleteQueryBuilder.from(anything())).thenReturn(
-      instance(deleteQueryBuilder),
-    );
-    when(
-      deleteQueryBuilder.where('id = :id', objectContaining({ id: id })),
-    ).thenReturn(instance(deleteQueryBuilder));
+  describe('deleteById', () => {
+    let deleteQueryBuilder: DeleteQueryBuilder<Book>;
+    let selectQueryBuilder: SelectQueryBuilder<Book>;
 
-    const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
-    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(
-      instance(selectQueryBuilder),
-    );
-    when(
-      selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata'),
-    ).thenReturn(instance(selectQueryBuilder));
-    when(selectQueryBuilder.where(anyString(), anything())).thenReturn(
-      instance(selectQueryBuilder),
-    );
-    when(selectQueryBuilder.getOne()).thenResolve(<Book>{
-      id: id,
-      file: { id: id },
+    beforeEach(() => {
+      deleteQueryBuilder = mock<DeleteQueryBuilder<Book>>();
+      when(deleteQueryBuilder.from(anything())).thenReturn(instance(deleteQueryBuilder));
+      when(deleteQueryBuilder.where('id = :id', objectContaining({ id: id }))).thenReturn(instance(deleteQueryBuilder));
+
+      selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
+      when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
+      when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'library')).thenReturn(instance(selectQueryBuilder));
+      when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata')).thenReturn(instance(selectQueryBuilder));
+      when(selectQueryBuilder.where(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
+      when(selectQueryBuilder.delete()).thenReturn(instance(deleteQueryBuilder));
+
+      when(connectionMock.createQueryBuilder()).thenReturn(
+        instance(selectQueryBuilder),
+      );
+  
+      when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(
+        instance(selectQueryBuilder),
+      );
     });
-    when(selectQueryBuilder.delete()).thenReturn(instance(deleteQueryBuilder));
 
-    when(connectionMock.createQueryBuilder()).thenReturn(
-      instance(selectQueryBuilder),
-    );
+    afterEach(() => {
+      verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).once();
+      verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'library')).once();
+      verify(selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata')).once();
+    });
 
-    when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(
-      instance(selectQueryBuilder),
-    );
+    test('should delete all', async () => {
+      // Arrange
+      when(selectQueryBuilder.getOne()).thenResolve(<Book>{
+        id: id,
+        file: { id: id },
+        metadata: { id: id }
+      });
+  
+      // Act
+      await dataStore.deleteById(id);
+  
+      // Assert
+      verify(deleteQueryBuilder.from(anything())).thrice();
+      verify(deleteQueryBuilder.where(anyString(), anything())).thrice();
+      verify(deleteQueryBuilder.execute()).thrice();
+    });
 
-    // Act
-    await dataStore.deleteById(id);
-
-    // Assert
-    verify(deleteQueryBuilder.from(anything())).twice();
-    verify(deleteQueryBuilder.where(anyString(), anything())).twice();
-    verify(deleteQueryBuilder.execute()).twice();
+    test('should skip metadata if it is null', async () => {
+      // Arrange
+      when(selectQueryBuilder.getOne()).thenResolve(<Book>{
+        id: id,
+        file: { id: id },
+      });
+  
+      // Act
+      await dataStore.deleteById(id);
+  
+      // Assert
+      verify(deleteQueryBuilder.from(anything())).twice();
+      verify(deleteQueryBuilder.where(anyString(), anything())).twice();
+      verify(deleteQueryBuilder.execute()).twice();
+    });
   });
 
   test('deleteByFilePath', async () => {
@@ -264,24 +297,17 @@ describe('BookDataStore', () => {
     ).thenReturn(instance(deleteQueryBuilder));
 
     const selectQueryBuilder = mock<SelectQueryBuilder<Book>>();
-    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(
-      instance(selectQueryBuilder),
-    );
-    when(
-      selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata'),
-    ).thenReturn(instance(selectQueryBuilder));
-    when(selectQueryBuilder.where(anyString(), anything())).thenReturn(
-      instance(selectQueryBuilder),
-    );
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'file')).thenReturn(instance(selectQueryBuilder));
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'library')).thenReturn(instance(selectQueryBuilder));
+    when(selectQueryBuilder.leftJoinAndSelect(anyString(), 'metadata')).thenReturn(instance(selectQueryBuilder));
+    when(selectQueryBuilder.where(anyString(), anything())).thenReturn(instance(selectQueryBuilder));
     when(selectQueryBuilder.getOne()).thenResolve(<Book>{
       id: id,
       file: { id: id },
     });
     when(selectQueryBuilder.delete()).thenReturn(instance(deleteQueryBuilder));
 
-    when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(
-      instance(selectQueryBuilder),
-    );
+    when(bookRepositoryMock.createQueryBuilder(anyString())).thenReturn(instance(selectQueryBuilder));
     when(bookRepositoryMock.findOne(anything())).thenResolve(<Book>{ id: id });
 
     const repositoryFile = mock<Repository<File>>();

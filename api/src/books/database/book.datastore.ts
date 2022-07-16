@@ -1,16 +1,19 @@
+import { Injectable, Logger, Options } from '@nestjs/common';
 import { Connection } from 'typeorm';
 
 import { Book } from './book.entity';
 import { File } from './file.entity';
+import { Metadata } from './metadata.entity';
 
-import { Injectable } from '@nestjs/common';
 import { BaseDataStore } from '../../core/database/base.datastore';
 
 @Injectable()
 export class BookDataStore extends BaseDataStore<Book> {
-  private alias = 'book';
+  private readonly alias = 'book';
 
-  constructor(connection: Connection) {
+  constructor(
+    connection: Connection,
+    private readonly logger: Logger) {
     super(connection, Book);
   }
 
@@ -20,9 +23,20 @@ export class BookDataStore extends BaseDataStore<Book> {
     return await repository
       .createQueryBuilder(this.alias)
       .leftJoinAndSelect(`${this.alias}.file`, 'file')
+      .leftJoinAndSelect('file.library', 'library')
       .leftJoinAndSelect(`${this.alias}.metadata`, 'metadata')
       .where(`${this.alias}.id = :id`, { id: id })
       .getOne();
+  }
+
+  public async findByFilePath(path: string): Promise<Book> {
+    const file = await this.connection
+      .getRepository(File)
+      .findOne({ path: path });
+
+    return await this.connection
+      .getRepository(Book)
+      .findOne({ file: file });
   }
 
   public async addBook(book: Book): Promise<number> {
@@ -38,6 +52,7 @@ export class BookDataStore extends BaseDataStore<Book> {
     return await repository
       .createQueryBuilder(this.alias)
       .leftJoinAndSelect(`${this.alias}.file`, 'file')
+      .leftJoinAndSelect('file.library', 'library')
       .skip(offset)
       .take(count)
       .getMany();
@@ -62,6 +77,7 @@ export class BookDataStore extends BaseDataStore<Book> {
 
     const books = await builder
       .leftJoinAndSelect(`${this.alias}.file`, 'file')
+      .leftJoinAndSelect('file.library', 'library')
       .skip(offset)
       .take(count)
       .getMany();
@@ -86,6 +102,7 @@ export class BookDataStore extends BaseDataStore<Book> {
 
       await queryRunner.commitTransaction();
     } catch (ex) {
+      this.logger.error(ex);
       await queryRunner.rollbackTransaction();
     } finally {
       queryRunner.release();
@@ -96,16 +113,16 @@ export class BookDataStore extends BaseDataStore<Book> {
     const book = await this.findByIdWithReferences(id);
 
     await this.deleteByEntity(File, book.file.id);
+
+    if (book.metadata) {
+      await this.deleteByEntity(Metadata, book.metadata.id);
+    }
+
     await this.deleteByEntity(Book, book.id);
   }
 
   public async deleteByFilePath(path: string): Promise<void> {
-    const file = await this.connection
-      .getRepository(File)
-      .findOne({ path: path });
-    const book = await this.connection
-      .getRepository(Book)
-      .findOne({ file: file });
+    const book = await this.findByFilePath(path);
 
     await this.deleteById(book.id);
   }

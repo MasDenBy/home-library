@@ -145,7 +145,7 @@ describe('OpenLibraryService', () => {
       axiosMock.get.mockRejectedValue(expectedException);
 
       // Act
-      await service.search(pattern);
+      await service.findByIsbn(isbn);
 
       // Assert
       verify(logger.error(expectedException)).once();

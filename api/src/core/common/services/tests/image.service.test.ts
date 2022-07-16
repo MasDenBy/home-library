@@ -9,6 +9,8 @@ import { ImageService } from '../image.service';
 jest.mock('axios');
 
 describe('ImageService', () => {
+  const libraryId = 1;
+
   let service: ImageService;
   let fsMock: FileSystemWrapper;
   let configService: ConfigService;
@@ -38,7 +40,7 @@ describe('ImageService', () => {
     when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
 
     // Act
-    const name = await service.download('myfile-S.jpg');
+    const name = await service.download('myfile-S.jpg', libraryId);
 
     // Assert
     expect(name).not.toBeNull();
@@ -57,7 +59,7 @@ describe('ImageService', () => {
     when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
 
     // Act
-    await service.remove('myfile-S.jpg');
+    await service.remove('myfile-S.jpg', libraryId);
 
     // Assert
     verify(fsMock.pathFromAppRoot(anyString())).once();
@@ -72,7 +74,7 @@ describe('ImageService', () => {
       when(fsMock.pathFromAppRoot(anyString())).thenReturn('root');
 
       // Act
-      const content = await service.getImageContent(fileName);
+      const content = await service.getImageContent(fileName, libraryId);
 
       // Assert
       expect(content).not.toBeNull();
@@ -87,7 +89,7 @@ describe('ImageService', () => {
       when(fsMock.pathFromAppRoot(anyString())).thenThrow(error);
 
       // Act
-      const content = await service.getImageContent(fileName);
+      const content = await service.getImageContent(fileName, libraryId);
 
       // Assert
       expect(content).toBeNull();

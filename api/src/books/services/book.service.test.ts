@@ -7,6 +7,7 @@ import {
   anything,
   anyString,
   objectContaining,
+  anyNumber,
 } from 'ts-mockito';
 import { ReadStream } from 'typeorm/platform/PlatformTools';
 
@@ -45,17 +46,32 @@ describe('BookService', () => {
     );
   });
 
-  test('createFromFile', async () => {
-    // Arrange
+  describe('createFromFile', () => {
     const fileName = 'test.book.pdf';
 
-    when(fsMock.basename(fileName)).thenReturn('test.book');
+    test('if book exists return identifier and do not add to database', async () => {
+      // Arrange
+      const book = <Book>{ id: 1 };
 
-    // Act
-    await service.createFromFile(fileName, new Library());
+      when(dataStoreMock.findByFilePath(fileName)).thenResolve(book);
+  
+      // Act
+      await service.createFromFile(fileName, new Library());
+  
+      // Assert
+      verify(dataStoreMock.addBook(anyOfClass(Book))).never();
+    });
 
-    // Assert
-    verify(dataStoreMock.addBook(anyOfClass(Book)));
+    test('if book does not exists add it to database', async () => {
+      // Arrange
+      when(fsMock.basename(fileName)).thenReturn('test.book');
+  
+      // Act
+      await service.createFromFile(fileName, new Library());
+  
+      // Assert
+      verify(dataStoreMock.addBook(anyOfClass(Book)));
+    });
   });
 
   test('list', async () => {
@@ -95,7 +111,10 @@ describe('BookService', () => {
   test('getById', async () => {
     // Arrange
     const book = <Book>{
-      file: { imageName: 'image.png' },
+      file: { 
+        imageName: 'image.png',
+        library: { id: 1 }
+      },
       metadata: { isbn: 'isbn' },
     };
 
@@ -106,7 +125,7 @@ describe('BookService', () => {
 
     // Assert
     verify(dataStoreMock.findByIdWithReferences(id)).once();
-    verify(imageServiceMock.getImageContent(book.file.imageName)).once();
+    verify(imageServiceMock.getImageContent(book.file.imageName, anyNumber())).once();
   });
 
   describe('update', () => {
@@ -255,6 +274,20 @@ describe('BookService', () => {
       verify(openlibraryMock.findByIsbn(anyString())).never();
     });
 
+    test('when book info is not found then stop processing', async () => {
+      // Arrange
+      const book = <Book>{ metadata: <Metadata>{ isbn: '12-3' }, title: 'title' };
+
+      when(dataStoreMock.findByIdWithReferences(id)).thenResolve(book);
+      when(openlibraryMock.findByIsbn(book.metadata.isbn)).thenResolve(null);
+
+      // Act
+      await service.index(id);
+
+      // Assert
+      verify(dataStoreMock.update(book)).never();
+    });
+
     describe('should', () => {
       const isbn = 'isbn';
       const oldImageName = 'old_image';
@@ -276,7 +309,10 @@ describe('BookService', () => {
         // Arrange
         const book = <Book>{
           title: 'title',
-          file: { imageName: oldImageName },
+          file: {
+            imageName: oldImageName,
+            library: { id: 12 }
+          },
         };
 
         when(dataStoreMock.findByIdWithReferences(id)).thenResolve(book);
@@ -284,9 +320,11 @@ describe('BookService', () => {
         when(openlibraryMock.search(book.title)).thenResolve(isbn);
         when(openlibraryMock.findByIsbn(isbn)).thenResolve(bookInfo);
 
-        when(imageServiceMock.download(bookInfo.thumbnail_url)).thenResolve(
-          newImageName,
-        );
+        when(
+          imageServiceMock.download(
+            bookInfo.thumbnail_url,
+            book.file.library.id
+        )).thenResolve(newImageName);
 
         // Act
         await service.index(id);
@@ -303,8 +341,8 @@ describe('BookService', () => {
 
       test('remove old image and download new', () => {
         // Assert
-        verify(imageServiceMock.download(bookInfo.thumbnail_url)).once();
-        verify(imageServiceMock.remove(oldImageName)).once();
+        verify(imageServiceMock.download(bookInfo.thumbnail_url, anyNumber())).once();
+        verify(imageServiceMock.remove(oldImageName, anyNumber())).once();
       });
 
       test('update book with all details', () => {

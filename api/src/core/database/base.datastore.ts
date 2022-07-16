@@ -1,4 +1,9 @@
-import { Connection, DeleteResult, EntityTarget } from 'typeorm';
+import {
+  Connection,
+  DeleteResult,
+  EntityTarget,
+  SelectQueryBuilder,
+} from 'typeorm';
 
 export abstract class BaseDataStore<T> {
   constructor(
@@ -22,8 +27,19 @@ export abstract class BaseDataStore<T> {
     target: EntityTarget<TEntity>,
     id: number,
   ): Promise<DeleteResult> {
-    return this.connection
-      .createQueryBuilder()
+    return this.deleteWithBuilder(
+      target,
+      id,
+      this.connection.createQueryBuilder(),
+    );
+  }
+
+  public deleteWithBuilder<TEntity>(
+    target: EntityTarget<TEntity>,
+    id: number,
+    queryBuilder: SelectQueryBuilder<any>,
+  ): Promise<DeleteResult> {
+    return queryBuilder
       .delete()
       .from(target)
       .where('id = :id', { id: id })

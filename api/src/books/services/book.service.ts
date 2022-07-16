@@ -91,7 +91,12 @@ export class BookService {
   }
 
   public async createFromFile(path: string, library: Library): Promise<number> {
-    const book = <Book>{
+    let book = await this.dataStore.findByFilePath(path);
+
+    if(book)
+      return book.id;
+
+    book = <Book>{
       title: this.fs.basename(path),
       file: <File>{
         library: library,
@@ -127,7 +132,7 @@ export class BookService {
 
     if (bookInfo == null) return;
 
-    book.authors = bookInfo.details.authors.map((x) => x.name).join(', ');
+    book.authors = bookInfo.details.authors?.map((x) => x.name).join(', ');
     book.description = bookInfo.details.description?.value;
     book.title = bookInfo.details.title;
 
@@ -144,9 +149,10 @@ export class BookService {
 
       book.file.imageName = await this.imageService.download(
         bookInfo.thumbnail_url,
+        book.file.library.id,
       );
 
-      if (oldName) this.imageService.remove(oldName);
+      if (oldName) this.imageService.remove(oldName, book.file.library.id);
     }
 
     await this.dataStore.update(book);
@@ -168,6 +174,7 @@ export class BookService {
     if (entity.file.imageName) {
       dto.file.image = await this.imageService.getImageContent(
         entity.file.imageName,
+        entity.file.library.id
       );
     }
 
