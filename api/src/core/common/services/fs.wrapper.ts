@@ -11,8 +11,10 @@ import {
   readdir,
   writeFile,
   readFile,
+  rmSync,
+  fstat,
 } from 'fs';
-import { basename, extname, parse, join } from 'path';
+import { basename, extname, parse, join, sep, posix } from 'path';
 import { promisify } from 'util';
 import * as root from 'app-root-path';
 
@@ -80,7 +82,7 @@ export class FileSystemWrapper {
   }
 
   public osRoot(): string {
-    return parse(process.cwd()).root;
+    return parse(process.cwd()).root.split(sep).join(posix.sep);
   }
 
   public pathFromAppRoot(folder: string): string {
@@ -102,6 +104,13 @@ export class FileSystemWrapper {
 
   public deleteFile(file: string): void {
     unlinkSync(file);
+  }
+
+  public deleteFolder(folder: string): void {
+    const path = this.pathFromAppRoot(folder);
+    if(existsSync(path)) {
+      rmSync(path, { force: true, recursive: true });
+    }
   }
 
   public async readFile(filePath: string): Promise<Buffer> {

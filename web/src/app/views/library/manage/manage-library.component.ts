@@ -17,6 +17,7 @@ import { IPath } from 'src/app/models';
 export class ManageLibraryComponent implements OnInit {
     folders: string[];
     currentPath: string;
+    private root: string;
 
     constructor(
         private fileManagerService: FileManagerService,
@@ -54,9 +55,18 @@ export class ManageLibraryComponent implements OnInit {
             return;
         }
 
-        const separator = this.currentPath[0];
-        const index = this.currentPath.lastIndexOf(separator);
-        const path = index === 0 ? separator : this.currentPath.substring(0, index);
+        const separator = '/';
+        const parts = this.currentPath.split(separator);
+
+        if(parts.length > 1) {
+            parts.pop();
+        }
+
+        let path = parts.join(separator);
+
+        if(path.length < this.root.length) {
+            path = this.root;
+        }
 
         this.openPath(path);
     }
@@ -65,6 +75,9 @@ export class ManageLibraryComponent implements OnInit {
         this.fileManagerService.getPaths(path).subscribe((data: IPath) => {
             this.folders = data.folders;
             this.currentPath = data.path;
+            if(!this.root) {
+                this.root = data.path;
+            }
         });
     }
 }

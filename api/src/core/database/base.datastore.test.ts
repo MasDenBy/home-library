@@ -88,6 +88,17 @@ describe('BaseDataStore', () => {
     // Assert
     verify(repository.count()).once();
   });
+
+  test('save', async () => {
+    // Arrange
+    var entity = new TestEntity();
+
+    // Act
+    await dataStore.save(entity);
+
+    // Assert
+    verify(repository.save(entity)).once();
+  });
 });
 
 class TestDataStore extends BaseDataStore<TestEntity> {

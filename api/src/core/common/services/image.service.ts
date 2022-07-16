@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { nanoid } from 'nanoid';
-import { join } from 'path';
+import { join, extname } from 'path';
 
 import { FileSystemWrapper } from './fs.wrapper';
 
@@ -14,15 +14,17 @@ export class ImageService {
     private readonly logger: Logger,
   ) {}
 
-  public async download(url: string): Promise<string> {
+  public async download(url: string, libraryId: number): Promise<string> {
     const mediumSizeUrl = url.replace('-S.', '-M.');
-    const name = nanoid();
+    const name = `${nanoid()}${extname(url)}`;
 
     const response = await axios.get(mediumSizeUrl, {
       responseType: 'arraybuffer',
     });
 
-    const imagesDirectoryPath = this.fs.pathFromAppRoot(this.imagesDirectory);
+    const imagesDirectoryPath = this.fs.pathFromAppRoot(
+      this.getImagesDirectory(libraryId),
+    );
     this.fs.checkOrCreateDirectory(imagesDirectoryPath);
 
     const fileName = join(imagesDirectoryPath, name);
@@ -32,15 +34,18 @@ export class ImageService {
     return name;
   }
 
-  public remove(imageName: string): void {
-    const fullPath = this.getImagePath(imageName);
+  public remove(imageName: string, libraryId: number): void {
+    const fullPath = this.getImagePath(imageName, libraryId);
 
     this.fs.deleteFile(fullPath);
   }
 
-  public async getImageContent(imageName: string): Promise<string> {
+  public async getImageContent(
+    imageName: string,
+    libraryId: number,
+  ): Promise<string> {
     try {
-      const imagePath = this.getImagePath(imageName);
+      const imagePath = this.getImagePath(imageName, libraryId);
       const buffer = await this.fs.readFile(imagePath);
 
       return buffer.toString('base64');
@@ -51,12 +56,17 @@ export class ImageService {
     return null;
   }
 
-  private get imagesDirectory() {
-    return this.configService.get<string>('IMAGE_DIR');
+  public getImagePath(imageName: string, libraryId: number): string {
+    const imagesDirectoryPath = this.fs.pathFromAppRoot(
+      this.getImagesDirectory(libraryId),
+    );
+    return join(imagesDirectoryPath, imageName);
   }
 
-  private getImagePath(imageName: string): string {
-    const imagesDirectoryPath = this.fs.pathFromAppRoot(this.imagesDirectory);
-    return join(imagesDirectoryPath, imageName);
+  public getImagesDirectory(libraryId: number): string {
+    return join(
+      this.configService.get<string>('IMAGE_DIR'),
+      libraryId.toString(),
+    );
   }
 }

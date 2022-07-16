@@ -2,22 +2,30 @@ import { DeleteResult } from 'typeorm';
 import { mock, instance, when, verify, anyOfClass, anything } from 'ts-mockito';
 import { LibraryService } from '../library.service';
 import { LibraryDataStore } from '../../database/library.datastore';
-import { LibraryDto } from '../../library.dto';
+import { LibraryDto } from '../../dto/library.dto';
 import { Library } from '../../database/library.entity';
 import { IndexerService } from '../indexer.service';
+import { ImageService } from '../../../core/common/services/image.service';
+import { FileSystemWrapper } from '../../../core/common/services/fs.wrapper';
 
 describe('LibraryService', () => {
   let service: LibraryService;
   let dataStoreMock: LibraryDataStore;
   let indexerMock: IndexerService;
+  let fsMock: FileSystemWrapper;
+  let imageServiceMock: ImageService;
 
   beforeEach(() => {
     dataStoreMock = mock(LibraryDataStore);
     indexerMock = mock(IndexerService);
+    fsMock = mock(FileSystemWrapper);
+    imageServiceMock = mock(ImageService);
 
     service = new LibraryService(
       instance(dataStoreMock),
       instance(indexerMock),
+      instance(fsMock),
+      instance(imageServiceMock),
     );
   });
 
@@ -69,14 +77,16 @@ describe('LibraryService', () => {
   test('deleteById', async () => {
     // Arrange
     const id = 1;
+    const imageDirectory = 'images/temp';
 
-    when(dataStoreMock.delete(id)).thenResolve(new DeleteResult());
+    when(imageServiceMock.getImagesDirectory(id)).thenReturn(imageDirectory);
 
     // Act
     await service.deleteById(id);
 
     // Assert
-    verify(dataStoreMock.delete(id)).once();
+    verify(dataStoreMock.deleteById(id)).once();
+    verify(fsMock.deleteFolder(imageDirectory)).once();
   });
 
   describe('index', () => {

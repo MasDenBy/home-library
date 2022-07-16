@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { FileSystemWrapper } from '../../core/common/services/fs.wrapper';
+import { ImageService } from '../../core/common/services/image.service';
 import { LibraryDataStore } from '../database/library.datastore';
-import { LibraryDto } from '../library.dto';
+import { LibraryDto } from '../dto/library.dto';
 import { IndexerService } from './indexer.service';
 
 @Injectable()
 export class LibraryService {
   constructor(
-    private libraryDataStore: LibraryDataStore,
-    private indexer: IndexerService,
+    private readonly libraryDataStore: LibraryDataStore,
+    private readonly indexer: IndexerService,
+    private readonly fs: FileSystemWrapper,
+    private readonly imageService: ImageService,
   ) {}
 
   public list(): Promise<LibraryDto[]> {
@@ -28,8 +32,10 @@ export class LibraryService {
     return LibraryDto.fromEntity(entity);
   }
 
-  public async deleteById(id: number): Promise<unknown> {
-    return await this.libraryDataStore.delete(id);
+  public async deleteById(id: number): Promise<void> {
+    await this.libraryDataStore.deleteById(id);
+    const libraryFolder = this.imageService.getImagesDirectory(id);
+    this.fs.deleteFolder(libraryFolder);
   }
 
   public async index(id: number): Promise<void> {
