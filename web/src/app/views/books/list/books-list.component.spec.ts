@@ -1,5 +1,4 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { ActivatedRoute, ParamMap } from '@angular/router';
 
 import { Observable } from 'rxjs';
 
@@ -8,9 +7,7 @@ import { DataViewModule } from 'primeng/dataview';
 import { BooksListComponent } from './books-list.component';
 import { BookService } from '../services/book.service';
 import { IPage } from '../models/book.model';
-import { ImageService, SessionStorage } from '../../../common';
-import { Constants } from '../../../constants';
-import { LoadingService } from '../../../common/components/loading/loading.service';
+import { ImageService, UiService } from '../../../common';
 import { LoadingComponent } from '../../../common/components/loading/loading.component';
 
 describe('BooksListComponent', () => {
@@ -25,9 +22,7 @@ describe('BooksListComponent', () => {
     let fixture: ComponentFixture<BooksListComponent>;
     let component: BooksListComponent;
     let bookService: jasmine.SpyObj<BookService>;
-    let sessionStorage: jasmine.SpyObj<SessionStorage>;
-
-    const paramMap: jasmine.SpyObj<ParamMap> = jasmine.createSpyObj('ParamMap', ['get']);
+    let uiService: jasmine.SpyObj<UiService>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -37,89 +32,63 @@ describe('BooksListComponent', () => {
             declarations: [BooksListComponent, LoadingComponent],
             providers: [
                 { provide: BookService, useValue: jasmine.createSpyObj('BookService', ['getBooks', 'search']) },
-                { provide: SessionStorage, useValue: jasmine.createSpyObj('SessionStorage', ['getItem', 'setItem'])},
-                {
-                    provide: ActivatedRoute,
-                    useValue: {
-                        snapshot: {
-                            paramMap
-                        }
-                    },
-                },
-                { provide: LoadingService, useValue: new LoadingService() },
+                UiService,
                 ImageService
             ]
         });
 
-        fixture = TestBed.createComponent(BooksListComponent);
-        component = fixture.componentInstance;
         bookService = TestBed.inject(BookService) as jasmine.SpyObj<BookService>;
-        sessionStorage = TestBed.inject(SessionStorage) as jasmine.SpyObj<SessionStorage>;
+        uiService = TestBed.inject(UiService) as jasmine.SpyObj<UiService>;
     });
 
-    describe('ngOnInit', () => {
-        beforeEach(() => {
-            paramMap.get.and.returnValue(pattern);
-        });
-
-        it('should get pattern', () => {
-            component.ngOnInit();
-
-            expect(paramMap.get).toHaveBeenCalledWith('pattern');
-        });
-
-        it('should set offset when it exists in session', () => {
-            const testOffset = 10;
-
-            sessionStorage.getItem.and.returnValue(testOffset.toString());
-
-            component.ngOnInit();
-
-            expect(component.offset).toEqual(testOffset);
-            expect(sessionStorage.getItem).toHaveBeenCalledWith(Constants.offsetKey);
-        });
-
-        it('should set offset to 0 when it doesnot exists in session', () => {
-            sessionStorage.getItem.and.returnValue(null);
-
-            component.ngOnInit();
-
-            expect(component.offset).toEqual(0);
-            expect(sessionStorage.getItem).toHaveBeenCalledWith(Constants.offsetKey);
-        });
-    });
-
-    describe('loadBooks', () => {
-        it('should load books with offset and count specified', () => {
+    describe('page$', () => {
+        it('should get list of books if search patter is empty', () => {
+            // Arrange
             bookService.getBooks.and.returnValue(new Observable(observer => {
                 observer.next(page);
             }));
 
-            const event = { first: 10, rows: 20};
-            component.loadBooks(event);
+            // Act
+            fixture = TestBed.createComponent(BooksListComponent);
+            component = fixture.componentInstance;
+            component.page$.subscribe();
 
-            expect(component.page).toEqual(page);
-            expect(bookService.getBooks).toHaveBeenCalledWith(event.first, event.rows);
-            expect(sessionStorage.setItem).toHaveBeenCalledWith(Constants.offsetKey, event.first as any);
+            // Assert
+            expect(bookService.getBooks).toHaveBeenCalled();
         });
 
-        it('should search books with offset and count if pattern is specified', () => {
-            paramMap.get.and.returnValue(pattern);
-
-            bookService.getBooks.and.returnValue(new Observable(observer => {
-                observer.next(page);
-            }));
-
+        it('should search books if search patter is presented', () => {
+            // Arrange
+            uiService.search(pattern);
             bookService.search.and.returnValue(new Observable(observer => {
                 observer.next(page);
             }));
 
-            component.ngOnInit();
+            // Act
+            fixture = TestBed.createComponent(BooksListComponent);
+            component = fixture.componentInstance;
+            component.page$.subscribe();
 
-            const event = { first: 10, rows: 20};
-            component.loadBooks(event);
-
-            expect(bookService.search).toHaveBeenCalledWith(pattern, event.first, event.rows);
+            // Assert
+            expect(bookService.search).toHaveBeenCalled();
         });
+    });
+
+    it('loadBooks should push offset and count', () => {
+        // Arrange
+        bookService.getBooks.and.returnValue(new Observable(observer => {
+            observer.next(page);
+        }));
+
+        const event = { first: 15, rows: 30 };
+
+        // Act
+        fixture = TestBed.createComponent(BooksListComponent);
+        component = fixture.componentInstance;
+        component.loadBooks(event);
+        component.page$.subscribe();
+
+        // Assert
+        expect(bookService.getBooks).toHaveBeenCalledWith(event.first, event.rows);
     });
 });

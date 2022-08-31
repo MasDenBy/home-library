@@ -18,6 +18,7 @@ import { BooksRoutingModule } from './books-routing.module';
 import { BooksListComponent } from './list/books-list.component';
 import { BookDetailsComponent } from './details/book-details.component';
 import { BookEditComponent } from './edit/book-edit.component';
+import { SearchComponent } from './search/search.component';
 import { BookService } from './services/book.service';
 import { ImageService, SessionStorage, WindowWrapper } from '../../common';
 
@@ -38,7 +39,8 @@ import { ImageService, SessionStorage, WindowWrapper } from '../../common';
     declarations: [
         BookDetailsComponent,
         BookEditComponent,
-        BooksListComponent
+        BooksListComponent,
+        SearchComponent
     ],
     providers: [
         BookService,
@@ -47,6 +49,9 @@ import { ImageService, SessionStorage, WindowWrapper } from '../../common';
         ConfirmationService,
         MessageService,
         WindowWrapper
+    ],
+    exports: [
+        SearchComponent
     ]
 })
 export class BooksModule { }
