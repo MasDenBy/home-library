@@ -1,15 +1,14 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
-import { LoadingService } from "../components/loading/loading.service";
+import { LoadingService } from '../components/loading/loading.service';
 
 @Injectable()
 export class NetworkInterceptor implements HttpInterceptor {
+  private totalRequests = 0;
+  private completedRequests = 0;
   constructor(private loader: LoadingService) {}
-
-  totalRequests = 0;
-  completedRequests = 0;
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     this.loader.loadingOn();

@@ -1,8 +1,8 @@
-import { HttpHandler, HttpRequest } from "@angular/common/http";
-import { TestBed } from "@angular/core/testing";
-import { Observable } from "rxjs";
-import { LoadingService } from "../components/loading/loading.service";
-import { NetworkInterceptor } from "./network.interceptor";
+import { HttpHandler, HttpRequest } from '@angular/common/http';
+import { TestBed } from '@angular/core/testing';
+import { Observable } from 'rxjs';
+import { LoadingService } from '../components/loading/loading.service';
+import { NetworkInterceptor } from './network.interceptor';
 
 describe('NetworkInterceptor', () => {
     let interceptor: NetworkInterceptor;
@@ -25,7 +25,7 @@ describe('NetworkInterceptor', () => {
 
     it('intercept should show and hide loading spinner', () => {
         // Arrange
-        var request = new HttpRequest<unknown>("GET", "http://localhost/fake");
+        const request = new HttpRequest<unknown>('GET', 'http://localhost/fake');
 
         httpHandler.handle.and.returnValue(new Observable(observer => {
             observer.next();

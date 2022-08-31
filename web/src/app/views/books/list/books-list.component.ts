@@ -16,8 +16,8 @@ export class BooksListComponent {
     public page$: Observable<IPage>;
     public count = 18;
     public offset = 0;
-    private loadEvent$: Observable<{offset: number, count: number}>;
-    private loadEventSubject: BehaviorSubject<{offset: number, count: number}>;
+    private loadEvent$: Observable<{offset: number; count: number}>;
+    private loadEventSubject: BehaviorSubject<{offset: number; count: number}>;
 
     constructor(
         private bookService: BookService,

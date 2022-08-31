@@ -1,5 +1,5 @@
-import { Component } from "@angular/core";
-import { UiService } from "../../../common/ui.service";
+import { Component } from '@angular/core';
+import { UiService } from '../../../common/ui.service';
 
 @Component({
     templateUrl: './search.component.html',

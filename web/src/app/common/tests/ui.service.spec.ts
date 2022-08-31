@@ -1,4 +1,4 @@
-import { UiService } from "../ui.service";
+import { UiService } from '../ui.service';
 
 describe('UiService', () => {
     let service: UiService;
