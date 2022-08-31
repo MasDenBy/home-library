@@ -3,5 +3,7 @@ export * from './http.service';
 export * from './image.service';
 export * from './index.service';
 export * from './session.storage';
+export * from './ui.service';
 export * from './helpers/http.helper';
+export * from './interceptors/network.interceptor';
 export * from './window.wrapper';

@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,7 +16,9 @@ import { LoadingService } from './common/components/loading/loading.service';
 import {
   FileManagerService,
   HttpService,
-  IndexService
+  IndexService,
+  UiService,
+  NetworkInterceptor
 } from './common';
 
 @NgModule({
@@ -37,7 +39,13 @@ import {
     FileManagerService,
     HttpService,
     IndexService,
-    LoadingService
+    LoadingService,
+    UiService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: NetworkInterceptor,
+      multi: true,
+    }
   ],
   bootstrap: [AppComponent]
 })

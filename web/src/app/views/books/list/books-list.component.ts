@@ -1,54 +1,42 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component } from '@angular/core';
 
 import { IPage } from '../models/book.model';
 import { BookService } from '../services/book.service';
-import { ImageService, SessionStorage } from '../../../common';
-import { Constants } from '../../../constants';
-import { tap } from 'rxjs/operators';
-import { LoadingService } from '../../../common/components/loading/loading.service';
+import { ImageService } from '../../../common';
+import { switchMap } from 'rxjs/operators';
+import { UiService } from '../../../common/ui.service';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 
 @Component({
     templateUrl: './books-list.component.html',
     selector: 'app-books-list',
     styleUrls: ['./books-list.component.scss']
 })
-export class BooksListComponent implements OnInit {
-    public page: IPage;
+export class BooksListComponent {
+    public page$: Observable<IPage>;
     public count = 18;
     public offset = 0;
-    private pattern: string;
+    private loadEvent$: Observable<{offset: number, count: number}>;
+    private loadEventSubject: BehaviorSubject<{offset: number, count: number}>;
 
     constructor(
-        private route: ActivatedRoute,
         private bookService: BookService,
-        private sessionStorage: SessionStorage,
-        private readonly loadingService: LoadingService,
-        public imageService: ImageService) { }
+        private readonly uiService: UiService,
+        public imageService: ImageService) {
+            this.loadEventSubject = new BehaviorSubject({ offset: 0, count: this.count });
+            this.loadEvent$ = this.loadEventSubject.asObservable();
 
-    ngOnInit(): void {
-        this.pattern = this.route.snapshot.paramMap.get('pattern');
-
-        const offset = this.sessionStorage.getItem(Constants.offsetKey);
-
-        this.offset = offset ? +offset : 0;
+           this.page$ = combineLatest([
+                this.loadEvent$,
+                this.uiService.searchPattern$
+            ]).pipe(
+                switchMap(([event, pattern]) => pattern
+                    ? this.bookService.search(pattern, event.offset, event.count)
+                    : this.bookService.getBooks(event.offset, event.count))
+            );
     }
 
     loadBooks(event) {
-        this.sessionStorage.setItem(Constants.offsetKey, event.first);
-
-        this.retrieveBooks(event.first, event.rows);
-    }
-
-    private retrieveBooks(offset: number, count: number): void {
-        const page$ = (this.pattern
-            ? this.bookService.search(this.pattern, offset, count)
-            : this.bookService.getBooks(offset, count))
-            .pipe(
-                tap(page => this.page = page)
-            );
-
-        this.loadingService.showLoaderUntilCompleted(page$)
-                .subscribe();
+        this.loadEventSubject.next({offset: event.first, count: event.rows});
     }
 }
