@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-MasDen.HomeLibrary.BookProcessor-0fa515b5-0280-4e6e-8d6c-73e873e4ea3e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="FluentValidation" Version="11.5.1" />
+    <PackageReference Include="IL.FluentValidation.Extensions.Options" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="MySqlConnector" Version="2.2.5" />
+    <PackageReference Include="Rebus" Version="7.0.0" />
+    <PackageReference Include="Rebus.MySql" Version="2.1.0" />
+    <PackageReference Include="Rebus.Serilog" Version="7.0.0" />
+    <PackageReference Include="Rebus.ServiceProvider" Version="8.4.0" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+  </ItemGroup>
+</Project>
