@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>650d1320-f001-4f9b-9d90-032ebfb51a5c</UserSecretsId>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="MasDen.HomeLibrary.IntegrationTests" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MasDen.HomeLibrary.Infrastructure\MasDen.HomeLibrary.Infrastructure.csproj" />
+    <ProjectReference Include="..\MasDen.HomeLibrary.Persistence\MasDen.HomeLibrary.Persistence.csproj" />
+    <ProjectReference Include="..\MasDen.HomeLibrary\MasDen.HomeLibrary.csproj" />
+  </ItemGroup>
+
+</Project>

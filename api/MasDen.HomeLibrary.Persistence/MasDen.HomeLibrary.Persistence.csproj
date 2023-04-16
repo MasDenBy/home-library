@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="MySql.Data" Version="8.0.32.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MasDen.HomeLibrary.Domain\MasDen.HomeLibrary.Domain.csproj" />
+    <ProjectReference Include="..\MasDen.HomeLibrary.Infrastructure\MasDen.HomeLibrary.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

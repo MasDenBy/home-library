@@ -1,0 +1,1 @@
+﻿global using MasDen.HomeLibrary.Domain.Entities;
