@@ -6,42 +6,52 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  buildConfiguration: 'Release'
+
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '14.x'
-  displayName: 'Install Node.js'
+  - task: UseDotNet@2
+    displayName: install sdk
+    inputs:
+      version: '6.x'
 
-- task: Npm@1
-  inputs:
-    command: 'install'
-    workingDir: 'api'
-  displayName: 'Instal dependencies'
+  - task: DotNetCoreCLI@2
+    displayName: restore
+    inputs:
+      command: restore
+      projects: 'api/MasDen.HomeLibrary.Api.sln'
 
-- task: Npm@1
-  inputs:
-    command: 'custom'
-    workingDir: 'api'
-    customCommand: 'run build'
-  displayName: 'Build'
-  
-- task: Npm@1
-  inputs:
-    command: 'custom'
-    workingDir: 'api'
-    customCommand: 'run lint'
-  displayName: 'Lint'
+  - task: DotNetCoreCLI@2
+    displayName: build
+    inputs:
+      command: build
+      projects: 'api/MasDen.HomeLibrary.Api.sln'
+      arguments: '--configuration $(buildConfiguration)'
 
-- task: Npm@1
-  inputs:
-    command: 'custom'
-    workingDir: 'api'
-    customCommand: 'run test:coverage'
-  displayName: 'Test & Coverage'
+  - task: CmdLine@2
+    displayName: tests
+    inputs:
+      script: |
+        dotnet test --logger trx api/MasDen.HomeLibrary.Api.sln
 
-- task: PublishCodeCoverageResults@1
-  inputs:
-    codeCoverageTool: 'Cobertura'
-    summaryFileLocation: 'api/coverage/cobertura-coverage.xml'
-    pathToSources: 'api/src'
-  displayName: 'Publish Code Coverage'
+  - task: PublishTestResults@2
+    displayName: publish test results
+    inputs:
+      testRunner: XUnit
+      testResultsFiles: '**/*.trx'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: custom
+      custom: tool
+      arguments: install -g dotnet-reportgenerator-globaltool
+    displayName: install ReportGenerator tool
+
+  - script: reportgenerator -reports:$(Build.SourcesDirectory)/api/tests/CoverageResults/*/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
+    displayName: create report
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'publish code coverage'
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: $(Build.SourcesDirectory)/coverlet/reports/Cobertura.xml
