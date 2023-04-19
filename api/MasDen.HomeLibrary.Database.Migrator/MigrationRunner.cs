@@ -20,9 +20,8 @@ internal class MigrationRunner
         runner.MigrateUp();
     }
 
-    private static IServiceProvider CreateServices(string connectionString)
-    {
-        return new ServiceCollection()
+    private static IServiceProvider CreateServices(string connectionString) =>
+        new ServiceCollection()
             .AddFluentMigratorCore()
             .ConfigureRunner(runner =>
                 runner.AddMySql5()
@@ -30,11 +29,10 @@ internal class MigrationRunner
                       .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations())
             .AddLogging(log => log.AddFluentMigratorConsole())
             .BuildServiceProvider(false);
-    }
 
     private static void EnsureDatabase(string connectionString, string name)
     {
-        using var connection = new MySqlConnection(connectionString);
+        using var connection = new MySqlConnection(ConnectionStringWithoutDatabase(connectionString, name));
         var records = connection.Query(
             sql: "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = @name",
             param: new
@@ -46,5 +44,8 @@ internal class MigrationRunner
         {
             connection.Execute($"CREATE DATABASE {name}");
         }
+
+        static string ConnectionStringWithoutDatabase(string connectionString, string databaseName) =>
+            connectionString.Replace($"Database={databaseName};", string.Empty);
     }
 }

@@ -11,7 +11,8 @@ internal class IntegrationTestsWebApplicationFactory : WebApplicationFactory<Pro
         builder.ConfigureAppConfiguration(configurationBuilder =>
         {
             var integrationConfig = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("testssettings.json")
                 .Build();
 
             configurationBuilder.AddConfiguration(integrationConfig);
