@@ -29,10 +29,26 @@ steps:
       arguments: '--configuration $(buildConfiguration)'
 
   - task: CmdLine@2
+    displayName: build DB images
+    inputs:
+      script: docker-compose -f ./.azuredevops/api/docker-compose.yml build
+
+  - task: CmdLine@2
+    displayName: run DB migration
+    inputs:
+      script: docker-compose -f ./.azuredevops/api/docker-compose.yml up -d
+
+  - task: CmdLine@2
     displayName: tests
     inputs:
       script: |
         dotnet test --logger trx api/MasDen.HomeLibrary.Api.sln
+
+  - task: CmdLine@2
+    displayName: stop DB container
+    inputs:
+      script: |
+        docker-compose -f ./.azuredevops/api/docker-compose.yml down
 
   - task: PublishTestResults@2
     displayName: publish test results

@@ -2,7 +2,7 @@
 using Dapper;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace MasDen.HomeLibrary.Database.Migrator;
 
@@ -33,14 +33,15 @@ internal class MigrationRunner
     private static void EnsureDatabase(string connectionString, string name)
     {
         using var connection = new MySqlConnection(ConnectionStringWithoutDatabase(connectionString, name));
-        var records = connection.Query(
-            sql: "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = @name",
+        var count = DatabasePolicy.QuerySingleWithRetry<long>(
+            connection: connection,
+            sql: "SELECT COUNT(1) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = @name",
             param: new
             {
                 name
             });
 
-        if (!records.Any())
+        if (count <= 0)
         {
             connection.Execute($"CREATE DATABASE {name}");
         }

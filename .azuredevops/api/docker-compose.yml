@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+  db:
+    image: mariadb:latest
+    env_file: 
+      - tests.env
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    networks:
+      - database-network
+
+  db-migration:
+    build: 
+      context: ../../
+      dockerfile: .azuredevops/api/Dockerfile
+    env_file: 
+      - tests.env
+    networks:
+      - database-network
+    depends_on:
+      - db
+      
+networks:
+  database-network:
+    name: masden-database-network

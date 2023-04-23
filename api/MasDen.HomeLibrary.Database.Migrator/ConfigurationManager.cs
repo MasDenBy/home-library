@@ -10,8 +10,7 @@ internal static class ConfigurationManager
     {
         var filePath = ".env";
 
-        if (!File.Exists(filePath))
-            throw new InvalidOperationException(".env file does not found.");
+        if (!File.Exists(filePath)) return;
 
         foreach (var line in File.ReadAllLines(filePath))
         {

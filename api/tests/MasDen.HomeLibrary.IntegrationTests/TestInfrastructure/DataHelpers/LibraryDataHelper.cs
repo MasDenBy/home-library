@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using MasDen.HomeLibrary.Domain.Entities;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 

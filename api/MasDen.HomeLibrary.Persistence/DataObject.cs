@@ -3,7 +3,7 @@ using System.Data;
 using System.Reflection;
 using Dapper;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace MasDen.HomeLibrary.Persistence;
 
