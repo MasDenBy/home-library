@@ -9,5 +9,14 @@ internal class ApplicationConfigurationValidator : AbstractValidator<Application
         RuleFor(x => x.DatabaseConnectionString)
             .NotNull()
             .NotEmpty();
+
+        RuleFor(x => x.DatabaseRetryCount)
+            .GreaterThan(0);
+
+        RuleFor(x => x.DatabaseRetryMaxDelay)
+            .GreaterThan(0);
+
+        RuleFor(x => x.DatabaseRetryDelay)
+            .GreaterThan(0);
     }
 }

@@ -9,10 +9,10 @@ builder.Configuration
     .AddUserSecrets<Program>();
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructure(builder.Configuration);
+
 builder.Services.AddPersistence();
 
 builder.Services.AddEndpointsApiExplorer();

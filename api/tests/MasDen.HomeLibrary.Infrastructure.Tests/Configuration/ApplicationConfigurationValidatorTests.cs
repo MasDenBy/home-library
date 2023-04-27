@@ -9,7 +9,7 @@ public class ApplicationConfigurationValidatorTests
     [InlineData(null)]
     [InlineData("")]
     [Theory]
-    public void Validate_IfDatabaseConnectionStringIsNotValid_ShouldReturnInvalidResult(string? value)
+    public void Validate_IfConfigurationIsNotValid_ShouldReturnInvalidResult(string? value)
     {
         // Arrange
 #pragma warning disable CS8601 // Possible null reference assignment.
@@ -22,13 +22,22 @@ public class ApplicationConfigurationValidatorTests
         // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(x => x.PropertyName == "DatabaseConnectionString");
+        result.Errors.Should().Contain(x => x.PropertyName == "DatabaseRetryCount");
+        result.Errors.Should().Contain(x => x.PropertyName == "DatabaseRetryDelay");
+        result.Errors.Should().Contain(x => x.PropertyName == "DatabaseRetryMaxDelay");
     }
 
     [Fact]
     public void Validate_IfConfigurationIsValid_ShouldReturnValidResult()
     {
         // Arrange
-        var applicationConfiguration = new ApplicationConfiguration { DatabaseConnectionString = "Server=localhost;Database=test;" };
+        var applicationConfiguration = new ApplicationConfiguration 
+        {
+            DatabaseConnectionString = "Server=localhost;Database=test;",
+            DatabaseRetryCount = 1,
+            DatabaseRetryDelay = 2,
+            DatabaseRetryMaxDelay = 3
+        };
 
         // Act
         var result = this.sut.Validate(applicationConfiguration);

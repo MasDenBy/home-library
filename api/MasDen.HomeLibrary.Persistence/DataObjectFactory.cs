@@ -13,5 +13,7 @@ internal class DataObjectFactory : IDataObjectFactory
     }
 
     public IDataObject<T> Create<T>() where T : class
-        => new DataObject<T>(this.configuration.DatabaseConnectionString);
+        => new DataObject<T>(
+            connectionString: this.configuration.DatabaseConnectionString,
+            retryOptions: new RetryOptions(this.configuration.DatabaseRetryCount, this.configuration.DatabaseRetryDelay, this.configuration.DatabaseRetryMaxDelay));
 }
