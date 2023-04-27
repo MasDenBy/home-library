@@ -35,6 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\MasDen.HomeLibrary.Api\MasDen.HomeLibrary.Api.csproj" />
     <ProjectReference Include="..\..\MasDen.HomeLibrary.Domain\MasDen.HomeLibrary.Domain.csproj" />
+    <ProjectReference Include="..\..\MasDen.HomeLibrary.Persistence\MasDen.HomeLibrary.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>

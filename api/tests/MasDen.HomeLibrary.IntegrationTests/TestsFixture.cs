@@ -18,9 +18,10 @@ public class TestsFixture : IDisposable
 
         var configuration = this.factory.Services.GetRequiredService<IConfiguration>();
         this.config = new TestsConfiguration();
+
         configuration.Bind(this.config);
 
-        this.dataHelper = new DataHelper(this.config.DatabaseConnectionString);
+        this.dataHelper = new DataHelper(this.config);
     }
 
     internal HttpClient HttpClient => this.factory.CreateClient();

@@ -1,17 +1,20 @@
 ﻿using Dapper;
 using MasDen.HomeLibrary.Domain.Entities;
+using MasDen.HomeLibrary.Persistence;
 using MySqlConnector;
 
 namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 
 internal class LibraryDataHelper : IDisposable
 {
-    private readonly string connectionString;
+    private readonly TestsConfiguration configuration;
+    private readonly RetryOptions retryOptions;
     private bool disposed;
 
-    public LibraryDataHelper(string connectionString)
+    public LibraryDataHelper(TestsConfiguration configuration)
     {
-        this.connectionString = connectionString;
+        this.configuration = configuration;
+        this.retryOptions = new RetryOptions(configuration.DatabaseRetryCount, configuration.DatabaseRetryDelay, configuration.DatabaseRetryMaxDelay);
     }
 
     public async Task<IReadOnlyCollection<Library>> InsertAsync(IEnumerable<Library> libraries)
@@ -28,26 +31,27 @@ internal class LibraryDataHelper : IDisposable
 
     public async Task<Library> InsertAsync(Library library)
     {
-        using var connection = new MySqlConnection(this.connectionString);
-        await connection.OpenAsync();
+        using var connection = new MySqlConnection(this.configuration.DatabaseConnectionString);
 
-        library.Id = await connection.QuerySingleAsync<int>(
-            sql: "INSERT INTO library (id, path) VALUES (@id, @path); SELECT LAST_INSERT_ID();",
-            param: new
-            {
-                id = library.Id,
-                path = library.Path
-            });
+        library.Id = await Policies.CreateAsyncRetryPolicy(this.retryOptions)
+            .ExecuteAsync(async () => await
+                connection.QuerySingleAsync<int>(
+                    sql: "INSERT INTO library (id, path) VALUES (@id, @path); SELECT LAST_INSERT_ID();",
+                    param: new
+                    {
+                        id = library.Id,
+                        path = library.Path
+                    }));
 
         return library;
     }
 
     private void CleanTable()
     {
-        using var connection = new MySqlConnection(this.connectionString);
-        connection.Open();
+        using var connection = new MySqlConnection(this.configuration.DatabaseConnectionString);
 
-        connection.Execute(sql: "DELETE FROM library");
+        Policies.CreateRetryPolicy(this.retryOptions)
+            .Execute(() => connection.Execute(sql: "DELETE FROM library"));
     }
 
     public void Dispose()

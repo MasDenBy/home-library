@@ -1,17 +1,17 @@
 ﻿namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 internal class DataHelper : IDisposable
 {
-    private readonly string connectionString;
+    private readonly TestsConfiguration configuration;
 
     private LibraryDataHelper? libraryDataHelper;
     private bool disposed;
 
-    public DataHelper(string connectionString)
+    public DataHelper(TestsConfiguration configuration)
     {
-        this.connectionString = connectionString;
+        this.configuration = configuration;
     }
 
-    public LibraryDataHelper Library => this.libraryDataHelper ??= new LibraryDataHelper(this.connectionString);
+    public LibraryDataHelper Library => this.libraryDataHelper ??= new LibraryDataHelper(this.configuration);
 
     public void Dispose()
     {
