@@ -1,8 +1,7 @@
 ﻿using MasDen.HomeLibrary.Domain.Entities;
-using MasDen.HomeLibrary.Libraries.Queries.GetLibraries;
 using Riok.Mapperly.Abstractions;
 
-namespace MasDen.HomeLibrary.Common.Mappers;
+namespace MasDen.HomeLibrary.Libraries.Queries.GetLibraries;
 
 [Mapper]
 public partial class LibraryMapper

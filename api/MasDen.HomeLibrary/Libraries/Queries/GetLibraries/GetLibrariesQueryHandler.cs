@@ -1,5 +1,4 @@
-﻿using MasDen.HomeLibrary.Common.Mappers;
-using MasDen.HomeLibrary.Infrastructure.Persistence;
+﻿using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MediatR;
 
 namespace MasDen.HomeLibrary.Libraries.Queries.GetLibraries;

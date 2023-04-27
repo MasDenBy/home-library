@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
-using System.Reflection;
+﻿using System.Data;
 using Dapper;
+using Dapper.Contrib.Extensions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MySqlConnector;
 
@@ -30,12 +29,15 @@ internal class DataObject<T> : IDataObject<T>
             : entities.ToList();
     }
 
-    private static string GetTableName()
+    public async Task<int> InsertAsync(T entity)
     {
-        var table = typeof(T).GetTypeInfo().GetCustomAttribute<TableAttribute>();
+        using IDbConnection connection = this.CreateConnection();
+        connection.Open();
 
-        return table == null ? typeof(T).Name.ToLowerInvariant() : table.Name;
+        return await connection.InsertAsync<T>(entity);
     }
+
+    private static string GetTableName() => DataObjectHelpers.GetTableName(typeof(T));
 
     private IDbConnection CreateConnection() => new MySqlConnection(this.connectionString);
 }

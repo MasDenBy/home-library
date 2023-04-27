@@ -22,4 +22,18 @@ public class LibrariesControllerTests : IClassFixture<TestsFixture>
         // Assert
         response.Should().Be200Ok().And.BeAs(expectedLibraries);
     }
+
+    [Fact]
+    public async Task Post_ShouldResponse201CreatedWithDto()
+    {
+        // Arrange
+        var library = new LibraryFaker(true).Generate();
+
+        // Act
+        var response = await this.fixture.HttpClient.PostAsync($"/api/libraries?path={library.Path}", null);
+
+        // Assert
+        response.Should().Be201Created().And.BeAs(new { Path = library.Path });
+        response.Should().HaveHeader("Location").And.NotBeEmpty();
+    }
 }

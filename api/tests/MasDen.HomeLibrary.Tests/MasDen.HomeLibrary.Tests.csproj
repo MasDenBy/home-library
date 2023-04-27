@@ -15,12 +15,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="FluentAssertions" Version="6.10.0" />
-    <PackageReference Include="FluentAssertions.Web" Version="1.2.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.16" />
+    <PackageReference Include="FluentAssertions" Version="6.11.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
-    <PackageReference Include="MySqlConnector" Version="2.2.5" />
+    <PackageReference Include="NSubstitute" Version="5.0.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -33,14 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MasDen.HomeLibrary.Api\MasDen.HomeLibrary.Api.csproj" />
-    <ProjectReference Include="..\..\MasDen.HomeLibrary.Domain\MasDen.HomeLibrary.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="testssettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\..\MasDen.HomeLibrary.Infrastructure\MasDen.HomeLibrary.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\MasDen.HomeLibrary\MasDen.HomeLibrary.csproj" />
   </ItemGroup>
 
 </Project>

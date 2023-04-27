@@ -10,6 +10,9 @@ public class LibraryDataStore : BaseDataStore<Library>, ILibraryDataStore
     {
     }
 
-    public Task<IReadOnlyCollection<Library>> GetAllAsync(CancellationToken cancellationToken = default)
-        => this.DataObject.GetAllAsync(cancellationToken);
+    public Task<IReadOnlyCollection<Library>> GetAllAsync(CancellationToken cancellationToken = default) =>
+        this.DataObject.GetAllAsync(cancellationToken);
+
+    public Task<int> CreateAsync(Library library) =>
+        this.DataObject.InsertAsync(library);
 }

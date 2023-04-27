@@ -1,4 +1,5 @@
-﻿using MasDen.HomeLibrary.Infrastructure.Persistence;
+﻿using Dapper.Contrib.Extensions;
+using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MasDen.HomeLibrary.Persistence.DataStores;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDataObjectFactory, DataObjectFactory>();
 
         services.AddScoped<ILibraryDataStore, LibraryDataStore>();
+
+        SqlMapperExtensions.TableNameMapper = entityType => DataObjectHelpers.GetTableName(entityType);
 
         return services;
     }

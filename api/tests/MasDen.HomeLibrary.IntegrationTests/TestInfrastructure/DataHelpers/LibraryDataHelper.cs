@@ -7,7 +7,6 @@ namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 internal class LibraryDataHelper : IDisposable
 {
     private readonly string connectionString;
-    private readonly List<int> addedIds = new();
     private bool disposed;
 
     public LibraryDataHelper(string connectionString)
@@ -40,22 +39,15 @@ internal class LibraryDataHelper : IDisposable
                 path = library.Path
             });
 
-        this.addedIds.Add(library.Id);
-
         return library;
     }
 
-    public void Delete(IEnumerable<int> ids)
+    private void CleanTable()
     {
         using var connection = new MySqlConnection(this.connectionString);
         connection.Open();
 
-        connection.Execute(
-            sql: "DELETE FROM library WHERE id IN @ids",
-            param: new
-            {
-                ids
-            });
+        connection.Execute(sql: "DELETE FROM library");
     }
 
     public void Dispose()
@@ -68,9 +60,9 @@ internal class LibraryDataHelper : IDisposable
     {
         if (this.disposed) return;
 
-        if (disposing && this.addedIds.Count > 0)
+        if (disposing)
         {
-            this.Delete(this.addedIds);
+            this.CleanTable();
         }
 
         this.disposed = true;
