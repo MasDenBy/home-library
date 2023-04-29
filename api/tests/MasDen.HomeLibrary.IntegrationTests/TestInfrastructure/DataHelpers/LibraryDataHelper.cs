@@ -46,6 +46,19 @@ internal class LibraryDataHelper : IDisposable
         return library;
     }
 
+    public async Task<bool> ExistsAsync(int id)
+    {
+        using var connection = new MySqlConnection(this.configuration.DatabaseConnectionString);
+
+        var count = await Policies.CreateAsyncRetryPolicy(this.retryOptions)
+            .ExecuteAsync(async () => await
+                connection.QuerySingleAsync<int>(
+                    sql: "SELECT COUNT(1) FROM library WHERE id = @id",
+                    param: new { id }));
+
+        return count > 0;
+    }
+
     private void CleanTable()
     {
         using var connection = new MySqlConnection(this.configuration.DatabaseConnectionString);

@@ -1,4 +1,5 @@
 ﻿using MasDen.HomeLibrary.Libraries.Commands.CreateLibrary;
+using MasDen.HomeLibrary.Libraries.Commands.DeleteLibrary;
 using MasDen.HomeLibrary.Libraries.Queries.GetLibraries;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,5 +18,13 @@ public class LibrariesController : ApiControllerBase
         var dto = await this.Mediator.Send(new CreateLibraryCommand(path), cancellationToken);
 
         return Created($"/api/libraries/{dto.Id}", dto);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    {
+        await this.Mediator.Send(new DeleteLibraryCommand(id), cancellationToken);
+
+        return NoContent();
     }
 }

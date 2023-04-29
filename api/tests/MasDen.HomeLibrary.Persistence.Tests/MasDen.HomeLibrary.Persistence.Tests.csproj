@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="34.0.2" />
     <PackageReference Include="coverlet.msbuild" Version="3.2.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -30,8 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MasDen.HomeLibrary.Infrastructure\MasDen.HomeLibrary.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\MasDen.HomeLibrary\MasDen.HomeLibrary.csproj" />
+    <ProjectReference Include="..\..\MasDen.HomeLibrary.Persistence\MasDen.HomeLibrary.Persistence.csproj" />
     <ProjectReference Include="..\MasDen.HomeLibrary.TestInfrastructure\MasDen.HomeLibrary.TestInfrastructure.csproj" />
   </ItemGroup>
 

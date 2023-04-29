@@ -14,10 +14,10 @@ public class CreateLibraryCommandHandlerTests
         var library = new Library(this.faker.Random.Int(), this.faker.System.DirectoryPath());
         var command = new CreateLibraryCommand(library.Path);
 
-        var libraryDataStoreMock = Substitute.For<ILibraryDataStore>();
-        libraryDataStoreMock.CreateAsync(Arg.Any<Library>()).Returns(library.Id);
+        var libraryDataStoreMock = new Mock<ILibraryDataStore>();
+        libraryDataStoreMock.Setup(x=>x.CreateAsync(It.IsAny<Library>())).ReturnsAsync(library.Id);
 
-        var sut = new CreateLibraryCommandHandler(libraryDataStoreMock);
+        var sut = new CreateLibraryCommandHandler(libraryDataStoreMock.Object);
 
         // Act
         var dto = await sut.Handle(command, default(CancellationToken));
@@ -26,6 +26,6 @@ public class CreateLibraryCommandHandlerTests
         dto.Id.Should().Be(library.Id);
         dto.Path.Should().Be(library.Path);
 
-        await libraryDataStoreMock.Received().CreateAsync(Arg.Is<Library>(a => a.Path == command.Path));
+        libraryDataStoreMock.Verify(x => x.CreateAsync(It.Is<Library>(a => a.Path == command.Path)), Times.Once);
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System.Data;
+using System.Threading;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MySqlConnector;
 using Polly.Retry;
+using static Dapper.SqlMapper;
 
 namespace MasDen.HomeLibrary.Persistence;
 
@@ -24,7 +26,6 @@ internal class DataObject<T> : IDataObject<T>
     public async Task<IReadOnlyCollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         using IDbConnection connection = this.CreateConnection();
-        connection.Open();
         CommandDefinition command = new($"SELECT * FROM {GetTableName()}", cancellationToken: cancellationToken);
 
         IEnumerable<T> entities = await this.AsyncRetryPolicy
@@ -38,10 +39,28 @@ internal class DataObject<T> : IDataObject<T>
     public async Task<int> InsertAsync(T entity)
     {
         using IDbConnection connection = this.CreateConnection();
-        connection.Open();
 
         return await this.AsyncRetryPolicy
             .ExecuteAsync(async () => await connection.InsertAsync(entity));
+    }
+
+    public async Task<bool> DeleteAsync(T entity)
+    {
+        using IDbConnection connection = this.CreateConnection();
+
+        return await this.AsyncRetryPolicy
+            .ExecuteAsync(async () => await connection.DeleteAsync(entity));
+    }
+
+    public async Task<T> QuerySingleAsync(string where, dynamic param, CancellationToken cancellationToken = default)
+    {
+        using IDbConnection connection = this.CreateConnection();
+        CommandDefinition command = new(
+            $"SELECT * FROM {GetTableName()}" + (string.IsNullOrWhiteSpace(where) ? "" : $" WHERE {where}"),
+            parameters: param as object,
+            cancellationToken: cancellationToken);
+
+        return await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QuerySingleOrDefaultAsync<T>(command));
     }
 
     private static string GetTableName() => DataObjectHelpers.GetTableName(typeof(T));

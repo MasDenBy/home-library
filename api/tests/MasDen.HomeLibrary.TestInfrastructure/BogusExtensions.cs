@@ -1,4 +1,6 @@
-﻿namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure;
+﻿using Bogus;
+
+namespace MasDen.HomeLibrary.TestInfrastructure;
 
 internal static class BogusExtensions
 {

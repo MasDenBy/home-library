@@ -1,8 +1,9 @@
-﻿using MasDen.HomeLibrary.Domain.Entities;
+﻿using Bogus;
+using MasDen.HomeLibrary.Domain.Entities;
 
-namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.Fakers;
+namespace MasDen.HomeLibrary.TestInfrastructure.Fakers;
 
-internal class LibraryFaker : Faker<Library>
+public class LibraryFaker : Faker<Library>
 {
     public LibraryFaker(bool newInstance = false)
     {
