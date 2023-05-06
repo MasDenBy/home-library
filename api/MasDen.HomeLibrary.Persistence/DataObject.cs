@@ -1,11 +1,9 @@
-﻿using System.Data;
-using System.Threading;
-using Dapper;
+﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MySqlConnector;
 using Polly.Retry;
-using static Dapper.SqlMapper;
+using System.Data;
 
 namespace MasDen.HomeLibrary.Persistence;
 
@@ -36,12 +34,15 @@ internal class DataObject<T> : IDataObject<T>
             : entities.ToList();
     }
 
-    public async Task<int> InsertAsync(T entity)
+    public async Task<TId> InsertAsync<TId>(string insertSql, dynamic param)
     {
         using IDbConnection connection = this.CreateConnection();
 
         return await this.AsyncRetryPolicy
-            .ExecuteAsync(async () => await connection.InsertAsync(entity));
+            .ExecuteAsync(async () => await
+                connection.QuerySingleAsync<TId>(
+                    sql: $"{insertSql}; SELECT CAST(LAST_INSERT_ID() AS INT);",
+                    param: param as object));
     }
 
     public async Task<bool> DeleteAsync(T entity)
@@ -61,6 +62,19 @@ internal class DataObject<T> : IDataObject<T>
             cancellationToken: cancellationToken);
 
         return await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QuerySingleOrDefaultAsync<T>(command));
+    }
+
+    public async Task<(IReadOnlyCollection<T> entities, long total)> QueryPageAsync(string sql, dynamic param, CancellationToken cancellationToken = default)
+    {
+        using IDbConnection connection = this.CreateConnection();
+        CommandDefinition command = new(sql, param as object, cancellationToken: cancellationToken);
+
+        var reader = await connection.QueryMultipleAsync(command);
+
+        dynamic total = reader.Read().Single();
+        var entities = reader.Read<T>();
+
+        return (entities.ToList(), total.TotalCount);
     }
 
     private static string GetTableName() => DataObjectHelpers.GetTableName(typeof(T));

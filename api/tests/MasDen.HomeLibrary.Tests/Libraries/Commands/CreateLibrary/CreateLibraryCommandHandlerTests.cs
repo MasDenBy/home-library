@@ -1,6 +1,7 @@
 ﻿using MasDen.HomeLibrary.Domain.Entities;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MasDen.HomeLibrary.Libraries.Commands.CreateLibrary;
+using MasDen.HomeLibrary.TestInfrastructure.Fakers;
 
 namespace MasDen.HomeLibrary.Tests.Libraries.Commands.CreateLibrary;
 public class CreateLibraryCommandHandlerTests
@@ -11,7 +12,7 @@ public class CreateLibraryCommandHandlerTests
     public async Task Handle_ShouldReturnCreatedDto()
     {
         // Arrange
-        var library = new Library(this.faker.Random.Int(), this.faker.System.DirectoryPath());
+        var library = new LibraryFaker().Generate();
         var command = new CreateLibraryCommand(library.Path);
 
         var libraryDataStoreMock = new Mock<ILibraryDataStore>();

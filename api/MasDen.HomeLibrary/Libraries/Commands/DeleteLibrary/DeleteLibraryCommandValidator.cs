@@ -5,7 +5,7 @@ public class DeleteLibraryCommandValidator : AbstractValidator<DeleteLibraryComm
 {
     public DeleteLibraryCommandValidator()
     {
-        RuleFor(x => x.Id)
+        RuleFor(x => x.Id.Value)
             .GreaterThan(0);
     }
 }

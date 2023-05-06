@@ -1,7 +1,8 @@
-﻿using MediatR;
+﻿using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+using MediatR;
 
 namespace MasDen.HomeLibrary.Libraries.Commands.DeleteLibrary;
 
-public record DeleteLibraryCommand(int Id) : IRequest
+public record DeleteLibraryCommand(LibraryId Id) : IRequest
 {
 }

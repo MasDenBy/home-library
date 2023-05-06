@@ -22,21 +22,21 @@ public class Migration01_Initial : Migration
         Create.Table("file")
             .WithColumn("id").AsInt32().NotNullable().PrimaryKey().Identity()
             .WithColumn("path").AsString(500).NotNullable()
-            .WithColumn("imageName").AsString(30)
-            .WithColumn("libraryId").AsInt32().NotNullable().ForeignKey("library", "id");
+            .WithColumn("imageName").AsString(100).Nullable();
 
         Create.Table("metadata")
             .WithColumn("id").AsInt32().NotNullable().PrimaryKey().Identity()
-            .WithColumn("isbn").AsString(13)
-            .WithColumn("pages").AsInt32()
-            .WithColumn("year").AsString(255);
+            .WithColumn("isbn").AsString(13).Nullable()
+            .WithColumn("pages").AsInt32().Nullable()
+            .WithColumn("year").AsString(255).Nullable();
 
         Create.Table("book")
             .WithColumn("id").AsInt32().NotNullable().PrimaryKey().Identity()
             .WithColumn("title").AsString(1000).NotNullable()
-            .WithColumn("description").AsString(4000)
-            .WithColumn("authors").AsString(255)
+            .WithColumn("description").AsString(4000).Nullable()
+            .WithColumn("authors").AsString(255).Nullable()
             .WithColumn("fileId").AsInt32().ForeignKey("file", "id")
-            .WithColumn("metadataId").AsInt32().ForeignKey("metadata", "id");
+            .WithColumn("metadataId").AsInt32().Nullable().ForeignKey("metadata", "id")
+            .WithColumn("libraryId").AsInt32().NotNullable().ForeignKey("library", "id");
     }
 }

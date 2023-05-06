@@ -1,4 +1,5 @@
 ﻿using MasDen.HomeLibrary.Domain.Entities;
+using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 using MasDen.HomeLibrary.Infrastructure.Exceptions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MasDen.HomeLibrary.Persistence.DataStores;
@@ -25,7 +26,7 @@ public class LibraryDataStoreTests
     public async Task DeleteAsync_IfEntityDoesNotFound_ShouldThrowNotFoundException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<NotFoundException>(() => this.sut.DeleteAsync(1));
+        await Assert.ThrowsAsync<NotFoundException>(() => this.sut.DeleteAsync(new LibraryId(1)));
     }
 
     [Fact]

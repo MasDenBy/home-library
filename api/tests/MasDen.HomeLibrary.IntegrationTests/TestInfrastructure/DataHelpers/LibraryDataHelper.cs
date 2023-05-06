@@ -1,21 +1,17 @@
 ﻿using Dapper;
 using MasDen.HomeLibrary.Domain.Entities;
-using MasDen.HomeLibrary.Persistence;
-using MySqlConnector;
+using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 
 namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 
-internal class LibraryDataHelper : IDisposable
+internal class LibraryDataHelper : DataHelperBase
 {
-    private readonly TestsConfiguration configuration;
-    private readonly RetryOptions retryOptions;
-    private bool disposed;
-
     public LibraryDataHelper(TestsConfiguration configuration)
+        : base(configuration)
     {
-        this.configuration = configuration;
-        this.retryOptions = new RetryOptions(configuration.DatabaseRetryCount, configuration.DatabaseRetryDelay, configuration.DatabaseRetryMaxDelay);
     }
+
+    protected override string TableName => "library";
 
     public async Task<IReadOnlyCollection<Library>> InsertAsync(IEnumerable<Library> libraries)
     {
@@ -31,57 +27,33 @@ internal class LibraryDataHelper : IDisposable
 
     public async Task<Library> InsertAsync(Library library)
     {
-        using var connection = new MySqlConnection(this.configuration.DatabaseConnectionString);
+        using var connection = this.CreateConnection();
 
-        library.Id = await Policies.CreateAsyncRetryPolicy(this.retryOptions)
+         var id = await this.AsyncRetryPolicy
             .ExecuteAsync(async () => await
-                connection.QuerySingleAsync<int>(
-                    sql: "INSERT INTO library (id, path) VALUES (@id, @path); SELECT LAST_INSERT_ID();",
+                connection.QuerySingleAsync<LibraryId>(
+                    sql: "INSERT INTO library (id, path) VALUES (@id, @path); SELECT CAST(LAST_INSERT_ID() AS INT);",
                     param: new
                     {
                         id = library.Id,
                         path = library.Path
                     }));
 
+        library.SetId(id);
+
         return library;
     }
 
-    public async Task<bool> ExistsAsync(int id)
+    public async Task<bool> ExistsAsync(LibraryId id)
     {
-        using var connection = new MySqlConnection(this.configuration.DatabaseConnectionString);
+        using var connection = this.CreateConnection();
 
-        var count = await Policies.CreateAsyncRetryPolicy(this.retryOptions)
+        var count = await this.AsyncRetryPolicy
             .ExecuteAsync(async () => await
                 connection.QuerySingleAsync<int>(
                     sql: "SELECT COUNT(1) FROM library WHERE id = @id",
                     param: new { id }));
 
         return count > 0;
-    }
-
-    private void CleanTable()
-    {
-        using var connection = new MySqlConnection(this.configuration.DatabaseConnectionString);
-
-        Policies.CreateRetryPolicy(this.retryOptions)
-            .Execute(() => connection.Execute(sql: "DELETE FROM library"));
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (this.disposed) return;
-
-        if (disposing)
-        {
-            this.CleanTable();
-        }
-
-        this.disposed = true;
     }
 }

@@ -16,7 +16,7 @@ public class NotFoundException : Exception
     {
     }
 
-    public NotFoundException(Type type, int id)
+    public NotFoundException(Type type, long id)
         : base($"The {type.Name} with identifier {id} does not found.")
     { }
 

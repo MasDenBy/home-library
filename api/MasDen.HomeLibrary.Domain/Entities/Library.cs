@@ -2,12 +2,18 @@
 
 public class Library
 {
-    public Library(int id, string path)
+    public Library(string path)
+        :this(LibraryId.Empty, path)
+    { }
+
+    public Library(LibraryId id, string path)
     {
         Id = id;
         Path = path;
     }
 
-    public int Id { get; set; }
-    public string Path { get; set; }
+    public LibraryId Id { get; private set; }
+    public string Path { get; private set; }
+
+    public void SetId(LibraryId libraryId) => this.Id = libraryId;
 }

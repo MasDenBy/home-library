@@ -13,7 +13,7 @@ public static class Policies
         IEnumerable<TimeSpan> delay = CreateDelay(retryOptions);
 
         return Policy
-            .Handle<MySqlException>()
+            .Handle<MySqlException>(NeedToRetryException)
             .Or<SocketException>()
             .WaitAndRetry(delay);
     }
@@ -23,10 +23,12 @@ public static class Policies
         IEnumerable<TimeSpan> delay = CreateDelay(retryOptions);
 
         return Policy
-            .Handle<MySqlException>()
+            .Handle<MySqlException>(NeedToRetryException)
             .Or<SocketException>()
             .WaitAndRetryAsync(delay);
     }
+
+    private static bool NeedToRetryException(MySqlException exception) => exception.Number == 1042;
 
     private static IEnumerable<TimeSpan> CreateDelay(RetryOptions retryOptions)
     {

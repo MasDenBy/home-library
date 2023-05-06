@@ -1,5 +1,6 @@
 ﻿namespace MasDen.HomeLibrary.IntegrationTests.Controllers;
 
+[Collection("Integration")]
 public class LibrariesControllerTests : IClassFixture<TestsFixture>
 {
     private readonly TestsFixture fixture;
@@ -20,7 +21,7 @@ public class LibrariesControllerTests : IClassFixture<TestsFixture>
         var response = await this.fixture.HttpClient.GetAsync("/api/libraries");
 
         // Assert
-        response.Should().Be200Ok().And.BeAs(expectedLibraries);
+        response.Should().Be200Ok().And.BeAs(new Libraries.Queries.GetLibraries.LibraryMapper().ToDto(expectedLibraries));
     }
 
     [Fact]

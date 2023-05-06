@@ -14,11 +14,11 @@ public class CreateLibraryCommandHandler : IRequestHandler<CreateLibraryCommand,
 
     public async Task<CreatedLibraryDto> Handle(CreateLibraryCommand request, CancellationToken cancellationToken)
     {
-        Library library = new(0, request.Path);
+        Library library = new(request.Path);
 
         var id = await this.libraryDataStore.CreateAsync(library);
 
-        library.Id = id;
+        library.SetId(id);
 
         return new LibraryMapper().ToDto(library);
     }

@@ -1,11 +1,11 @@
-﻿using MasDen.HomeLibrary.Libraries.Commands.CreateLibrary;
+﻿using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+using MasDen.HomeLibrary.Libraries.Commands.CreateLibrary;
 using MasDen.HomeLibrary.Libraries.Commands.DeleteLibrary;
 using MasDen.HomeLibrary.Libraries.Queries.GetLibraries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MasDen.HomeLibrary.Api.Controllers;
 
-[ApiController]
 public class LibrariesController : ApiControllerBase
 {
     [HttpGet]
@@ -21,7 +21,7 @@ public class LibrariesController : ApiControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(LibraryId id, CancellationToken cancellationToken)
     {
         await this.Mediator.Send(new DeleteLibraryCommand(id), cancellationToken);
 

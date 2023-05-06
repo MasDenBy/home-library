@@ -1,10 +1,11 @@
 ﻿using MasDen.HomeLibrary.Domain.Entities;
+using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 
 namespace MasDen.HomeLibrary.Infrastructure.Persistence;
 
 public interface ILibraryDataStore : IDataStore<Library>
 {
-    Task<int> CreateAsync(Library library);
-    Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+    Task<LibraryId> CreateAsync(Library library);
+    Task<bool> DeleteAsync(LibraryId id, CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<Library>> GetAllAsync(CancellationToken cancellationToken = default);
 }

@@ -1,7 +1,9 @@
-﻿namespace MasDen.HomeLibrary.Libraries.Commands.CreateLibrary;
+﻿using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+
+namespace MasDen.HomeLibrary.Libraries.Commands.CreateLibrary;
 
 public class CreatedLibraryDto
 {
-    public int Id { get; set; }
+    public LibraryId Id { get; set; }
     public string Path { get; set; } = null!;
 }

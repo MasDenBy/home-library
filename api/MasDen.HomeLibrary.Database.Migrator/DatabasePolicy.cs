@@ -17,7 +17,7 @@ internal static class DatabasePolicy
             .Select(s => TimeSpan.FromTicks(Math.Min(s.Ticks, maxDelay.Ticks)));
 
         var retryPolicy = Policy
-            .Handle<MySqlException>()
+            .Handle<MySqlException>(exception => exception.Number == 1042)
             .Or<SocketException>()
             .WaitAndRetry(delay,
                 (exception, timeSpan, retryCount) =>

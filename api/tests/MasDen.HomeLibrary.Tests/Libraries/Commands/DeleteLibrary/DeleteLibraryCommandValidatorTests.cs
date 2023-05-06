@@ -1,4 +1,5 @@
-﻿using MasDen.HomeLibrary.Libraries.Commands.DeleteLibrary;
+﻿using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+using MasDen.HomeLibrary.Libraries.Commands.DeleteLibrary;
 
 namespace MasDen.HomeLibrary.Tests.Libraries.Commands.DeleteLibrary;
 
@@ -17,7 +18,7 @@ public class DeleteLibraryCommandValidatorTests
     public void Validation_IfIdLessOrEqualZero_ShouldFail()
     {
         // Arrange
-        var command = new DeleteLibraryCommand(this.faker.Random.Int(max: 0));
+        var command = new DeleteLibraryCommand(new LibraryId(this.faker.Random.Int(max: 0)));
 
         // Act
         var result = this.sut.Validate(command);
@@ -30,7 +31,7 @@ public class DeleteLibraryCommandValidatorTests
     public void Validation_IfIdBiggerThanZero_ShouldSuccess()
     {
         // Arrange
-        var command = new DeleteLibraryCommand(this.faker.Random.Int(min: 1));
+        var command = new DeleteLibraryCommand(new LibraryId(this.faker.Random.Int(min: 1)));
 
         // Act
         var result = this.sut.Validate(command);
