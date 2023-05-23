@@ -27,6 +27,7 @@ public class TestsFixture : IDisposable
     internal HttpClient HttpClient => this.factory.CreateClient();
     internal IntegrationTestsWebApplicationFactory Factory => this.factory;
     internal DataHelper DataHelper => this.dataHelper;
+    internal TestsConfiguration Configuration => this.config;
 
     public void Dispose()
     {

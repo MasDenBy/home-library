@@ -2,7 +2,7 @@
 
 namespace MasDen.HomeLibrary.Books.Queries.GetBooks;
 
-public class BookDto
+public class BookPageItemDto
 {
     public BookId Id { get; set; }
     public string Title { get; set; } = null!;

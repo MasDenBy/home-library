@@ -1,5 +1,4 @@
-﻿using Bogus;
-using MasDen.HomeLibrary.Domain.Entities;
+﻿using MasDen.HomeLibrary.Domain.Entities;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 
 namespace MasDen.HomeLibrary.TestInfrastructure.Fakers;
@@ -7,16 +6,18 @@ namespace MasDen.HomeLibrary.TestInfrastructure.Fakers;
 public class BookFaker : Faker<Book>
 {
     private List<LibraryId> libraryIds = new();
-    private List<FileId> fileIds = new();
+    private List<Domain.Entities.File> files = new();
+    private List<Metadata> metadatas = new();
 
     public BookFaker()
     {
-        CustomInstantiator(faker => new Book(
-            title: faker.Lorem.Sentence(),
-            description: faker.Lorem.Paragraph(),
-            authors: faker.Name.FullName(),
-            fileId: this.fileIds.Any() ? faker.PickRandom(this.fileIds) : new FileId(faker.Random.Int(min: 0)),
-            libraryId: this.libraryIds.Any() ? faker.PickRandom(this.libraryIds) : new LibraryId(faker.Random.Int(min: 0))));
+        RuleFor(x => x.Id, setter => BookId.Empty);
+        RuleFor(x => x.Title, setter => setter.Lorem.Sentence());
+        RuleFor(x => x.Description, setter => setter.Lorem.Paragraph());
+        RuleFor(x => x.Authors, setter => setter.Name.FullName());
+        RuleFor(x => x.File, setter => this.files.Any() ? setter.PickRandom(this.files) : new FileFaker().Generate());
+        RuleFor(x => x.Metadata, setter => this.metadatas.Any() ? setter.PickRandom(this.metadatas) : null);
+        RuleFor(x => x.LibraryId, setter => this.libraryIds.Any() ? setter.PickRandom(this.libraryIds) : new LibraryId(setter.Random.Int(min: 0)));
     }
 
     public BookFaker WithRandomLibrary(IEnumerable<LibraryId> libraryIds)
@@ -26,9 +27,16 @@ public class BookFaker : Faker<Book>
         return this;
     }
 
-    public BookFaker WithRandomFile(IEnumerable<FileId> fileIds)
+    public BookFaker WithRandomFile(IEnumerable<Domain.Entities.File> files)
     {
-        this.fileIds = fileIds.ToList();
+        this.files = files.ToList();
+
+        return this;
+    }
+
+    public BookFaker WithRandomMetadata(IEnumerable<Metadata> metadatas)
+    {
+        this.metadatas = metadatas.ToList();
 
         return this;
     }

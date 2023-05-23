@@ -1,4 +1,5 @@
 ﻿using MasDen.HomeLibrary.Infrastructure.Configuration;
+using MasDen.HomeLibrary.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,6 +9,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<IImageService, ImageService>();
+
         services.AddSingleton(container =>
         {
             ApplicationConfiguration config = new();

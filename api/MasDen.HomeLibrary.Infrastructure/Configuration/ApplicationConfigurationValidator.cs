@@ -18,5 +18,9 @@ internal class ApplicationConfigurationValidator : AbstractValidator<Application
 
         RuleFor(x => x.DatabaseRetryDelay)
             .GreaterThan(0);
+
+        RuleFor(x => x.ImageDirectory)
+            .NotNull()
+            .NotEmpty();
     }
 }

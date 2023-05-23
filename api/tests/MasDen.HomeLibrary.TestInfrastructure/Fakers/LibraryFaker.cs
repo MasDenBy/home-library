@@ -8,8 +8,7 @@ public class LibraryFaker : Faker<Library>
 {
     public LibraryFaker(bool newInstance = false)
     {
-        CustomInstantiator(faker => new Library(
-            id: newInstance ? LibraryId.Empty : new LibraryId(faker.Random.PositiveInt()),
-            path: faker.System.DirectoryPath()));
+        RuleFor(x => x.Id, setter => newInstance ? LibraryId.Empty : new LibraryId(setter.Random.PositiveInt()));
+        RuleFor(x => x.Path, setter => setter.System.DirectoryPath());
     }
 }

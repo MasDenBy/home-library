@@ -69,12 +69,20 @@ internal class DataObject<T> : IDataObject<T>
         using IDbConnection connection = this.CreateConnection();
         CommandDefinition command = new(sql, param as object, cancellationToken: cancellationToken);
 
-        var reader = await connection.QueryMultipleAsync(command);
+        var reader = await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryMultipleAsync(command));
 
         dynamic total = reader.Read().Single();
         var entities = reader.Read<T>();
 
         return (entities.ToList(), total.TotalCount);
+    }
+
+    public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(string sql, Func<TFirst, TSecond, TThird, TReturn> map, dynamic param, string splitOn = "Id", CancellationToken cancellationToken = default)
+    {
+        using IDbConnection connection = this.CreateConnection();
+        CommandDefinition command = new(sql, param as object, cancellationToken: cancellationToken);
+
+        return await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryAsync<TFirst, TSecond, TThird, TReturn>(command, map, splitOn));
     }
 
     private static string GetTableName() => DataObjectHelpers.GetTableName(typeof(T));

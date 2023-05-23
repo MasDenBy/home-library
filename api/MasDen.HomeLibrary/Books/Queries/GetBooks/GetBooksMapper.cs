@@ -4,7 +4,7 @@ using Riok.Mapperly.Abstractions;
 namespace MasDen.HomeLibrary.Books.Queries.GetBooks;
 
 [Mapper]
-public partial class BookMapper
+public partial class GetBooksMapper
 {
-    public partial IReadOnlyCollection<BookDto> ToDto(IEnumerable<Book> books);
+    public partial IReadOnlyCollection<BookPageItemDto> ToDto(IEnumerable<Book> books);
 }

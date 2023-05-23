@@ -39,8 +39,8 @@ internal class BookDataHelper : DataHelperBase
                         title = book.Title,
                         description = book.Description,
                         authors = book.Authors,
-                        fileId = book.FileId,
-                        metadataId = book.MetadataId,
+                        fileId = book.File.Id,
+                        metadataId = book.Metadata?.Id,
                         libraryId = book.LibraryId
                     }));
 

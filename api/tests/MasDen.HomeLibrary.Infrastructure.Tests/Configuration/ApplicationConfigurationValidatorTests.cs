@@ -13,7 +13,7 @@ public class ApplicationConfigurationValidatorTests
     {
         // Arrange
 #pragma warning disable CS8601 // Possible null reference assignment.
-        var applicationConfiguration = new ApplicationConfiguration { DatabaseConnectionString = value };
+        var applicationConfiguration = new ApplicationConfiguration { DatabaseConnectionString = value, ImageDirectory = value };
 #pragma warning restore CS8601 // Possible null reference assignment.
 
         // Act
@@ -25,6 +25,7 @@ public class ApplicationConfigurationValidatorTests
         result.Errors.Should().Contain(x => x.PropertyName == "DatabaseRetryCount");
         result.Errors.Should().Contain(x => x.PropertyName == "DatabaseRetryDelay");
         result.Errors.Should().Contain(x => x.PropertyName == "DatabaseRetryMaxDelay");
+        result.Errors.Should().Contain(x => x.PropertyName == "ImageDirectory");
     }
 
     [Fact]
@@ -36,7 +37,8 @@ public class ApplicationConfigurationValidatorTests
             DatabaseConnectionString = "Server=localhost;Database=test;",
             DatabaseRetryCount = 1,
             DatabaseRetryDelay = 2,
-            DatabaseRetryMaxDelay = 3
+            DatabaseRetryMaxDelay = 3,
+            ImageDirectory = "images"
         };
 
         // Act

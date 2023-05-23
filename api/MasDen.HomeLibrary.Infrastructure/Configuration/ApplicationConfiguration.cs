@@ -15,4 +15,7 @@ public class ApplicationConfiguration
 
     [ConfigurationKeyName("DB_Retry_Delay")]
     public int DatabaseRetryDelay { get; set; }
+
+    [ConfigurationKeyName("IMAGE_DIR")]
+    public string ImageDirectory { get; init; } = null!;
 }

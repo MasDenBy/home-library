@@ -1,4 +1,5 @@
-﻿using MasDen.HomeLibrary.Books.Queries.GetBooks;
+﻿using MasDen.HomeLibrary.Books.Queries.GetBook;
+using MasDen.HomeLibrary.Books.Queries.GetBooks;
 using MasDen.HomeLibrary.Common.Models;
 
 namespace MasDen.HomeLibrary.IntegrationTests.Controllers;
@@ -27,11 +28,11 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
         var files = await this.fixture.DataHelper.File.InsertAsync(new FileFaker().GenerateLazy(booksNumber));
         var bookFaker = new BookFaker()
             .WithRandomLibrary(libraries.Select(x => x.Id))
-            .WithRandomFile(files.Select(x => x.Id));
+            .WithRandomFile(files);
 
         var books = await this.fixture.DataHelper.Book.InsertAsync(bookFaker.GenerateLazy(booksNumber));
-        var expectedPage = new PagingCollection<BookDto>(
-            new BookMapper().ToDto(books.Skip(offset).Take(count)).ToList(),
+        var expectedPage = new PagingCollection<BookPageItemDto>(
+            new GetBooksMapper().ToDto(books.Skip(offset).Take(count)).ToList(),
             books.Count);
 
         // Act
@@ -39,5 +40,47 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
 
         // Assert
         response.Should().Be200Ok().And.BeAs(expectedPage);
+    }
+
+    [Fact]
+    public async Task Get_ShouldResponse200OkWithBook()
+    {
+        // Arrange
+        var library = await this.fixture.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate());
+        var file = await this.fixture.DataHelper.File.InsertAsync(new FileFaker().Generate());
+        var metadata = await this.fixture.DataHelper.Metadata.InsertAsync(new MetadataFaker().Generate());
+#pragma warning disable CS8604 // Possible null reference argument.
+        var imageContent = await ImageHelper.SaveImageAsync(file.ImageName, Path.Combine(this.fixture.Configuration.ImageDirectory, library.Id.ToString()));
+#pragma warning restore CS8604 // Possible null reference argument.
+
+        var bookFaker = new BookFaker()
+            .WithRandomLibrary(new[] { library.Id })
+            .WithRandomFile(new[] { file })
+            .WithRandomMetadata(new[] { metadata });
+
+        var book = await this.fixture.DataHelper.Book.InsertAsync(bookFaker.Generate());
+
+        var expectedDto = new BookDto
+        {
+            Authors = book.Authors,
+            Description = book.Description,
+            File = new FileDto
+            {
+                Image = imageContent
+            },
+            Id = book.Id,
+            Metadata = new MetadataDto
+            {
+                Pages = metadata.Pages,
+                Year = metadata.Year,
+            },
+            Title = book.Title
+        };
+
+        // Act
+        var response = await this.fixture.HttpClient.GetAsync($"/api/books/{book.Id}");
+
+        // Assert
+        response.Should().Be200Ok().And.BeAs(expectedDto);
     }
 }
