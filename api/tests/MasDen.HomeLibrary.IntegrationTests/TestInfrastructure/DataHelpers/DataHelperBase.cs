@@ -1,8 +1,8 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using MasDen.HomeLibrary.Persistence;
 using MySqlConnector;
 using Polly.Retry;
-using System.Data;
 
 namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 

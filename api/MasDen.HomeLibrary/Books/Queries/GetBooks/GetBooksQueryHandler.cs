@@ -5,16 +5,16 @@ using MediatR;
 namespace MasDen.HomeLibrary.Books.Queries.GetBooks;
 public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, PagingCollection<BookPageItemDto>>
 {
-    private readonly IBookDataStore bookDataStore;
+    private readonly IUnitOfWork unitOfWork;
 
-    public GetBooksQueryHandler(IBookDataStore bookDataStore)
+    public GetBooksQueryHandler(IUnitOfWork unitOfWork)
     {
-        this.bookDataStore = bookDataStore;
+        this.unitOfWork = unitOfWork;
     }
 
     public async Task<PagingCollection<BookPageItemDto>> Handle(GetBooksQuery request, CancellationToken cancellationToken)
     {
-        var (entitites, total) = await this.bookDataStore.GetBooksAsync(request.Offset, request.Count, cancellationToken);
+        var (entitites, total) = await this.unitOfWork.Book.GetBooksAsync(request.Offset, request.Count, cancellationToken);
 
         return new PagingCollection<BookPageItemDto>(
             items: new GetBooksMapper().ToDto(entitites).ToList(),

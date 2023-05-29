@@ -28,7 +28,7 @@ public class Migration01_Initial : Migration
             .WithColumn("id").AsInt32().NotNullable().PrimaryKey().Identity()
             .WithColumn("isbn").AsString(13).Nullable()
             .WithColumn("pages").AsInt32().Nullable()
-            .WithColumn("year").AsString(255).Nullable();
+            .WithColumn("year").AsInt32().Nullable();
 
         Create.Table("book")
             .WithColumn("id").AsInt32().NotNullable().PrimaryKey().Identity()

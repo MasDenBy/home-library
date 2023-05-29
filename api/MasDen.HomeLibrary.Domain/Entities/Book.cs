@@ -13,4 +13,10 @@ public class Book
     public void SetId(BookId bookId) => this.Id = bookId;
     public void SetFile(File file) => this.File = file;
     public void SetMetadata(Metadata metadata) => this.Metadata = metadata;
+    public void Update(string title, string? description, string? authors)
+    {
+        this.Title = title;
+        this.Description = description;
+        this.Authors = authors;
+    }
 }

@@ -40,4 +40,11 @@ public class BookFaker : Faker<Book>
 
         return this;
     }
+
+    public BookFaker WithMetadata(Metadata metadata)
+    {
+        this.metadatas = new List<Metadata> { metadata };
+
+        return this;
+    }
 }

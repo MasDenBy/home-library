@@ -44,4 +44,25 @@ public class BookDataStore : BaseDataStore<Book>, IBookDataStore
 
         return entities.First();
     }
+
+    public async Task UpdateAsync(Book book, CancellationToken cancellationToken = default)
+    {
+        await this.DataObject.ExecuteAsync(
+            sql: @"
+                    UPDATE book
+                    SET title = @title,
+                        authors = @authors,
+                        description = @description,
+                        metadataId = @metadataId
+                    WHERE id = @id",
+            new
+            {
+                id = book.Id,
+                title = book.Title,
+                authors = book.Authors,
+                description = book.Description,
+                metadataId = book.Metadata?.Id
+            },
+            cancellationToken: cancellationToken);
+    }
 }

@@ -5,18 +5,18 @@ using MediatR;
 namespace MasDen.HomeLibrary.Libraries.Commands.CreateLibrary;
 public class CreateLibraryCommandHandler : IRequestHandler<CreateLibraryCommand, CreatedLibraryDto>
 {
-    private readonly ILibraryDataStore libraryDataStore;
+    private readonly IUnitOfWork unitOfWork;
 
-    public CreateLibraryCommandHandler(ILibraryDataStore libraryDataStore)
+    public CreateLibraryCommandHandler(IUnitOfWork unitOfWork)
     {
-        this.libraryDataStore = libraryDataStore;
+        this.unitOfWork = unitOfWork;
     }
 
     public async Task<CreatedLibraryDto> Handle(CreateLibraryCommand request, CancellationToken cancellationToken)
     {
         Library library = new(request.Path);
 
-        var id = await this.libraryDataStore.CreateAsync(library);
+        var id = await this.unitOfWork.Library.CreateAsync(library);
 
         library.SetId(id);
 

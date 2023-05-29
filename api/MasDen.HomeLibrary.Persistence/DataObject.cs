@@ -1,21 +1,20 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using Dapper.Contrib.Extensions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
-using MySqlConnector;
 using Polly.Retry;
-using System.Data;
 
 namespace MasDen.HomeLibrary.Persistence;
 
 internal class DataObject<T> : IDataObject<T>
     where T : class
 {
-    private readonly string connectionString;
+    private readonly IDbConnectionWrapper connectionWrapper;
     private readonly RetryOptions retryOptions;
 
-    public DataObject(string connectionString, RetryOptions retryOptions)
+    public DataObject(IDbConnectionWrapper connectionWrapper, RetryOptions retryOptions)
     {
-        this.connectionString = connectionString;
+        this.connectionWrapper = connectionWrapper;
         this.retryOptions = retryOptions;
     }
 
@@ -23,8 +22,8 @@ internal class DataObject<T> : IDataObject<T>
 
     public async Task<IReadOnlyCollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        using IDbConnection connection = this.CreateConnection();
-        CommandDefinition command = new($"SELECT * FROM {GetTableName()}", cancellationToken: cancellationToken);
+        IDbConnection? connection = this.CreateConnection();
+        var command = this.connectionWrapper.CreateCommand($"SELECT * FROM {GetTableName()}", cancellationToken: cancellationToken);
 
         IEnumerable<T> entities = await this.AsyncRetryPolicy
             .ExecuteAsync(async () => await connection.QueryAsync<T>(command));
@@ -36,18 +35,16 @@ internal class DataObject<T> : IDataObject<T>
 
     public async Task<TId> InsertAsync<TId>(string insertSql, dynamic param)
     {
-        using IDbConnection connection = this.CreateConnection();
+        CommandDefinition command = this.connectionWrapper.CreateCommand($"{insertSql}; SELECT CAST(LAST_INSERT_ID() AS INT);", param);
 
         return await this.AsyncRetryPolicy
             .ExecuteAsync(async () => await
-                connection.QuerySingleAsync<TId>(
-                    sql: $"{insertSql}; SELECT CAST(LAST_INSERT_ID() AS INT);",
-                    param: param as object));
+                this.CreateConnection().ExecuteScalarAsync<TId>(command));
     }
 
     public async Task<bool> DeleteAsync(T entity)
     {
-        using IDbConnection connection = this.CreateConnection();
+        IDbConnection? connection = this.CreateConnection();
 
         return await this.AsyncRetryPolicy
             .ExecuteAsync(async () => await connection.DeleteAsync(entity));
@@ -55,7 +52,7 @@ internal class DataObject<T> : IDataObject<T>
 
     public async Task<T> QuerySingleAsync(string where, dynamic param, CancellationToken cancellationToken = default)
     {
-        using IDbConnection connection = this.CreateConnection();
+        IDbConnection? connection = this.CreateConnection();
         CommandDefinition command = new(
             $"SELECT * FROM {GetTableName()}" + (string.IsNullOrWhiteSpace(where) ? "" : $" WHERE {where}"),
             parameters: param as object,
@@ -66,7 +63,7 @@ internal class DataObject<T> : IDataObject<T>
 
     public async Task<(IReadOnlyCollection<T> entities, long total)> QueryPageAsync(string sql, dynamic param, CancellationToken cancellationToken = default)
     {
-        using IDbConnection connection = this.CreateConnection();
+        IDbConnection? connection = this.CreateConnection();
         CommandDefinition command = new(sql, param as object, cancellationToken: cancellationToken);
 
         var reader = await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryMultipleAsync(command));
@@ -79,13 +76,24 @@ internal class DataObject<T> : IDataObject<T>
 
     public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(string sql, Func<TFirst, TSecond, TThird, TReturn> map, dynamic param, string splitOn = "Id", CancellationToken cancellationToken = default)
     {
-        using IDbConnection connection = this.CreateConnection();
+        IDbConnection? connection = this.CreateConnection();
         CommandDefinition command = new(sql, param as object, cancellationToken: cancellationToken);
 
         return await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryAsync<TFirst, TSecond, TThird, TReturn>(command, map, splitOn));
     }
 
+    public async Task<int> ExecuteAsync(string sql, dynamic param, CancellationToken cancellationToken = default)
+    {
+        CommandDefinition command = this.connectionWrapper.CreateCommand(sql, param, cancellationToken);
+
+        var rows = await this.AsyncRetryPolicy
+            .ExecuteAsync(async () => await
+                this.CreateConnection().ExecuteAsync(command));
+
+        return rows;
+    }
+
     private static string GetTableName() => DataObjectHelpers.GetTableName(typeof(T));
 
-    private IDbConnection CreateConnection() => new MySqlConnection(this.connectionString);
+    public IDbConnection? CreateConnection() => this.connectionWrapper.Connection;
 }

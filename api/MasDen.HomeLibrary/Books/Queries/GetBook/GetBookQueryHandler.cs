@@ -5,18 +5,18 @@ using MediatR;
 namespace MasDen.HomeLibrary.Books.Queries.GetBook;
 public class GetBookQueryHandler : IRequestHandler<GetBookQuery, BookDto>
 {
-    private readonly IBookDataStore bookDataStore;
+    private readonly IUnitOfWork unitOfWork;
     private readonly IImageService imageService;
 
-    public GetBookQueryHandler(IBookDataStore bookDataStore, IImageService imageService)
+    public GetBookQueryHandler(IUnitOfWork unitOfWork, IImageService imageService)
     {
-        this.bookDataStore = bookDataStore;
+        this.unitOfWork = unitOfWork;
         this.imageService = imageService;
     }
 
     public async Task<BookDto> Handle(GetBookQuery request, CancellationToken cancellationToken)
     {
-        var entity = await this.bookDataStore.GetBookAsync(request.BookId);
+        var entity = await this.unitOfWork.Book.GetBookAsync(request.BookId);
         var dto = new BookMapper().ToDto(entity);
 
         if (!string.IsNullOrWhiteSpace(entity.File.ImageName))

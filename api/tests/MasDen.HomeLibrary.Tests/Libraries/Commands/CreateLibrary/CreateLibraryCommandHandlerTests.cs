@@ -16,9 +16,12 @@ public class CreateLibraryCommandHandlerTests
         var command = new CreateLibraryCommand(library.Path);
 
         var libraryDataStoreMock = new Mock<ILibraryDataStore>();
-        libraryDataStoreMock.Setup(x=>x.CreateAsync(It.IsAny<Library>())).ReturnsAsync(library.Id);
+        libraryDataStoreMock.Setup(x => x.CreateAsync(It.IsAny<Library>())).ReturnsAsync(library.Id);
 
-        var sut = new CreateLibraryCommandHandler(libraryDataStoreMock.Object);
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
+        unitOfWorkMock.Setup(x => x.Library).Returns(libraryDataStoreMock.Object);
+
+        var sut = new CreateLibraryCommandHandler(unitOfWorkMock.Object);
 
         // Act
         var dto = await sut.Handle(command, default(CancellationToken));

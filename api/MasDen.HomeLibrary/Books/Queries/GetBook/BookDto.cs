@@ -19,6 +19,6 @@ public record FileDto
 
 public record MetadataDto
 {
-    public int Pages { get; set; }
+    public int? Pages { get; set; }
     public string? Year { get; set; }
 }

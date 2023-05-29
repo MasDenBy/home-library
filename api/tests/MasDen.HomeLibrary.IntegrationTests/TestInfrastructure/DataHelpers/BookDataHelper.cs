@@ -48,4 +48,25 @@ internal class BookDataHelper : DataHelperBase
 
         return book;
     }
+
+    public async Task<Book> GetBookAsync(BookId bookId)
+    {
+        using var connection = this.CreateConnection();
+
+        CommandDefinition command = new(@"SELECT b.id, b.title, b.authors, b.description, b.libraryId, b.fileId as Id, f.path, f.imageName, b.metadataId as Id, m.pages, m.year, m.isbn
+              FROM book b 
+              JOIN file f ON f.id = b.fileId
+              LEFT JOIN metadata m ON m.id = b.metadataId
+              WHERE b.id = @id", new { id = bookId });
+
+        var books = await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryAsync<Book, Domain.Entities.File, Metadata, Book>(command, (book, file, metadata) =>
+        {
+            book.SetMetadata(metadata);
+            book.SetFile(file);
+
+            return book;
+        }, "Id, Id"));
+
+        return books.First();
+    }
 }

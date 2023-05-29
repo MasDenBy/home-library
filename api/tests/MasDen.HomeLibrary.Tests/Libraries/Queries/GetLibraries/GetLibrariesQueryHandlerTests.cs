@@ -15,7 +15,10 @@ public class GetLibrariesQueryHandlerTests
         libraryDataStoreMock.Setup(x => x.GetAllAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new LibraryFaker().GenerateBetween(1, 3));
 
-        var sut = new GetLibrariesQueryHandler(libraryDataStoreMock.Object);
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
+        unitOfWorkMock.Setup(x => x.Library).Returns(libraryDataStoreMock.Object);
+
+        var sut = new GetLibrariesQueryHandler(unitOfWorkMock.Object);
 
         // Act
         await sut.Handle(command, default(CancellationToken));

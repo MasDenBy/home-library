@@ -4,13 +4,13 @@ using MediatR;
 namespace MasDen.HomeLibrary.Libraries.Commands.DeleteLibrary;
 public class DeleteLibraryCommandHandler : IRequestHandler<DeleteLibraryCommand>
 {
-    private readonly ILibraryDataStore libraryDataStore;
+    private readonly IUnitOfWork unitOfWork;
 
-    public DeleteLibraryCommandHandler(ILibraryDataStore libraryDataStore)
+    public DeleteLibraryCommandHandler(IUnitOfWork unitOfWork)
     {
-        this.libraryDataStore = libraryDataStore;
+        this.unitOfWork = unitOfWork;
     }
 
     public Task Handle(DeleteLibraryCommand request, CancellationToken cancellationToken) =>
-        this.libraryDataStore.DeleteAsync(request.Id, cancellationToken);
+        this.unitOfWork.Library.DeleteAsync(request.Id, cancellationToken);
 }

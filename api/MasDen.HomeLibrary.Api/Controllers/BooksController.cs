@@ -1,4 +1,5 @@
-﻿using MasDen.HomeLibrary.Books.Queries.GetBook;
+﻿using MasDen.HomeLibrary.Books.Commands.UpdateBook;
+using MasDen.HomeLibrary.Books.Queries.GetBook;
 using MasDen.HomeLibrary.Books.Queries.GetBooks;
 using MasDen.HomeLibrary.Common.Models;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
@@ -14,4 +15,17 @@ public class BooksController : ApiControllerBase
     [HttpGet("{id}")]
     public Task<BookDto> Get(BookId id, CancellationToken cancellationToken = default) =>
         this.Mediator.Send(new GetBookQuery(id), cancellationToken);
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Patch(BookId id, UpdateBookCommand command, CancellationToken cancellationToken = default)
+    {
+        if(id != command.Id)
+        {
+            return this.BadRequest();
+        }
+
+        await this.Mediator.Send(command, cancellationToken);
+
+        return this.NoContent();
+    }
 }
