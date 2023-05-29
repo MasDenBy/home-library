@@ -76,7 +76,7 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
                 Image = imageContent
             },
             Id = book.Id,
-            Metadata = new Books.Queries.GetBook.MetadataDto
+            Metadata = new MetadataDto
             {
                 Pages = metadata.Pages,
                 Year = metadata.Year,
