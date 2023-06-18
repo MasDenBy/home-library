@@ -24,12 +24,11 @@ public class LibraryDataStore : BaseDataStore<Library>, ILibraryDataStore
                 path = library.Path
             });
 
-    public async Task<bool> DeleteAsync(LibraryId id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(LibraryId id, CancellationToken cancellationToken = default)
     {
-        var entity = await this.DataObject.QuerySingleAsync("Id = @id", new { id }, cancellationToken);
-
-        return entity == null
-            ? throw new NotFoundException(typeof(Library), id.Value)
-            : await this.DataObject.DeleteAsync(entity);
+        if(!await this.DataObject.DeleteAsync(id.Value, cancellationToken))
+        {
+            throw new NotFoundException(typeof(Library), id.Value);
+        }
     }
 }

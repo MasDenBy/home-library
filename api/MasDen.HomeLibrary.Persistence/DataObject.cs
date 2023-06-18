@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Dapper;
-using Dapper.Contrib.Extensions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 using Polly.Retry;
 
@@ -42,21 +41,25 @@ internal class DataObject<T> : IDataObject<T>
                 this.CreateConnection().ExecuteScalarAsync<TId>(command));
     }
 
-    public async Task<bool> DeleteAsync(T entity)
+    public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         IDbConnection? connection = this.CreateConnection();
+        CommandDefinition command = this.connectionWrapper.CreateCommand(
+            sql: $"DELETE FROM {GetTableName()} WHERE id=@id",
+            param: new { id },
+            cancellationToken: cancellationToken);
 
         return await this.AsyncRetryPolicy
-            .ExecuteAsync(async () => await connection.DeleteAsync(entity));
+            .ExecuteAsync(async () => await connection.ExecuteAsync(command)) > 0;
     }
 
     public async Task<T> QuerySingleAsync(string where, dynamic param, CancellationToken cancellationToken = default)
     {
         IDbConnection? connection = this.CreateConnection();
-        CommandDefinition command = new(
+        CommandDefinition command = this.connectionWrapper.CreateCommand(
             $"SELECT * FROM {GetTableName()}" + (string.IsNullOrWhiteSpace(where) ? "" : $" WHERE {where}"),
-            parameters: param as object,
-            cancellationToken: cancellationToken);
+            param,
+            cancellationToken);
 
         return await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QuerySingleOrDefaultAsync<T>(command));
     }

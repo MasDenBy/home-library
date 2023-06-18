@@ -31,12 +31,12 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
         var count = this.faker.Random.Int(min: 1, max: 5);
 
         var libraries = await this.fixture.DataHelper.Library.InsertAsync(new LibraryFaker(true).GenerateBetween(1, 3));
-        var files = await this.fixture.DataHelper.File.InsertAsync(new FileFaker().GenerateLazy(booksNumber));
         var bookFaker = new BookFaker()
-            .WithRandomLibrary(libraries.Select(x => x.Id))
-            .WithRandomFile(files);
+            .WithRandomLibrary(libraries.Select(x => x.Id));
 
         var books = await this.fixture.DataHelper.Book.InsertAsync(bookFaker.GenerateLazy(booksNumber));
+        var files = await this.fixture.DataHelper.BookFile.InsertAsync(new BookFileFaker().GenerateForEachBook(books));
+
         var expectedPage = new PagingCollection<BookPageItemDto>(
             new GetBooksMapper().ToDto(books.Skip(offset).Take(count)).ToList(),
             books.Count);
@@ -54,18 +54,17 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
     {
         // Arrange
         var library = await this.fixture.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate());
-        var file = await this.fixture.DataHelper.File.InsertAsync(new FileFaker().Generate());
-        var metadata = await this.fixture.DataHelper.Metadata.InsertAsync(new MetadataFaker().Generate());
+
+        var bookFaker = new BookFaker()
+            .WithRandomLibrary(new[] { library.Id });
+
+        var book = await this.fixture.DataHelper.Book.InsertAsync(bookFaker.Generate());
+
+        var file = await this.fixture.DataHelper.BookFile.InsertAsync(new BookFileFaker().WithBookId(book.Id).Generate());
+        var metadata = await this.fixture.DataHelper.Metadata.InsertAsync(new MetadataFaker().WithBookId(book.Id).Generate());
 #pragma warning disable CS8604 // Possible null reference argument.
         var imageContent = await ImageHelper.SaveImageAsync(file.ImageName, Path.Combine(this.fixture.Configuration.ImageDirectory, library.Id.ToString()));
 #pragma warning restore CS8604 // Possible null reference argument.
-
-        var bookFaker = new BookFaker()
-            .WithRandomLibrary(new[] { library.Id })
-            .WithRandomFile(new[] { file })
-            .WithRandomMetadata(new[] { metadata });
-
-        var book = await this.fixture.DataHelper.Book.InsertAsync(bookFaker.Generate());
 
         var expectedDto = new BookDto
         {
@@ -97,15 +96,14 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
     {
         // Arrange
         var library = await this.fixture.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate());
-        var file = await this.fixture.DataHelper.File.InsertAsync(new FileFaker().Generate());
-        var metadata = await this.fixture.DataHelper.Metadata.InsertAsync(new MetadataFaker().Generate());
 
         var bookFaker = new BookFaker()
-            .WithRandomLibrary(new[] { library.Id })
-            .WithRandomFile(new[] { file })
-            .WithRandomMetadata(new[] { metadata });
+            .WithRandomLibrary(new[] { library.Id });
 
         var book = await this.fixture.DataHelper.Book.InsertAsync(bookFaker.Generate());
+
+        await this.fixture.DataHelper.BookFile.InsertAsync(new BookFileFaker().WithBookId(book.Id).Generate());
+        var metadata = await this.fixture.DataHelper.Metadata.InsertAsync(new MetadataFaker().WithBookId(book.Id).Generate());
 
         var updateBook = new BookFaker()
             .WithMetadata(new MetadataFaker().Generate())
@@ -119,9 +117,9 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
             Title = updateBook.Title,
             Metadata = new UpdateBookMetadata
             {
-                Isbn = updateBook.Metadata?.Isbn,
-                Pages = updateBook.Metadata?.Pages,
-                Year = updateBook.Metadata?.Year,
+                Isbn = metadata?.Isbn,
+                Pages = metadata?.Pages,
+                Year = metadata?.Year,
             }
         };
 
@@ -139,17 +137,16 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
     {
         // Arrange
         var library = await this.fixture.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate());
-        var file = await this.fixture.DataHelper.File.InsertAsync(new FileFaker().Generate());
 
         var bookFaker = new BookFaker()
-            .WithRandomLibrary(new[] { library.Id })
-            .WithRandomFile(new[] { file });
+            .WithRandomLibrary(new[] { library.Id });
 
         var book = await this.fixture.DataHelper.Book.InsertAsync(bookFaker.Generate());
 
-        var updateBook = new BookFaker()
-            .WithMetadata(new MetadataFaker().Generate())
-            .Generate();
+        await this.fixture.DataHelper.BookFile.InsertAsync(new BookFileFaker().WithBookId(book.Id).Generate());
+
+        var updateBook = new BookFaker().Generate();
+        var updateMetadata = new MetadataFaker().Generate();
 
         var updateBookCommand = new UpdateBookCommand
         {
@@ -159,9 +156,9 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
             Title = updateBook.Title,
             Metadata = new UpdateBookMetadata
             {
-                Isbn = updateBook.Metadata?.Isbn,
-                Pages = updateBook.Metadata?.Pages,
-                Year = updateBook.Metadata?.Year,
+                Isbn = updateMetadata.Isbn,
+                Pages = updateMetadata.Pages,
+                Year = updateMetadata.Year,
             }
         };
 
@@ -191,6 +188,29 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
 
         // Assert
         response.Should().Be400BadRequest();
+    }
+
+    [Fact]
+    [TestPriority(6)]
+    public async Task Delete_ShouldResponse204NoContentAndDeleteEntities()
+    {
+        // Arrange
+        var library = await this.fixture.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate());
+
+        var bookFaker = new BookFaker()
+            .WithRandomLibrary(new[] { library.Id });
+
+        var book = await this.fixture.DataHelper.Book.InsertAsync(bookFaker.Generate());
+
+        await this.fixture.DataHelper.BookFile.InsertAsync(new BookFileFaker().WithBookId(book.Id).Generate());
+        await this.fixture.DataHelper.Metadata.InsertAsync(new MetadataFaker().WithBookId(book.Id).Generate());
+
+        // Act
+        var response = await this.fixture.HttpClient.DeleteAsync($"/api/books/{book.Id}");
+
+        // Assert
+        response.Should().Be204NoContent();
+        
     }
 
     private async Task AssertBook(Book book, UpdateBookCommand updateBookCommand)

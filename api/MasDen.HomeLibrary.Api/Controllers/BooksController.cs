@@ -1,4 +1,5 @@
 ﻿using MasDen.HomeLibrary.Books.Commands.UpdateBook;
+using MasDen.HomeLibrary.Books.DeleteBook;
 using MasDen.HomeLibrary.Books.Queries.GetBook;
 using MasDen.HomeLibrary.Books.Queries.GetBooks;
 using MasDen.HomeLibrary.Common.Models;
@@ -27,5 +28,13 @@ public class BooksController : ApiControllerBase
         await this.Mediator.Send(command, cancellationToken);
 
         return this.NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(BookId id, CancellationToken cancellationToken)
+    {
+        await this.Mediator.Send(new DeleteBookCommand(id), cancellationToken);
+
+        return NoContent();
     }
 }

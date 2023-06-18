@@ -1,5 +1,6 @@
 ﻿using MasDen.HomeLibrary.Domain.Entities;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+using MasDen.HomeLibrary.Infrastructure.Exceptions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 
 namespace MasDen.HomeLibrary.Persistence.DataStores;
@@ -12,13 +13,14 @@ public class MetadataDataStore : BaseDataStore<Metadata>, IMetadataDataStore
 
     public Task<MetadataId> CreateAsync(Metadata metadata) =>
         this.DataObject.InsertAsync<MetadataId>(
-            insertSql: "INSERT INTO metadata (id, isbn, pages, year) VALUES (@id, @isbn, @pages, @year)",
+            insertSql: "INSERT INTO metadata (id, isbn, pages, year, bookId) VALUES (@id, @isbn, @pages, @year, @bookId)",
             param: new
             {
                 id = metadata.Id,
                 isbn = metadata.Isbn,
                 pages = metadata.Pages,
-                year = metadata.Year
+                year = metadata.Year,
+                bookId = metadata.BookId
             });
 
     public async Task UpdateAsync(Metadata metadata, CancellationToken cancellationToken = default)
@@ -38,5 +40,13 @@ public class MetadataDataStore : BaseDataStore<Metadata>, IMetadataDataStore
                 year = metadata.Year
             },
             cancellationToken: cancellationToken);
+    }
+
+    public async Task DeleteAsync(MetadataId id, CancellationToken cancellationToken = default)
+    {
+        if(!await this.DataObject.DeleteAsync(id.Value, cancellationToken))
+        {
+            throw new NotFoundException(typeof(Metadata), id.Value);
+        }
     }
 }

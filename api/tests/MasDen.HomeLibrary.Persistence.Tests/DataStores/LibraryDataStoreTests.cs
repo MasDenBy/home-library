@@ -35,13 +35,13 @@ public class LibraryDataStoreTests
         // Arrange
         var library = new LibraryFaker().Generate();
 
-        dataObjectMock.Setup(x=>x.QuerySingleAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(library);
+        dataObjectMock.Setup(x=>x.DeleteAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
         // Act
         await this.sut.DeleteAsync(library.Id);
 
         // Assert
-        dataObjectMock.Verify(x => x.DeleteAsync(library), Times.Once);
+        dataObjectMock.Verify(x => x.DeleteAsync(library.Id.Value, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

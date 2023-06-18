@@ -3,6 +3,6 @@
 namespace MasDen.HomeLibrary.Domain.StronglyTypedIds;
 
 [StronglyTypedId]
-public partial struct FileId
+public partial struct BookFileId
 {
 }

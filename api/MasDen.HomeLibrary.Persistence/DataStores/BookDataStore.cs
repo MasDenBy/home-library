@@ -1,5 +1,6 @@
 ﻿using MasDen.HomeLibrary.Domain.Entities;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+using MasDen.HomeLibrary.Infrastructure.Exceptions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 
 namespace MasDen.HomeLibrary.Persistence.DataStores;
@@ -27,11 +28,11 @@ public class BookDataStore : BaseDataStore<Book>, IBookDataStore
 
     public async Task<Book> GetBookAsync(BookId bookId, CancellationToken cancellationToken = default)
     {
-        var entities = await this.DataObject.QueryAsync<Book, Domain.Entities.File, Metadata, Book>(
-            @"SELECT b.id, b.title, b.authors, b.description, b.libraryId, b.fileId as Id, f.path, f.imageName, b.metadataId as Id, m.pages, m.year
+        var entities = await this.DataObject.QueryAsync<Book, BookFile, Metadata, Book>(
+            @"SELECT b.id, b.title, b.authors, b.description, b.libraryId, f.id, f.path, f.imageName, f.bookId, m.id, m.pages, m.year, m.bookId
               FROM book b 
-              JOIN file f ON f.id = b.fileId
-              LEFT JOIN metadata m ON m.id = b.metadataId
+              JOIN bookfile f ON f.bookid = b.id
+              LEFT JOIN metadata m ON m.bookid = b.id
               WHERE b.id = @id",
             (book, file, metadata) =>
             {
@@ -40,7 +41,7 @@ public class BookDataStore : BaseDataStore<Book>, IBookDataStore
 
                 return book;
             },
-            new { id = bookId }, "Id, Id", cancellationToken);
+            new { id = bookId }, "id, id", cancellationToken);
 
         return entities.First();
     }
@@ -52,17 +53,23 @@ public class BookDataStore : BaseDataStore<Book>, IBookDataStore
                     UPDATE book
                     SET title = @title,
                         authors = @authors,
-                        description = @description,
-                        metadataId = @metadataId
+                        description = @description
                     WHERE id = @id",
             new
             {
                 id = book.Id,
                 title = book.Title,
                 authors = book.Authors,
-                description = book.Description,
-                metadataId = book.Metadata?.Id
+                description = book.Description
             },
             cancellationToken: cancellationToken);
+    }
+
+    public async Task DeleteAsync(BookId id, CancellationToken cancellationToken = default)
+    {
+        if(!await this.DataObject.DeleteAsync(id.Value, cancellationToken))
+        {
+            throw new NotFoundException(typeof(Book), id.Value);
+        }
     }
 }

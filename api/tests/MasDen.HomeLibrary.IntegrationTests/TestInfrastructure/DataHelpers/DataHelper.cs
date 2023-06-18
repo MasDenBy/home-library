@@ -5,7 +5,7 @@ internal class DataHelper : IDisposable
     private readonly TestsConfiguration configuration;
 
     private BookDataHelper? bookDataHelper;
-    private FileDataHelper? fileDataHelper;
+    private BookFileDataHelper? bookFileDataHelper;
     private LibraryDataHelper? libraryDataHelper;
     private MetadataDataHelper? metadataDataHelper;
 
@@ -17,7 +17,7 @@ internal class DataHelper : IDisposable
     }
 
     public BookDataHelper Book => this.bookDataHelper ??= new BookDataHelper(this.configuration);
-    public FileDataHelper File => this.fileDataHelper ??= new FileDataHelper(this.configuration);
+    public BookFileDataHelper BookFile => this.bookFileDataHelper ??= new BookFileDataHelper(this.configuration);
     public LibraryDataHelper Library => this.libraryDataHelper ??= new LibraryDataHelper(this.configuration);
     public MetadataDataHelper Metadata => this.metadataDataHelper ??= new MetadataDataHelper(this.configuration);
 
@@ -34,7 +34,7 @@ internal class DataHelper : IDisposable
         if (disposing)
         {
             this.bookDataHelper?.Dispose();
-            this.fileDataHelper?.Dispose();
+            this.bookFileDataHelper?.Dispose();
             this.libraryDataHelper?.Dispose();
             this.metadataDataHelper?.Dispose();
         }

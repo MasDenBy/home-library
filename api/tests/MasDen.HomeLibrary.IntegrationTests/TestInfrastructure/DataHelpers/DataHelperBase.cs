@@ -28,7 +28,7 @@ internal abstract class DataHelperBase : IDisposable
         using var connection = new MySqlConnection(this.configuration.DatabaseConnectionString);
 
         Policies.CreateRetryPolicy(this.retryOptions)
-            .Execute(() => connection.Execute(sql: $"DELETE FROM {this.TableName}"));
+            .Execute(() => connection.Execute(sql: $"SET FOREIGN_KEY_CHECKS=0;DELETE FROM {this.TableName};SET FOREIGN_KEY_CHECKS=1;"));
     }
 
     public void Dispose()

@@ -19,36 +19,46 @@ public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand>
         var entity = await this.unitOfWork.Book.GetBookAsync(request.Id) ?? throw new NotFoundException(typeof(Book), request.Id.Value);
         entity.Update(request.Title, request.Description, request.Authors);
 
-        this.unitOfWork.BeginTransaction();
-
-        if (request.Metadata != null)
+        try
         {
-            var metadata = new Metadata
-            {
-                Id = entity.Metadata != null ? entity.Metadata.Id : MetadataId.Empty,
-                Isbn = request.Metadata.Isbn,
-                Pages = request.Metadata.Pages,
-                Year = request.Metadata.Year
-            };
+            this.unitOfWork.BeginTransaction();
 
-            if(metadata.Id == MetadataId.Empty)
+            if (request.Metadata != null)
             {
-                var metadataId = await this.unitOfWork.Metadata.CreateAsync(metadata);
-
-                metadata = metadata with
+                var metadata = new Metadata
                 {
-                    Id = metadataId
+                    Id = entity.Metadata != null ? entity.Metadata.Id : MetadataId.Empty,
+                    Isbn = request.Metadata.Isbn,
+                    Pages = request.Metadata.Pages,
+                    Year = request.Metadata.Year,
+                    BookId = entity.Id
                 };
-            }
-            else
-            {
-                await this.unitOfWork.Metadata.UpdateAsync(metadata, cancellationToken);
+
+                if (metadata.Id == MetadataId.Empty)
+                {
+                    var metadataId = await this.unitOfWork.Metadata.CreateAsync(metadata);
+
+                    metadata = metadata with
+                    {
+                        Id = metadataId
+                    };
+                }
+                else
+                {
+                    await this.unitOfWork.Metadata.UpdateAsync(metadata, cancellationToken);
+                }
+
+                entity.SetMetadata(metadata);
             }
 
-            entity.SetMetadata(metadata);
+            await this.unitOfWork.Book.UpdateAsync(entity, cancellationToken);
+            this.unitOfWork.CommitTransaction();
         }
+        catch (Exception)
+        {
+            this.unitOfWork.RollbackTransaction();
 
-        await this.unitOfWork.Book.UpdateAsync(entity, cancellationToken);
-        this.unitOfWork.CommitTransaction();
+            throw;
+        }
     }
 }

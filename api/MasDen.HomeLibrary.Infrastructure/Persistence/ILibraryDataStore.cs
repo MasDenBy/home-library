@@ -6,6 +6,6 @@ namespace MasDen.HomeLibrary.Infrastructure.Persistence;
 public interface ILibraryDataStore : IDataStore<Library>
 {
     Task<LibraryId> CreateAsync(Library library);
-    Task<bool> DeleteAsync(LibraryId id, CancellationToken cancellationToken = default);
+    Task DeleteAsync(LibraryId id, CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<Library>> GetAllAsync(CancellationToken cancellationToken = default);
 }

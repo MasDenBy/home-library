@@ -32,15 +32,13 @@ internal class BookDataHelper : DataHelperBase
         var id = await this.AsyncRetryPolicy
             .ExecuteAsync(async () => await
                 connection.QuerySingleAsync<BookId>(
-                    sql: "INSERT INTO book (id, title, description, authors, fileId, metadataId, libraryId) VALUES (@id, @title, @description, @authors, @fileId, @metadataId, @libraryId); SELECT CAST(LAST_INSERT_ID() AS INT);",
+                    sql: "INSERT INTO book (id, title, description, authors, libraryId) VALUES (@id, @title, @description, @authors, @libraryId); SELECT CAST(LAST_INSERT_ID() AS INT);",
                     param: new
                     {
                         id = book.Id,
                         title = book.Title,
                         description = book.Description,
                         authors = book.Authors,
-                        fileId = book.File.Id,
-                        metadataId = book.Metadata?.Id,
                         libraryId = book.LibraryId
                     }));
 
@@ -53,19 +51,19 @@ internal class BookDataHelper : DataHelperBase
     {
         using var connection = this.CreateConnection();
 
-        CommandDefinition command = new(@"SELECT b.id, b.title, b.authors, b.description, b.libraryId, b.fileId as Id, f.path, f.imageName, b.metadataId as Id, m.pages, m.year, m.isbn
+        CommandDefinition command = new(@"SELECT b.id, b.title, b.authors, b.description, b.libraryId, f.id, f.path, f.imageName, f.bookId, m.id, m.pages, m.year, m.isbn, m.bookId
               FROM book b 
-              JOIN file f ON f.id = b.fileId
-              LEFT JOIN metadata m ON m.id = b.metadataId
+              JOIN bookfile f ON f.bookid = b.id
+              LEFT JOIN metadata m ON m.bookid = b.id
               WHERE b.id = @id", new { id = bookId });
 
-        var books = await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryAsync<Book, Domain.Entities.File, Metadata, Book>(command, (book, file, metadata) =>
+        var books = await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryAsync<Book, BookFile, Metadata, Book>(command, (book, file, metadata) =>
         {
             book.SetMetadata(metadata);
             book.SetFile(file);
 
             return book;
-        }, "Id, Id"));
+        }, "id, id"));
 
         return books.First();
     }

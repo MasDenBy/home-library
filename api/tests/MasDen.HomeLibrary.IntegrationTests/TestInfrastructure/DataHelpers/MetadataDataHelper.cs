@@ -19,13 +19,14 @@ internal class MetadataDataHelper : DataHelperBase
         var id = await this.AsyncRetryPolicy
            .ExecuteAsync(async () => await
                connection.QuerySingleAsync<MetadataId>(
-                   sql: "INSERT INTO metadata (id, isbn, pages, year) VALUES (@id, @isbn, @pages, @year); SELECT CAST(LAST_INSERT_ID() AS INT);",
+                   sql: "INSERT INTO metadata (id, isbn, pages, year, bookId) VALUES (@id, @isbn, @pages, @year, @bookId); SELECT CAST(LAST_INSERT_ID() AS INT);",
                    param: new
                    {
                        id = metadata.Id,
                        isbn = metadata.Isbn,
                        pages = metadata.Pages,
-                       year = metadata.Year
+                       year = metadata.Year,
+                       bookId = metadata.BookId
                    }));
 
         return metadata with { Id = id };

@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
 
         SqlMapperExtensions.TableNameMapper = entityType => DataObjectHelpers.GetTableName(entityType);
         SqlMapper.AddTypeHandler(new BookId.DapperTypeHandler());
-        SqlMapper.AddTypeHandler(new FileId.DapperTypeHandler());
+        SqlMapper.AddTypeHandler(new BookFileId.DapperTypeHandler());
         SqlMapper.AddTypeHandler(new LibraryId.DapperTypeHandler());
         SqlMapper.AddTypeHandler(new MetadataId.DapperTypeHandler());
 

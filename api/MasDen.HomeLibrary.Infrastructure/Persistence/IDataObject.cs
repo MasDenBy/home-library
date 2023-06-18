@@ -2,7 +2,7 @@
 
 public interface IDataObject<T> where T : class
 {
-    Task<bool> DeleteAsync(T entity);
+    Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
     Task<int> ExecuteAsync(string sql, dynamic param, CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<T>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<TId> InsertAsync<TId>(string insertSql, dynamic param);

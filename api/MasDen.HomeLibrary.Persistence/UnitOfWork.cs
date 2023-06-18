@@ -9,6 +9,7 @@ public class UnitOfWork : IUnitOfWork
     private readonly IDbConnectionWrapper connectionWrapper;
 
     private IBookDataStore bookDataStore;
+    private IBookFileDataStore bookFileDataStore;
     private ILibraryDataStore libraryDataStore;
     private IMetadataDataStore metadataDataStore;
 
@@ -21,20 +22,11 @@ public class UnitOfWork : IUnitOfWork
     }
 
     public IBookDataStore Book => this.bookDataStore ??= new BookDataStore(this.dataObjectFactory);
+    public IBookFileDataStore BookFile => this.bookFileDataStore ??= new BookFileDataStore(this.dataObjectFactory);
     public ILibraryDataStore Library => this.libraryDataStore ??= new LibraryDataStore(this.dataObjectFactory);
     public IMetadataDataStore Metadata => this.metadataDataStore ??= new MetadataDataStore(this.dataObjectFactory);
 
     public void BeginTransaction() => this.connectionWrapper.BeginTransaction();
-
-    public void CommitTransaction()
-    {
-        try
-        {
-            this.connectionWrapper.CommitTransaction();
-        }
-        catch
-        {
-            this.connectionWrapper.RollbackTransaction();
-        }
-    }
+    public void CommitTransaction() => this.connectionWrapper.CommitTransaction();
+    public void RollbackTransaction() => this.connectionWrapper.RollbackTransaction();
 }
