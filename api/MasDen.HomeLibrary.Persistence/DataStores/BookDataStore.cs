@@ -26,6 +26,28 @@ public class BookDataStore : BaseDataStore<Book>, IBookDataStore
             cancellationToken: cancellationToken);
     }
 
+    public Task<(IReadOnlyCollection<Book> entities, long total)> SearchBooksAsync(string pattern, int offset, int count, CancellationToken cancellationToken = default)
+    {
+        var searchPattern = $"%{pattern}%";
+
+        return this.DataObject.QueryPageAsync(
+            sql: @"
+                    SELECT COUNT(*) AS TotalCount FROM book
+                    WHERE title LIKE @pattern OR description LIKE @pattern OR authors LIKE @pattern;
+
+                    SELECT * FROM book
+                    WHERE title LIKE @pattern OR description LIKE @pattern OR authors LIKE @pattern
+                    LIMIT @count OFFSET @offset;
+                    ",
+            param: new
+            {
+                pattern = searchPattern,
+                count,
+                offset
+            },
+            cancellationToken: cancellationToken);
+    }
+
     public async Task<Book> GetBookAsync(BookId bookId, CancellationToken cancellationToken = default)
     {
         var entities = await this.DataObject.QueryAsync<Book, BookFile, Metadata, Book>(

@@ -2,6 +2,7 @@
 using MasDen.HomeLibrary.Books.Commands.UpdateBook;
 using MasDen.HomeLibrary.Books.Queries.GetBook;
 using MasDen.HomeLibrary.Books.Queries.GetBooks;
+using MasDen.HomeLibrary.Books.Queries.Search;
 using MasDen.HomeLibrary.Common.Models;
 using MasDen.HomeLibrary.Domain.Entities;
 using MasDen.HomeLibrary.TestInfrastructure;
@@ -210,7 +211,37 @@ public class BooksControllerTests : IClassFixture<TestsFixture>
 
         // Assert
         response.Should().Be204NoContent();
-        
+    }
+
+    [Fact]
+    [TestPriority(7)]
+    public async Task Search_ShouldResponse200OkWithPage()
+    {
+        // Arrange
+        var booksNumber = this.faker.Random.Int(min: 15, max: 30);
+        var offset = this.faker.Random.Int(min: 0, max: 2);
+        var count = this.faker.Random.Int(min: 1, max: 5);
+
+        var libraries = await this.fixture.DataHelper.Library.InsertAsync(new LibraryFaker(true).GenerateBetween(1, 3));
+        var bookFaker = new BookFaker()
+            .WithRandomLibrary(libraries.Select(x => x.Id));
+
+        var books = await this.fixture.DataHelper.Book.InsertAsync(bookFaker.GenerateLazy(booksNumber));
+        var files = await this.fixture.DataHelper.BookFile.InsertAsync(new BookFileFaker().GenerateForEachBook(books));
+
+        var firstBook = books.First();
+        var pattern = string.Concat(firstBook.Title.Skip(1).Take(this.faker.Random.Int(3, 5)));
+
+        var searchRequest = new SearchBooksQuery(pattern, offset, count);
+
+        // Act
+        var response = await this.fixture.HttpClient.PostAsJsonAsync("/api/books/search", searchRequest);
+
+        // Assert
+        var result = await response.Should().Be200Ok()
+            .And.Subject.Content.ReadFromJsonAsync<PagingCollection<SearchBookPageItemDto>>();
+
+        result?.Items.Where(x => x.Id == firstBook.Id).Should().HaveCount(1);
     }
 
     private async Task AssertBook(Book book, UpdateBookCommand updateBookCommand)

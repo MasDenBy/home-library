@@ -2,6 +2,7 @@
 using MasDen.HomeLibrary.Books.DeleteBook;
 using MasDen.HomeLibrary.Books.Queries.GetBook;
 using MasDen.HomeLibrary.Books.Queries.GetBooks;
+using MasDen.HomeLibrary.Books.Queries.Search;
 using MasDen.HomeLibrary.Common.Models;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 using Microsoft.AspNetCore.Mvc;
@@ -31,10 +32,14 @@ public class BooksController : ApiControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(BookId id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(BookId id, CancellationToken cancellationToken = default)
     {
         await this.Mediator.Send(new DeleteBookCommand(id), cancellationToken);
 
         return NoContent();
     }
+
+    [HttpPost("search")]
+    public Task<PagingCollection<SearchBookPageItemDto>> Search(SearchBooksQuery query, CancellationToken cancellationToken = default) =>
+        this.Mediator.Send(query, cancellationToken);
 }
