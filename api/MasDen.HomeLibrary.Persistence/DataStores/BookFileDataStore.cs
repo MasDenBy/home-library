@@ -12,6 +12,11 @@ public class BookFileDataStore : BaseDataStore<BookFile>, IBookFileDataStore
     {
     }
 
+    public Task<BookFile> GetByBookIdAsync(BookId bookId, CancellationToken cancellationToken = default) =>
+        this.DataObject.QuerySingleAsync(
+            "bookId=@bookId",
+            new { bookId }, cancellationToken);
+
     public async Task DeleteAsync(BookFileId id, CancellationToken cancellationToken = default)
     {
         if(!await this.DataObject.DeleteAsync(id.Value, cancellationToken))

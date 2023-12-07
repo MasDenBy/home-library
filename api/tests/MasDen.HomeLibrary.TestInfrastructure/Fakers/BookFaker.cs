@@ -23,6 +23,13 @@ public class BookFaker : Faker<Book>
         return this;
     }
 
+    public BookFaker WithLibrary(LibraryId libraryId)
+    {
+        this.libraryIds.Add(libraryId);
+
+        return this;
+    }
+
     public BookFaker WithMetadata(Metadata metadata)
     {
         RuleFor(x => x.Metadata, setter => metadata);

@@ -6,12 +6,14 @@ using MySqlConnector;
 
 namespace MasDen.HomeLibrary.Database.Migrator;
 
-internal class MigrationRunner
+public class MigrationRunner
 {
-    public static void Run()
+    public static void Run(MigrationOptions? options = null)
     {
-        var services = CreateServices(ConfigurationManager.ConnectionString);
-        EnsureDatabase(ConfigurationManager.ConnectionString, ConfigurationManager.DatabaseName);
+        options ??= ConfigurationManager.MigrationOptions;
+
+        var services = CreateServices(options.ConnectionString);
+        EnsureDatabase(options.ConnectionString, options.DatabaseName);
 
         using var scope = services.CreateScope();
         var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();

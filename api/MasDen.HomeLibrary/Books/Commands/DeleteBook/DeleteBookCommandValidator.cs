@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace MasDen.HomeLibrary.Books.DeleteBook;
+namespace MasDen.HomeLibrary.Books.Commands.DeleteBook;
 public class DeleteBookCommandValidator : AbstractValidator<DeleteBookCommand>
 {
     public DeleteBookCommandValidator()

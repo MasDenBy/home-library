@@ -1,4 +1,5 @@
 ﻿using MasDen.HomeLibrary.Infrastructure.Configuration;
+using MasDen.HomeLibrary.Infrastructure.Processors.OpenLibrary;
 using MasDen.HomeLibrary.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,11 @@ public static class ServiceCollectionExtensions
                 throw new InvalidOperationException("Application configuration is invalid");
 
             return config;
+        });
+
+        services.AddHttpClient<OpenLibraryProcessor>(httpClient =>
+        {
+            httpClient.BaseAddress = new Uri("http://openlibrary.org");
         });
 
         return services;

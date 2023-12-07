@@ -1,11 +1,12 @@
 ﻿using Dapper;
 using MasDen.HomeLibrary.Domain.Entities;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+using MasDen.HomeLibrary.Infrastructure.Configuration;
 
 namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 internal class MetadataDataHelper : DataHelperBase
 {
-    public MetadataDataHelper(TestsConfiguration configuration)
+    public MetadataDataHelper(ApplicationConfiguration configuration)
         : base(configuration)
     {
     }

@@ -1,12 +1,13 @@
 ﻿using Dapper;
 using MasDen.HomeLibrary.Domain.Entities;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+using MasDen.HomeLibrary.Infrastructure.Configuration;
 
 namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 
 internal class BookDataHelper : DataHelperBase
 {
-    public BookDataHelper(TestsConfiguration configuration)
+    public BookDataHelper(ApplicationConfiguration configuration)
         : base(configuration)
     {
     }

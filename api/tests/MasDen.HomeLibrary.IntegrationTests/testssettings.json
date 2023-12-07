@@ -1,5 +1,4 @@
 {
-  "DB_CONNECTION_STRING": "Server=127.0.0.1;Port=3306;Database=homelibrarytests;Uid=root;Pwd=password;",
   "DB_Retry_Count": 20,
   "DB_Retry_MaxDelay": 120,
   "DB_Retry_Delay": 5,

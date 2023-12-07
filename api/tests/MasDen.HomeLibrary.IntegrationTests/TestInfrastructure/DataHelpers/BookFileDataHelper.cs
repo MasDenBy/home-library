@@ -1,11 +1,12 @@
 ﻿using Dapper;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+using MasDen.HomeLibrary.Infrastructure.Configuration;
 
 namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 
 internal class BookFileDataHelper : DataHelperBase
 {
-    public BookFileDataHelper(TestsConfiguration configuration)
+    public BookFileDataHelper(ApplicationConfiguration configuration)
         : base(configuration)
     {
     }

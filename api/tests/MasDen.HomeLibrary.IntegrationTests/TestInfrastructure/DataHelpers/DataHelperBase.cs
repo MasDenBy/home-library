@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using Dapper;
+using MasDen.HomeLibrary.Infrastructure.Configuration;
 using MasDen.HomeLibrary.Persistence;
 using MySqlConnector;
 using Polly.Retry;
@@ -8,11 +9,11 @@ namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 
 internal abstract class DataHelperBase : IDisposable
 {
-    private readonly TestsConfiguration configuration;
+    private readonly ApplicationConfiguration configuration;
     private readonly RetryOptions retryOptions;
     private bool disposed;
 
-    protected DataHelperBase(TestsConfiguration configuration)
+    protected DataHelperBase(ApplicationConfiguration configuration)
     {
         this.configuration = configuration;
         this.retryOptions = new RetryOptions(configuration.DatabaseRetryCount, configuration.DatabaseRetryDelay, configuration.DatabaseRetryMaxDelay);

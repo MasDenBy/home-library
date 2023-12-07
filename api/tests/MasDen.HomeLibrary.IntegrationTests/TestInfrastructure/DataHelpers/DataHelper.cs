@@ -1,8 +1,10 @@
-﻿namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
+﻿using MasDen.HomeLibrary.Infrastructure.Configuration;
+
+namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 
 internal class DataHelper : IDisposable
 {
-    private readonly TestsConfiguration configuration;
+    private readonly ApplicationConfiguration configuration;
 
     private BookDataHelper? bookDataHelper;
     private BookFileDataHelper? bookFileDataHelper;
@@ -11,7 +13,7 @@ internal class DataHelper : IDisposable
 
     private bool disposed;
 
-    public DataHelper(TestsConfiguration configuration)
+    public DataHelper(ApplicationConfiguration configuration)
     {
         this.configuration = configuration;
     }

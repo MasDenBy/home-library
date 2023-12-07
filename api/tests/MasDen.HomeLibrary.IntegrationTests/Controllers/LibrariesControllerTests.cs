@@ -1,11 +1,11 @@
 ﻿namespace MasDen.HomeLibrary.IntegrationTests.Controllers;
 
 [Collection("Integration")]
-public class LibrariesControllerTests : IClassFixture<TestsFixture>
+public class LibrariesControllerTests : IClassFixture<IntegrationTestsWebApplicationFactory>
 {
-    private readonly TestsFixture fixture;
+    private readonly IntegrationTestsWebApplicationFactory fixture;
 
-    public LibrariesControllerTests(TestsFixture fixture)
+    public LibrariesControllerTests(IntegrationTestsWebApplicationFactory fixture)
     {
         this.fixture = fixture;
     }

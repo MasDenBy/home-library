@@ -1,4 +1,4 @@
-﻿using MasDen.HomeLibrary.Books.DeleteBook;
+﻿using MasDen.HomeLibrary.Books.Commands.DeleteBook;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 
 namespace MasDen.HomeLibrary.Tests.Books.Commands.DeleteBook;

@@ -8,7 +8,7 @@ public class BookFileFaker : Faker<BookFile>
     public BookFileFaker(bool newInstance = true)
     {
         RuleFor(x => x.Id, setter => newInstance ? BookFileId.Empty : new BookFileId(this.FakerHub.Random.PositiveInt()));
-        RuleFor(x => x.Path, setter => setter.System.FilePath());
+        WithPath(this.FakerHub.System.FilePath());
         RuleFor(x => x.ImageName, setter => setter.System.FileName());
     }
 
@@ -29,6 +29,13 @@ public class BookFileFaker : Faker<BookFile>
     public BookFileFaker WithBookId(BookId bookId)
     {
         RuleFor(x => x.BookId, setter => bookId);
+
+        return this;
+    }
+
+    public BookFileFaker WithPath(string path)
+    {
+        RuleFor(x => x.Path, setter => path);
 
         return this;
     }

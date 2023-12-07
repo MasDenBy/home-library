@@ -1,11 +1,13 @@
 ﻿using MasDen.HomeLibrary.Books.Commands.UpdateBook;
-using MasDen.HomeLibrary.Books.DeleteBook;
+using MasDen.HomeLibrary.Books.Commands.DeleteBook;
 using MasDen.HomeLibrary.Books.Queries.GetBook;
 using MasDen.HomeLibrary.Books.Queries.GetBooks;
 using MasDen.HomeLibrary.Books.Queries.Search;
 using MasDen.HomeLibrary.Common.Models;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 using Microsoft.AspNetCore.Mvc;
+using MasDen.HomeLibrary.Books.Queries.DownloadBook;
+using MasDen.HomeLibrary.Books.Commands.IndexBook;
 
 namespace MasDen.HomeLibrary.Api.Controllers;
 public class BooksController : ApiControllerBase
@@ -42,4 +44,20 @@ public class BooksController : ApiControllerBase
     [HttpPost("search")]
     public Task<PagingCollection<SearchBookPageItemDto>> Search(SearchBooksQuery query, CancellationToken cancellationToken = default) =>
         this.Mediator.Send(query, cancellationToken);
+
+    [HttpGet("{id}/file")]
+    public async Task<IActionResult> Download(BookId id, CancellationToken cancellationToken = default)
+    {
+        var (stream, fileName) = await this.Mediator.Send(new DownloadBookQuery(id), cancellationToken);
+
+        return File(stream, "application/octet-stream", fileName);
+    }
+
+    [HttpPost("{id}/index")]
+    public async Task<IActionResult> IndexAsync(BookId id, CancellationToken cancellationToken = default)
+    {
+        await this.Mediator.Send(new IndexBookCommand(id), cancellationToken);
+
+        return NoContent();
+    }
 }

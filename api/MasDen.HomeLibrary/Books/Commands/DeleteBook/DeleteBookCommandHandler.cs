@@ -3,7 +3,7 @@ using MasDen.HomeLibrary.Infrastructure.Exceptions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MediatR;
 
-namespace MasDen.HomeLibrary.Books.DeleteBook;
+namespace MasDen.HomeLibrary.Books.Commands.DeleteBook;
 
 public class DeleteBookCommandHandler : IRequestHandler<DeleteBookCommand>
 {
@@ -16,27 +16,27 @@ public class DeleteBookCommandHandler : IRequestHandler<DeleteBookCommand>
 
     public async Task Handle(DeleteBookCommand request, CancellationToken cancellationToken)
     {
-        var entity = await this.unitOfWork.Book.GetBookAsync(request.Id, cancellationToken)
+        var entity = await unitOfWork.Book.GetBookAsync(request.Id, cancellationToken)
             ?? throw new NotFoundException(typeof(Book), request.Id.Value);
 
         try
         {
-            this.unitOfWork.BeginTransaction();
+            unitOfWork.BeginTransaction();
 
-            await this.unitOfWork.BookFile.DeleteAsync(entity.File.Id, cancellationToken);
+            await unitOfWork.BookFile.DeleteAsync(entity.File.Id, cancellationToken);
 
             if (entity.Metadata != null)
             {
-                await this.unitOfWork.Metadata.DeleteAsync(entity.Metadata.Id, cancellationToken);
+                await unitOfWork.Metadata.DeleteAsync(entity.Metadata.Id, cancellationToken);
             }
 
-            await this.unitOfWork.Book.DeleteAsync(entity.Id, cancellationToken);
+            await unitOfWork.Book.DeleteAsync(entity.Id, cancellationToken);
 
-            this.unitOfWork.CommitTransaction();
+            unitOfWork.CommitTransaction();
         }
         catch
         {
-            this.unitOfWork.RollbackTransaction();
+            unitOfWork.RollbackTransaction();
 
             throw;
         }

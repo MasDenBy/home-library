@@ -6,6 +6,8 @@ internal static class ConfigurationManager
 {
     private static Regex envVariablePattern = new(@"(^[A-Z0-9_]+)(\=)(.*\n(?=[A-Z])|.*$)", RegexOptions.Compiled);
 
+    private static MigrationOptions? migrationOptions = null;
+
     static ConfigurationManager()
     {
         var filePath = ".env";
@@ -23,6 +25,9 @@ internal static class ConfigurationManager
         }
     }
 
-    public static string ConnectionString => Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? throw new InvalidOperationException("Connection String does not found in environment variables.");
-    public static string DatabaseName => Environment.GetEnvironmentVariable("DB_NAME") ?? throw new InvalidOperationException("Database name does not found in environment variables.");
+    public static MigrationOptions MigrationOptions => migrationOptions ??= new MigrationOptions
+    {
+        ConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? throw new InvalidOperationException("Connection String does not found in environment variables."),
+        DatabaseName = Environment.GetEnvironmentVariable("DB_NAME") ?? throw new InvalidOperationException("Database name does not found in environment variables.")
+    };
 }
