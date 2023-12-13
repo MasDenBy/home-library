@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using MasDen.HomeLibrary.Domain.Entities;
+using MasDen.HomeLibrary.Domain;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 using MasDen.HomeLibrary.Infrastructure.Configuration;
 
@@ -20,29 +20,26 @@ internal class LibraryDataHelper : DataHelperBase
 
         foreach (var library in libraries)
         {
-            result.Add(await InsertAsync(library));
+            result.Add(await InsertAsync(library.Path));
         }
 
         return result;
     }
 
-    public async Task<Library> InsertAsync(Library library)
+    public async Task<Library> InsertAsync(string path)
     {
         using var connection = this.CreateConnection();
 
          var id = await this.AsyncRetryPolicy
             .ExecuteAsync(async () => await
                 connection.QuerySingleAsync<LibraryId>(
-                    sql: "INSERT INTO library (id, path) VALUES (@id, @path); SELECT CAST(LAST_INSERT_ID() AS INT);",
+                    sql: "INSERT INTO library (path) VALUES (@path); SELECT CAST(LAST_INSERT_ID() AS INT);",
                     param: new
                     {
-                        id = library.Id,
-                        path = library.Path
+                        path
                     }));
 
-        library.SetId(id);
-
-        return library;
+        return new Library(id, path);
     }
 
     public async Task<bool> ExistsAsync(LibraryId id)

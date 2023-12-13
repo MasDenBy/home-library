@@ -9,6 +9,6 @@ internal static class DataObjectHelpers
     {
         var table = entityType.GetTypeInfo().GetCustomAttribute<TableAttribute>();
 
-        return table == null ? entityType.Name.ToLowerInvariant() : table.Name;
+        return table == null ? entityType.Name.ToLowerInvariant().Replace("entity", string.Empty) : table.Name;
     }
 }

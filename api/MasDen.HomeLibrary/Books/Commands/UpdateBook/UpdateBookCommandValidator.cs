@@ -20,17 +20,17 @@ public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
             .MaximumLength(255);
 
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-        RuleFor(x => x.Metadata.Year)
+        RuleFor(x => x.Edition.Year)
             .GreaterThanOrEqualTo(0)
-            .When(x => x.Metadata != null);
+            .When(x => x.Edition != null);
 
-        RuleFor(x => x.Metadata.Isbn)
-            .MaximumLength(13)
-            .When(x => x.Metadata != null);
-
-        RuleFor(x => x.Metadata.Pages)
+        RuleFor(x => x.Edition.Pages)
             .GreaterThan(0)
-            .When(x => x.Metadata != null);
+            .When(x => x.Edition != null);
+
+        RuleFor(x => x.Edition.Id.Value)
+            .GreaterThan(0)
+            .When(x => x.Edition != null);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
     }
 }

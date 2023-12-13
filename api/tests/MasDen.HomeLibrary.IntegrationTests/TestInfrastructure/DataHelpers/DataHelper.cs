@@ -7,9 +7,8 @@ internal class DataHelper : IDisposable
     private readonly ApplicationConfiguration configuration;
 
     private BookDataHelper? bookDataHelper;
-    private BookFileDataHelper? bookFileDataHelper;
     private LibraryDataHelper? libraryDataHelper;
-    private MetadataDataHelper? metadataDataHelper;
+    private EditionDataHelper? metadataDataHelper;
 
     private bool disposed;
 
@@ -19,9 +18,8 @@ internal class DataHelper : IDisposable
     }
 
     public BookDataHelper Book => this.bookDataHelper ??= new BookDataHelper(this.configuration);
-    public BookFileDataHelper BookFile => this.bookFileDataHelper ??= new BookFileDataHelper(this.configuration);
     public LibraryDataHelper Library => this.libraryDataHelper ??= new LibraryDataHelper(this.configuration);
-    public MetadataDataHelper Metadata => this.metadataDataHelper ??= new MetadataDataHelper(this.configuration);
+    public EditionDataHelper Edition => this.metadataDataHelper ??= new EditionDataHelper(this.configuration);
 
     public void Dispose()
     {
@@ -36,7 +34,6 @@ internal class DataHelper : IDisposable
         if (disposing)
         {
             this.bookDataHelper?.Dispose();
-            this.bookFileDataHelper?.Dispose();
             this.libraryDataHelper?.Dispose();
             this.metadataDataHelper?.Dispose();
         }

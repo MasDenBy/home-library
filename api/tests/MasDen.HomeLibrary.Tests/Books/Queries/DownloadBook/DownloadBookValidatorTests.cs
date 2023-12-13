@@ -18,21 +18,21 @@ public class DownloadBookValidatorTests
     public void Validate_IfBookIdLessThanZero_ShouldFail()
     {
         // Arrange
-        var query = new DownloadBookQuery(new BookId(this.faker.Random.Int(max: -1)));
+        var query = new DownloadBookQuery(new BookId(this.faker.Random.Int(max: -1)), new EditionId(this.faker.Random.PositiveInt()));
 
         // Act
         var result = this.sut.Validate(query);
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(f => f.ErrorMessage == "'Id' must be greater than '0'.");
+        result.Errors.Should().Contain(f => f.ErrorMessage == "'BookId' must be greater than '0'.");
     }
 
     [Fact]
     public void Validation_IfValid_ShouldSucced()
     {
         // Arrange
-        var query = new DownloadBookQuery(new BookId(this.faker.Random.PositiveInt()));
+        var query = new DownloadBookQuery(new BookId(this.faker.Random.PositiveInt()), new EditionId(this.faker.Random.PositiveInt()));
 
         // Act
         var result = sut.Validate(query);

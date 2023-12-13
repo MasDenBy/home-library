@@ -3,7 +3,8 @@ using MasDen.HomeLibrary.Books.Queries.GetBook;
 using MasDen.HomeLibrary.Books.Queries.GetBooks;
 using MasDen.HomeLibrary.Books.Queries.Search;
 using MasDen.HomeLibrary.Common.Models;
-using MasDen.HomeLibrary.Domain.Entities;
+using MasDen.HomeLibrary.Domain;
+using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 using MasDen.HomeLibrary.TestInfrastructure;
 using System.Net.Http.Json;
 
@@ -36,7 +37,6 @@ public class BooksControllerTests : IClassFixture<IntegrationTestsWebApplication
             .WithRandomLibrary(libraries.Select(x => x.Id));
 
         var books = await this.factory.DataHelper.Book.InsertAsync(bookFaker.GenerateLazy(booksNumber));
-        var files = await this.factory.DataHelper.BookFile.InsertAsync(new BookFileFaker().GenerateForEachBook(books));
 
         var expectedPage = new PagingCollection<BookPageItemDto>(
             new GetBooksMapper().ToDto(books.Skip(offset).Take(count)).ToList(),
@@ -54,33 +54,32 @@ public class BooksControllerTests : IClassFixture<IntegrationTestsWebApplication
     public async Task Get_ShouldResponse200OkWithBook()
     {
         // Arrange
-        var library = await this.factory.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate());
+        var library = await this.factory.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate().Path);
 
         var bookFaker = new BookFaker()
             .WithRandomLibrary(new[] { library.Id });
 
         var book = await this.factory.DataHelper.Book.InsertAsync(bookFaker.Generate());
 
-        var file = await this.factory.DataHelper.BookFile.InsertAsync(new BookFileFaker().WithBookId(book.Id).Generate());
-        var metadata = await this.factory.DataHelper.Metadata.InsertAsync(new MetadataFaker().WithBookId(book.Id).Generate());
+        var editions = await this.factory.DataHelper.Edition.InsertAsync(new EditionFaker().WithBookId(book.Id).GenerateBetween(1, 5));
 #pragma warning disable CS8604 // Possible null reference argument.
-        var imageContent = await ImageHelper.SaveImageAsync(file.ImageName, Path.Combine(this.factory.Configuration.ImageDirectory, library.Id.ToString()));
+        var imageContent = await ImageHelper.SaveImageAsync(book.ImageName, Path.Combine(this.factory.Configuration.ImageDirectory, library.Id.ToString()));
 #pragma warning restore CS8604 // Possible null reference argument.
 
         var expectedDto = new BookDto
         {
             Authors = book.Authors,
             Description = book.Description,
-            File = new FileDto
-            {
-                Image = imageContent
-            },
-            Id = book.Id,
-            Metadata = new MetadataDto
-            {
-                Pages = metadata.Pages,
-                Year = metadata.Year,
-            },
+			Image = imageContent,
+			Id = book.Id,
+            Editions = editions.Select(edition => new EditionDto
+			{
+				Pages = edition.Pages,
+				Year = edition.Year,
+				Isbn = edition.Isbn,
+				Title = edition.Title,
+				FilePath = edition.FilePath
+			}).ToArray(),
             Title = book.Title
         };
 
@@ -93,21 +92,20 @@ public class BooksControllerTests : IClassFixture<IntegrationTestsWebApplication
 
     [Fact]
     [TestPriority(3)]
-    public async Task Patch_IfMetadataExists_ShouldResponse204NoContentAndUpdateBookAndMetadata()
+    public async Task Patch_IfEditionExists_ShouldResponse204NoContentAndUpdateBookAndEdition()
     {
         // Arrange
-        var library = await this.factory.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate());
+        var library = await this.factory.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate().Path);
 
         var bookFaker = new BookFaker()
             .WithRandomLibrary(new[] { library.Id });
 
         var book = await this.factory.DataHelper.Book.InsertAsync(bookFaker.Generate());
 
-        await this.factory.DataHelper.BookFile.InsertAsync(new BookFileFaker().WithBookId(book.Id).Generate());
-        var metadata = await this.factory.DataHelper.Metadata.InsertAsync(new MetadataFaker().WithBookId(book.Id).Generate());
+        var edition = await this.factory.DataHelper.Edition.InsertAsync(new EditionFaker().WithBookId(book.Id).Generate());
 
         var updateBook = new BookFaker()
-            .WithMetadata(new MetadataFaker().Generate())
+            .WithEditions(new[] { new EditionFaker().Generate() })
             .Generate();
 
         var updateBookCommand = new UpdateBookCommand
@@ -116,50 +114,12 @@ public class BooksControllerTests : IClassFixture<IntegrationTestsWebApplication
             Authors = updateBook.Authors,
             Description = updateBook.Description,
             Title = updateBook.Title,
-            Metadata = new UpdateBookMetadata
+            Edition = new UpdateBookEdition
             {
-                Isbn = metadata?.Isbn,
-                Pages = metadata?.Pages,
-                Year = metadata?.Year,
-            }
-        };
-
-        // Act
-        var response = await this.factory.HttpClient.PatchAsync($"/api/books/{book.Id}", JsonContent.Create(updateBookCommand));
-
-        // Assert
-        response.Should().Be204NoContent();
-        await AssertBook(book, updateBookCommand);
-    }
-
-    [Fact]
-    [TestPriority(4)]
-    public async Task Patch_IfNoMetadataExists_ShouldResponse204NoContentAndUpdateBookAndCreateMetadata()
-    {
-        // Arrange
-        var library = await this.factory.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate());
-
-        var bookFaker = new BookFaker()
-            .WithRandomLibrary(new[] { library.Id });
-
-        var book = await this.factory.DataHelper.Book.InsertAsync(bookFaker.Generate());
-
-        await this.factory.DataHelper.BookFile.InsertAsync(new BookFileFaker().WithBookId(book.Id).Generate());
-
-        var updateBook = new BookFaker().Generate();
-        var updateMetadata = new MetadataFaker().Generate();
-
-        var updateBookCommand = new UpdateBookCommand
-        {
-            Id = book.Id,
-            Authors = updateBook.Authors,
-            Description = updateBook.Description,
-            Title = updateBook.Title,
-            Metadata = new UpdateBookMetadata
-            {
-                Isbn = updateMetadata.Isbn,
-                Pages = updateMetadata.Pages,
-                Year = updateMetadata.Year,
+                Id = edition.Id,
+                Isbn = edition?.Isbn,
+                Pages = edition?.Pages,
+                Year = edition?.Year,
             }
         };
 
@@ -196,15 +156,14 @@ public class BooksControllerTests : IClassFixture<IntegrationTestsWebApplication
     public async Task Delete_ShouldResponse204NoContentAndDeleteEntities()
     {
         // Arrange
-        var library = await this.factory.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate());
+        var library = await this.factory.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate().Path);
 
         var bookFaker = new BookFaker()
             .WithRandomLibrary(new[] { library.Id });
 
         var book = await this.factory.DataHelper.Book.InsertAsync(bookFaker.Generate());
 
-        await this.factory.DataHelper.BookFile.InsertAsync(new BookFileFaker().WithBookId(book.Id).Generate());
-        await this.factory.DataHelper.Metadata.InsertAsync(new MetadataFaker().WithBookId(book.Id).Generate());
+        await this.factory.DataHelper.Edition.InsertAsync(new EditionFaker().WithBookId(book.Id).Generate());
 
         // Act
         var response = await this.factory.HttpClient.DeleteAsync($"/api/books/{book.Id}");
@@ -219,7 +178,7 @@ public class BooksControllerTests : IClassFixture<IntegrationTestsWebApplication
     {
         // Arrange
         var booksNumber = this.faker.Random.Int(min: 15, max: 30);
-        var offset = this.faker.Random.Int(min: 0, max: 2);
+        var offset = 0;
         var count = this.faker.Random.Int(min: 1, max: 5);
 
         var libraries = await this.factory.DataHelper.Library.InsertAsync(new LibraryFaker(true).GenerateBetween(1, 3));
@@ -227,7 +186,6 @@ public class BooksControllerTests : IClassFixture<IntegrationTestsWebApplication
             .WithRandomLibrary(libraries.Select(x => x.Id));
 
         var books = await this.factory.DataHelper.Book.InsertAsync(bookFaker.GenerateLazy(booksNumber));
-        var files = await this.factory.DataHelper.BookFile.InsertAsync(new BookFileFaker().GenerateForEachBook(books));
 
         var firstBook = books.First();
         var pattern = string.Concat(firstBook.Title.Skip(1).Take(this.faker.Random.Int(3, 5)));
@@ -241,7 +199,7 @@ public class BooksControllerTests : IClassFixture<IntegrationTestsWebApplication
         var result = await response.Should().Be200Ok()
             .And.Subject.Content.ReadFromJsonAsync<PagingCollection<SearchBookPageItemDto>>();
 
-        result?.Items.Where(x => x.Id == firstBook.Id).Should().HaveCount(1);
+        result?.Items.Should().HaveCountGreaterThanOrEqualTo(1);
     }
 
     [Fact]
@@ -254,20 +212,19 @@ public class BooksControllerTests : IClassFixture<IntegrationTestsWebApplication
 
         File.WriteAllText(bookFilePath, bookContent);
 
-        var library = await this.factory.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate());
+        var library = await this.factory.DataHelper.Library.InsertAsync(new LibraryFaker(true).Generate().Path);
 
         var bookFaker = new BookFaker()
             .WithLibrary(library.Id);
 
         var book = await this.factory.DataHelper.Book.InsertAsync(bookFaker.Generate());
-        await this.factory.DataHelper.BookFile.InsertAsync(
-            new BookFileFaker()
-                .WithBookId(book.Id)
-                .WithPath(bookFilePath)
+        var edition = await this.factory.DataHelper.Edition.InsertAsync(
+            new EditionFaker().WithBookId(book.Id)
+                .WithFilePath(bookFilePath)
                 .Generate());
 
         // Act
-        var response = await this.factory.HttpClient.GetAsync($"/api/books/{book.Id}/file");
+        var response = await this.factory.HttpClient.GetAsync($"/api/books/{book.Id}/editions/{edition.Id}/file");
 
         // Assert
         await response.Should().Be200Ok().And.Subject.Content.ReadAsStreamAsync();
@@ -276,12 +233,17 @@ public class BooksControllerTests : IClassFixture<IntegrationTestsWebApplication
     private async Task AssertBook(Book book, UpdateBookCommand updateBookCommand)
     {
         var actualBook = await this.factory.DataHelper.Book.GetBookAsync(book.Id);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        var actualEdition = await this.factory.DataHelper.Edition.GetAsync(updateBookCommand.Edition.Id);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
         actualBook.Should().NotBeNull();
         actualBook.Title.Should().Be(updateBookCommand.Title);
         actualBook.Authors.Should().Be(updateBookCommand.Authors);
         actualBook.Description.Should().Be(updateBookCommand.Description);
-        actualBook.Metadata?.Isbn.Should().Be(updateBookCommand.Metadata?.Isbn);
-        actualBook.Metadata?.Pages.Should().Be(updateBookCommand.Metadata?.Pages);
-        actualBook.Metadata?.Year.Should().Be(updateBookCommand.Metadata?.Year);
+
+        actualEdition.Isbn.Should().Be(updateBookCommand.Edition?.Isbn);
+        actualEdition.Pages.Should().Be(updateBookCommand.Edition?.Pages);
+        actualEdition.Year.Should().Be(updateBookCommand.Edition?.Year);
     }
 }

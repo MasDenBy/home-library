@@ -1,27 +1,32 @@
-﻿using MasDen.HomeLibrary.Domain.Entities;
+﻿using MasDen.HomeLibrary.Domain;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 using MasDen.HomeLibrary.Infrastructure.Exceptions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
+using MasDen.HomeLibrary.Persistence.Entities;
+using MasDen.HomeLibrary.Persistence.Mappers;
 
 namespace MasDen.HomeLibrary.Persistence.DataStores;
 
-public class LibraryDataStore : BaseDataStore<Library>, ILibraryDataStore
+public class LibraryDataStore : BaseDataStore<LibraryEntity>, ILibraryDataStore
 {
     public LibraryDataStore(IDataObjectFactory dataObjectFactory)
         : base(dataObjectFactory)
     {
     }
 
-    public Task<IReadOnlyCollection<Library>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        this.DataObject.GetAllAsync(cancellationToken);
+    public async Task<IReadOnlyCollection<Library>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        var entity = await this.DataObject.GetAllAsync(cancellationToken);
 
-    public Task<LibraryId> CreateAsync(Library library) =>
+        return new LibraryMapper().ToDomain(entity);
+	}
+
+    public Task<LibraryId> CreateAsync(string path) =>
         this.DataObject.InsertAsync<LibraryId>(
-            insertSql: "INSERT INTO library (id, path) VALUES (@id, @path)",
+            insertSql: "INSERT INTO library (path) VALUES (@path)",
             param: new
             {
-                id = library.Id,
-                path = library.Path
+                path
             });
 
     public async Task DeleteAsync(LibraryId id, CancellationToken cancellationToken = default)

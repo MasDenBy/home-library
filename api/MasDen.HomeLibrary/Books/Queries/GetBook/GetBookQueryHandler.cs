@@ -1,4 +1,6 @@
-﻿using MasDen.HomeLibrary.Infrastructure.Persistence;
+﻿using MasDen.HomeLibrary.Domain;
+using MasDen.HomeLibrary.Infrastructure.Exceptions;
+using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MasDen.HomeLibrary.Infrastructure.Services;
 using MediatR;
 
@@ -16,12 +18,17 @@ public class GetBookQueryHandler : IRequestHandler<GetBookQuery, BookDto>
 
     public async Task<BookDto> Handle(GetBookQuery request, CancellationToken cancellationToken)
     {
-        var entity = await this.unitOfWork.Book.GetBookAsync(request.BookId);
+        var entity = await this.unitOfWork.Book.GetBookAsync(request.BookId)
+            ?? throw new NotFoundException(typeof(Book), request.BookId.Value);
+
         var dto = new BookMapper().ToDto(entity);
 
-        if (!string.IsNullOrWhiteSpace(entity.File.ImageName))
+        if (!string.IsNullOrWhiteSpace(entity.ImageName))
         {
-            dto.File.Image = await this.imageService.GetImageContentAsync(entity.LibraryId, entity.File.ImageName);
+            dto = dto with
+            {
+                Image = await this.imageService.GetImageContentAsync(entity.LibraryId, entity.ImageName)
+            };
         }
 
         return dto;

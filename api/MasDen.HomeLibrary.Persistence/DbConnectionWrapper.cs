@@ -17,6 +17,7 @@ public class DbConnectionWrapper : IDbConnectionWrapper, IDisposable
     }
 
     public IDbConnection Connection => this.connection;
+    private IDbTransaction? Transaction => this.transaction?.Connection == null ? null : this.transaction;
 
     public void BeginTransaction()
     {
@@ -26,14 +27,14 @@ public class DbConnectionWrapper : IDbConnectionWrapper, IDisposable
         this.transaction = this.connection.BeginTransaction();
     }
 
-    public void CommitTransaction() => this.transaction?.Commit();
-    public void RollbackTransaction() => this.transaction?.Rollback();
+    public void CommitTransaction() => this.Transaction?.Commit();
+    public void RollbackTransaction() => this.Transaction?.Rollback();
 
     public CommandDefinition CreateCommand(string sql, CancellationToken cancellationToken = default) =>
-        new(sql, transaction: this.transaction, cancellationToken: cancellationToken);
+        new(sql, transaction: this.Transaction, cancellationToken: cancellationToken);
 
     public CommandDefinition CreateCommand(string sql, dynamic param, CancellationToken cancellationToken = default) =>
-        new(sql, parameters: param as object, transaction: this.transaction, cancellationToken: cancellationToken);
+        new(sql, parameters: param as object, transaction: this.Transaction, cancellationToken: cancellationToken);
 
     public void Dispose()
     {

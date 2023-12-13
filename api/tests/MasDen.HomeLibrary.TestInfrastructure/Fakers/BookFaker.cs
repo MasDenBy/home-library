@@ -1,4 +1,4 @@
-﻿using MasDen.HomeLibrary.Domain.Entities;
+﻿using MasDen.HomeLibrary.Domain;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 
 namespace MasDen.HomeLibrary.TestInfrastructure.Fakers;
@@ -9,11 +9,14 @@ public class BookFaker : Faker<Book>
 
     public BookFaker(bool newInstance = true)
     {
-        RuleFor(x => x.Id, setter => newInstance ? BookId.Empty : new BookId(this.FakerHub.Random.PositiveInt()));
-        RuleFor(x => x.Title, setter => setter.Lorem.Sentence());
-        RuleFor(x => x.Description, setter => setter.Lorem.Paragraph());
-        RuleFor(x => x.Authors, setter => setter.Name.FullName());
-        RuleFor(x => x.LibraryId, setter => this.libraryIds.Any() ? setter.PickRandom(this.libraryIds) : new LibraryId(setter.Random.Int(min: 0)));
+        CustomInstantiator(x => new Book(
+             id: newInstance ? BookId.Empty : new BookId(this.FakerHub.Random.PositiveInt()),
+             title: this.FakerHub.Lorem.Sentence(),
+             description: this.FakerHub.Lorem.Paragraph(),
+             authors: this.FakerHub.Name.FullName(),
+             editions: new[] { new EditionFaker().Generate() },
+             libraryId: this.libraryIds.Any() ? this.FakerHub.PickRandom(this.libraryIds) : new LibraryId(this.FakerHub.Random.Int(min: 0)),
+             imageName: this.FakerHub.System.CommonFileName()));
     }
 
     public BookFaker WithRandomLibrary(IEnumerable<LibraryId> libraryIds)
@@ -30,16 +33,9 @@ public class BookFaker : Faker<Book>
         return this;
     }
 
-    public BookFaker WithMetadata(Metadata metadata)
+    public BookFaker WithEditions(Edition[] editions)
     {
-        RuleFor(x => x.Metadata, setter => metadata);
-
-        return this;
-    }
-
-    public BookFaker WithBookFile(BookFile bookFile)
-    {
-        RuleFor(x => x.File, setter => bookFile);
+        RuleFor(x => x.Editions, setter => editions);
 
         return this;
     }

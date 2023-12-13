@@ -1,4 +1,5 @@
 ﻿using MasDen.HomeLibrary.Books.Commands.UpdateBook;
+using MasDen.HomeLibrary.Domain;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 
 namespace MasDen.HomeLibrary.Tests.Books.Commands.UpdateBook;
@@ -133,7 +134,7 @@ public class UpdateBookCommandValidatorTests
     public void Validation_IfMetadataYearLessThanZero_ShouldFail()
     {
         // Arrange
-        var metadata = new UpdateBookMetadataFaker()
+        var metadata = new UpdateBookEditionFaker()
             .WithYear(this.faker.Random.Int(max: -1))
             .Generate();
 
@@ -146,14 +147,14 @@ public class UpdateBookCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(f => f.ErrorMessage.StartsWith("'Metadata Year' must be greater than or equal to '0'."));
+        result.Errors.Should().Contain(f => f.ErrorMessage.StartsWith("'Edition Year' must be greater than or equal to '0'."));
     }
 
     [Fact]
-    public void Validation_IfMetadataPagesLessThanZero_ShouldFail()
+    public void Validation_IfEditionPagesLessThanZero_ShouldFail()
     {
         // Arrange
-        var metadata = new UpdateBookMetadataFaker()
+        var metadata = new UpdateBookEditionFaker()
             .WithPages(this.faker.Random.Int(max: -1))
             .Generate();
 
@@ -166,27 +167,7 @@ public class UpdateBookCommandValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(f => f.ErrorMessage.StartsWith("'Metadata Pages' must be greater than '0'."));
-    }
-
-    [Fact]
-    public void Validation_IfMetadataIsbnGreaterThan13Characters_ShouldFail()
-    {
-        // Arrange
-        var metadata = new UpdateBookMetadataFaker()
-            .WithIsbn(this.faker.Random.String(minLength: 14, maxLength: 50))
-            .Generate();
-
-        var command = new UpdateBookCommandFaker()
-            .WithMetadata(metadata)
-            .Generate();
-
-        // Act
-        var result = sut.Validate(command);
-
-        // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(f => f.ErrorMessage.StartsWith("The length of 'Metadata Isbn' must be 13 characters or fewer"));
+        result.Errors.Should().Contain(f => f.ErrorMessage.StartsWith("'Edition Pages' must be greater than '0'."));
     }
 
     private class UpdateBookCommandFaker : Faker<UpdateBookCommand>
@@ -197,7 +178,7 @@ public class UpdateBookCommandValidatorTests
             this.WithDescription(this.FakerHub.Lorem.Sentence());
             this.WithTitle(this.FakerHub.Lorem.Sentence());
             this.WithId(this.FakerHub.Random.Int(min: 1));
-            this.WithMetadata(new UpdateBookMetadataFaker().Generate());
+            this.WithMetadata(new UpdateBookEditionFaker().Generate());
         }
 
         public UpdateBookCommandFaker WithId(int value)
@@ -228,38 +209,46 @@ public class UpdateBookCommandValidatorTests
             return this;
         }
 
-        public UpdateBookCommandFaker WithMetadata(UpdateBookMetadata? value)
+        public UpdateBookCommandFaker WithMetadata(UpdateBookEdition? value)
         {
-            RuleFor(x => x.Metadata, setter => value);
+            RuleFor(x => x.Edition, setter => value);
 
             return this;
         }
     }
 
-    private class UpdateBookMetadataFaker : Faker<UpdateBookMetadata>
+    private class UpdateBookEditionFaker : Faker<UpdateBookEdition>
     {
-        public UpdateBookMetadataFaker()
+        public UpdateBookEditionFaker()
         {
-            this.WithIsbn(this.FakerHub.Random.String(length: 13));
+            this.WithId(this.FakerHub.Random.Int(min: 1));
+            this.WithIsbn(new Isbn(this.FakerHub.Random.String(length: 13)));
             this.WithPages(this.FakerHub.Random.Int(min: 1));
             this.WithYear(this.FakerHub.Random.Int(min: 0));
         }
 
-        public UpdateBookMetadataFaker WithIsbn(string? value)
+        public UpdateBookEditionFaker WithId(int value)
+        {
+            RuleFor(x => x.Id, s => new EditionId(value));
+
+            return this;
+        }
+
+        public UpdateBookEditionFaker WithIsbn(Isbn? value)
         {
             RuleFor(x => x.Isbn, s => value);
 
             return this;
         }
 
-        public UpdateBookMetadataFaker WithPages(int? value)
+        public UpdateBookEditionFaker WithPages(int? value)
         {
             RuleFor(x => x.Pages, s => value);
 
             return this;
         }
 
-        public UpdateBookMetadataFaker WithYear(int? value)
+        public UpdateBookEditionFaker WithYear(int? value)
         {
             RuleFor(x => x.Year, s => value);
 

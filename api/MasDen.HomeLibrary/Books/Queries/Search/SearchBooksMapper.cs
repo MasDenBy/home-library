@@ -1,4 +1,4 @@
-﻿using MasDen.HomeLibrary.Domain.Entities;
+﻿using MasDen.HomeLibrary.Domain;
 using Riok.Mapperly.Abstractions;
 
 namespace MasDen.HomeLibrary.Books.Queries.Search;

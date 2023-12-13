@@ -1,4 +1,4 @@
-﻿using MasDen.HomeLibrary.Domain.Entities;
+﻿using MasDen.HomeLibrary.Domain;
 using MasDen.HomeLibrary.Infrastructure.Exceptions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MediatR;
@@ -23,11 +23,12 @@ public class DeleteBookCommandHandler : IRequestHandler<DeleteBookCommand>
         {
             unitOfWork.BeginTransaction();
 
-            await unitOfWork.BookFile.DeleteAsync(entity.File.Id, cancellationToken);
-
-            if (entity.Metadata != null)
+            if (entity.Editions != null)
             {
-                await unitOfWork.Metadata.DeleteAsync(entity.Metadata.Id, cancellationToken);
+                foreach (var edition in entity.Editions)
+                {
+					await unitOfWork.Edition.DeleteAsync(edition.Id, cancellationToken);
+				}
             }
 
             await unitOfWork.Book.DeleteAsync(entity.Id, cancellationToken);

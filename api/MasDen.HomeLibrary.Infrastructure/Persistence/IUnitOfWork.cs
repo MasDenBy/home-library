@@ -3,8 +3,7 @@ public interface IUnitOfWork
 {
     IBookDataStore Book { get; }
     ILibraryDataStore Library { get; }
-    IMetadataDataStore Metadata { get; }
-    IBookFileDataStore BookFile { get; }
+    IEditionDataStore Edition { get; }
 
     void BeginTransaction();
     void CommitTransaction();

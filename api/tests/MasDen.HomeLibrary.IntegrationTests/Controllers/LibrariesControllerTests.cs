@@ -43,7 +43,7 @@ public class LibrariesControllerTests : IClassFixture<IntegrationTestsWebApplica
     {
         // Arrange
         var library = new LibraryFaker(true).Generate();
-        var added = await this.fixture.DataHelper.Library.InsertAsync(library);
+        var added = await this.fixture.DataHelper.Library.InsertAsync(library.Path);
 
         // Act
         var response = await this.fixture.HttpClient.DeleteAsync($"/api/libraries/{added.Id}");

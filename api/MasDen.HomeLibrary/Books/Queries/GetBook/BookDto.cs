@@ -1,4 +1,5 @@
-﻿using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+﻿using MasDen.HomeLibrary.Domain;
+using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 
 namespace MasDen.HomeLibrary.Books.Queries.GetBook;
 
@@ -8,17 +9,15 @@ public record BookDto
     public string Title { get; set; } = null!;
     public string? Authors { get; set; }
     public string? Description { get; set; }
-    public FileDto File { get; set; } = null!;
-    public MetadataDto? Metadata { get; set; }
+	public string? Image { get; init; }
+    public IReadOnlyCollection<EditionDto> Editions { get; init; } = null!;
 }
 
-public record FileDto
+public record EditionDto
 {
-    public string? Image { get; set; }
-}
-
-public record MetadataDto
-{
-    public int? Pages { get; set; }
+	public string Title { get; init; } = null!;
+	public Isbn? Isbn { get; init; }
+	public int? Pages { get; set; }
     public int? Year { get; set; }
+	public string FilePath { get; init; } = null!;
 }

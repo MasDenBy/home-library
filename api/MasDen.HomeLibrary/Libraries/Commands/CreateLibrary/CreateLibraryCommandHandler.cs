@@ -1,4 +1,4 @@
-﻿using MasDen.HomeLibrary.Domain.Entities;
+﻿using MasDen.HomeLibrary.Domain;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MediatR;
 
@@ -14,12 +14,10 @@ public class CreateLibraryCommandHandler : IRequestHandler<CreateLibraryCommand,
 
     public async Task<CreatedLibraryDto> Handle(CreateLibraryCommand request, CancellationToken cancellationToken)
     {
-        Library library = new(request.Path);
+        var id = await this.unitOfWork.Library.CreateAsync(request.Path);
 
-        var id = await this.unitOfWork.Library.CreateAsync(library);
+		Library library = new(id, request.Path);
 
-        library.SetId(id);
-
-        return new LibraryMapper().ToDto(library);
+		return new LibraryMapper().ToDto(library);
     }
 }

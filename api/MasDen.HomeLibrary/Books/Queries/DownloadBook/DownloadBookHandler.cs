@@ -14,14 +14,14 @@ public class DownloadBookHandler : IRequestHandler<DownloadBookQuery, (Stream, s
 
     public async Task<(Stream, string)> Handle(DownloadBookQuery request, CancellationToken cancellationToken)
     {
-        var file = await this.unitOfWork.BookFile.GetByBookIdAsync(request.Id, cancellationToken)
-            ?? throw new NotFoundException($"The file for book with identifier {request.Id} does not found.");
+        var edition = await this.unitOfWork.Edition.GetAsync(request.EditionId, request.BookId, cancellationToken)
+            ?? throw new NotFoundException($"The file for book edition with identifier {request.EditionId} does not found.");
 
-        if (!File.Exists(file.Path))
+        if (!File.Exists(edition.FilePath))
         {
-            throw new NotFoundException($"The file for book with identifier {request.Id} does not found.");
+            throw new NotFoundException($"The file for book edition with identifier {request.EditionId} does not found.");
         }
 
-        return (File.OpenRead(file.Path), Path.GetFileName(file.Path));
+        return (File.OpenRead(edition.FilePath), Path.GetFileName(edition.FilePath));
     }
 }

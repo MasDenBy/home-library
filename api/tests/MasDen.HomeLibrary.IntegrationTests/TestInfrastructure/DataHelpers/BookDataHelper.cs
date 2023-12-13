@@ -1,7 +1,8 @@
 ﻿using Dapper;
-using MasDen.HomeLibrary.Domain.Entities;
+using MasDen.HomeLibrary.Domain;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 using MasDen.HomeLibrary.Infrastructure.Configuration;
+using MasDen.HomeLibrary.Persistence.Entities;
 
 namespace MasDen.HomeLibrary.IntegrationTests.TestInfrastructure.DataHelpers;
 
@@ -33,13 +34,14 @@ internal class BookDataHelper : DataHelperBase
         var id = await this.AsyncRetryPolicy
             .ExecuteAsync(async () => await
                 connection.QuerySingleAsync<BookId>(
-                    sql: "INSERT INTO book (id, title, description, authors, libraryId) VALUES (@id, @title, @description, @authors, @libraryId); SELECT CAST(LAST_INSERT_ID() AS INT);",
+                    sql: "INSERT INTO book (id, title, description, authors, imageName, libraryId) VALUES (@id, @title, @description, @authors, @imageName, @libraryId); SELECT CAST(LAST_INSERT_ID() AS INT);",
                     param: new
                     {
                         id = book.Id,
                         title = book.Title,
                         description = book.Description,
                         authors = book.Authors,
+                        imageName = book.ImageName,
                         libraryId = book.LibraryId
                     }));
 
@@ -48,24 +50,15 @@ internal class BookDataHelper : DataHelperBase
         return book;
     }
 
-    public async Task<Book> GetBookAsync(BookId bookId)
+    public async Task<BookEntity> GetBookAsync(BookId bookId)
     {
         using var connection = this.CreateConnection();
 
-        CommandDefinition command = new(@"SELECT b.id, b.title, b.authors, b.description, b.libraryId, f.id, f.path, f.imageName, f.bookId, m.id, m.pages, m.year, m.isbn, m.bookId
-              FROM book b 
-              JOIN bookfile f ON f.bookid = b.id
-              LEFT JOIN metadata m ON m.bookid = b.id
+        CommandDefinition command = new(@"SELECT b.id, b.title, b.authors, b.description, b.libraryId
+              FROM book b
               WHERE b.id = @id", new { id = bookId });
 
-        var books = await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryAsync<Book, BookFile, Metadata, Book>(command, (book, file, metadata) =>
-        {
-            book.SetMetadata(metadata);
-            book.SetFile(file);
-
-            return book;
-        }, "id, id"));
-
-        return books.First();
+        return await this.AsyncRetryPolicy.ExecuteAsync(
+            async () => await connection.QueryFirstAsync<BookEntity>(command));
     }
 }

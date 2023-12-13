@@ -1,20 +1,22 @@
-﻿using MasDen.HomeLibrary.Domain.Entities;
+﻿using MasDen.HomeLibrary.Domain;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 using MasDen.HomeLibrary.Infrastructure.Exceptions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
+using MasDen.HomeLibrary.Persistence.Entities;
+using MasDen.HomeLibrary.Persistence.Mappers;
 
 namespace MasDen.HomeLibrary.Persistence.DataStores;
 
-public class BookDataStore : BaseDataStore<Book>, IBookDataStore
+public class BookDataStore : BaseDataStore<BookEntity>, IBookDataStore
 {
     public BookDataStore(IDataObjectFactory dataObjectFactory)
         : base(dataObjectFactory)
     {
     }
 
-    public Task<(IReadOnlyCollection<Book> entities, long total)> GetBooksAsync(int offset, int count, CancellationToken cancellationToken = default)
+    public async Task<(IReadOnlyCollection<Book> books, long total)> GetBooksAsync(int offset, int count, CancellationToken cancellationToken = default)
     {
-        return this.DataObject.QueryPageAsync(
+        var (entities, total) = await this.DataObject.QueryPageAsync(
             sql: @"
                     SELECT COUNT(*) AS TotalCount FROM book;
                     SELECT * FROM book LIMIT @count OFFSET @offset;",
@@ -24,13 +26,15 @@ public class BookDataStore : BaseDataStore<Book>, IBookDataStore
                 offset
             },
             cancellationToken: cancellationToken);
+
+        return (new BookMapper().ToDomain(entities), total);
     }
 
-    public Task<(IReadOnlyCollection<Book> entities, long total)> SearchBooksAsync(string pattern, int offset, int count, CancellationToken cancellationToken = default)
+    public async Task<(IReadOnlyCollection<Book> books, long total)> SearchBooksAsync(string pattern, int offset, int count, CancellationToken cancellationToken = default)
     {
         var searchPattern = $"%{pattern}%";
 
-        return this.DataObject.QueryPageAsync(
+        var (entities, total) = await this.DataObject.QueryPageAsync(
             sql: @"
                     SELECT COUNT(*) AS TotalCount FROM book
                     WHERE title LIKE @pattern OR description LIKE @pattern OR authors LIKE @pattern;
@@ -46,26 +50,30 @@ public class BookDataStore : BaseDataStore<Book>, IBookDataStore
                 offset
             },
             cancellationToken: cancellationToken);
-    }
 
-    public async Task<Book> GetBookAsync(BookId bookId, CancellationToken cancellationToken = default)
+		return (new BookMapper().ToDomain(entities), total);
+	}
+
+    public async Task<Book?> GetBookAsync(BookId bookId, CancellationToken cancellationToken = default)
     {
-        var entities = await this.DataObject.QueryAsync<Book, BookFile, Metadata, Book>(
-            @"SELECT b.id, b.title, b.authors, b.description, b.libraryId, f.id, f.path, f.imageName, f.bookId, m.id, m.pages, m.year, m.bookId
-              FROM book b 
-              JOIN bookfile f ON f.bookid = b.id
-              LEFT JOIN metadata m ON m.bookid = b.id
-              WHERE b.id = @id",
-            (book, file, metadata) =>
-            {
-                book.SetMetadata(metadata);
-                book.SetFile(file);
+        var reader = await this.DataObject.QueryMultipleAsync(
+            sql: @"
+                SELECT b.id, b.title, b.authors, b.description, b.libraryId, b.imageName
+                FROM book b
+                WHERE b.id = @id;
 
-                return book;
-            },
-            new { id = bookId }, "id, id", cancellationToken);
+                SELECT e.id, e.title, e.isbn, e.pages, e.year, e.filePath, e.bookId
+                FROM edition e
+                WHERE e.bookId = @id;",
+            param: new { id = bookId.Value },
+            cancellationToken);
 
-        return entities.First();
+        var entity = await reader.ReadFirstAsync<BookEntity>();
+        var editions = await reader.ReadAsync<EditionEntity>();
+
+        entity.Editions = editions.ToList();
+
+		return entity != null ? new BookMapper().ToDomain(entity) : null;
     }
 
     public async Task UpdateAsync(Book book, CancellationToken cancellationToken = default)

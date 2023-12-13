@@ -13,19 +13,16 @@ public class DeleteBookCommandHandlerTests
 
     private readonly Mock<IUnitOfWork> unitOfWorkMock;
     private readonly Mock<IBookDataStore> bookDataStoreMock;
-    private readonly Mock<IBookFileDataStore> bookFileDataStoreMock;
-    private readonly Mock<IMetadataDataStore> metadataDataStoreMock;
+    private readonly Mock<IEditionDataStore> editionDataStoreMock;
 
     public DeleteBookCommandHandlerTests()
     {
         this.bookDataStoreMock = new Mock<IBookDataStore>();
-        this.bookFileDataStoreMock = new Mock<IBookFileDataStore>();
-        this.metadataDataStoreMock = new Mock<IMetadataDataStore>();
+        this.editionDataStoreMock = new Mock<IEditionDataStore>();
 
         this.unitOfWorkMock = new Mock<IUnitOfWork>();
         this.unitOfWorkMock.Setup(x => x.Book).Returns(this.bookDataStoreMock.Object);
-        this.unitOfWorkMock.Setup(x => x.Metadata).Returns(this.metadataDataStoreMock.Object);
-        this.unitOfWorkMock.Setup(x => x.BookFile).Returns(this.bookFileDataStoreMock.Object);
+        this.unitOfWorkMock.Setup(x => x.Edition).Returns(this.editionDataStoreMock.Object);
 
         this.sut = new DeleteBookCommandHandler(unitOfWorkMock.Object);
     }
@@ -41,11 +38,9 @@ public class DeleteBookCommandHandlerTests
     public async Task Handle_ShouldDeleteAllEntitiesAndCommit()
     {
         // Arrange
-        var metadata = new MetadataFaker(false).Generate();
-        var file = new BookFileFaker(false).Generate();
+        var edition = new EditionFaker(false).Generate();
         var book = new BookFaker(false)
-            .WithBookFile(file)
-            .WithMetadata(metadata)
+            .WithEditions(new[] { edition })
             .Generate();
 
         var deleteCommand = CreateCommand(book.Id.Value);
@@ -60,34 +55,7 @@ public class DeleteBookCommandHandlerTests
         this.unitOfWorkMock.Verify(x => x.BeginTransaction(), Times.Once);
         this.unitOfWorkMock.Verify(x => x.CommitTransaction(), Times.Once);
 
-        this.bookFileDataStoreMock.Verify(x => x.DeleteAsync(file.Id, It.IsAny<CancellationToken>()), Times.Once);
-        this.metadataDataStoreMock.Verify(x => x.DeleteAsync(metadata.Id, It.IsAny<CancellationToken>()), Times.Once);
-        this.bookDataStoreMock.Verify(x => x.DeleteAsync(book.Id, It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task Handle_IfMetadataIsNull_ShouldNotDeleteDeleteMetadata()
-    {
-        // Arrange
-        var file = new BookFileFaker(false).Generate();
-        var book = new BookFaker(false)
-            .WithBookFile(file)
-            .Generate();
-
-        var deleteCommand = CreateCommand(book.Id.Value);
-
-        bookDataStoreMock.Setup(x => x.GetBookAsync(deleteCommand.Id, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(book);
-
-        // Act
-        await this.sut.Handle(deleteCommand, default);
-
-        // Assert
-        this.unitOfWorkMock.Verify(x => x.BeginTransaction(), Times.Once);
-        this.unitOfWorkMock.Verify(x => x.CommitTransaction(), Times.Once);
-
-        this.bookFileDataStoreMock.Verify(x => x.DeleteAsync(file.Id, It.IsAny<CancellationToken>()), Times.Once);
-        this.metadataDataStoreMock.Verify(x => x.DeleteAsync(It.IsAny<MetadataId>(), It.IsAny<CancellationToken>()), Times.Never);
+        this.editionDataStoreMock.Verify(x => x.DeleteAsync(edition.Id, It.IsAny<CancellationToken>()), Times.Once);
         this.bookDataStoreMock.Verify(x => x.DeleteAsync(book.Id, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -101,6 +69,8 @@ public class DeleteBookCommandHandlerTests
 
         bookDataStoreMock.Setup(x => x.GetBookAsync(deleteCommand.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(book);
+
+        this.editionDataStoreMock.Setup(x => x.DeleteAsync(It.IsAny<EditionId>(), It.IsAny<CancellationToken>())).Throws(new Exception());
 
         // Act
         await Assert.ThrowsAnyAsync<Exception>(() => this.sut.Handle(deleteCommand, default));

@@ -1,5 +1,5 @@
-﻿using MasDen.HomeLibrary.Infrastructure.Configuration;
-using MasDen.HomeLibrary.Infrastructure.Processors.OpenLibrary;
+﻿using MasDen.HomeLibrary.Infrastructure.Clients.OpenLibrary;
+using MasDen.HomeLibrary.Infrastructure.Configuration;
 using MasDen.HomeLibrary.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
             return config;
         });
 
-        services.AddHttpClient<OpenLibraryProcessor>(httpClient =>
+        services.AddHttpClient<IOpenLibraryHttpClient, OpenLibraryHttpClient>(httpClient =>
         {
             httpClient.BaseAddress = new Uri("http://openlibrary.org");
         });

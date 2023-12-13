@@ -45,10 +45,10 @@ public class BooksController : ApiControllerBase
     public Task<PagingCollection<SearchBookPageItemDto>> Search(SearchBooksQuery query, CancellationToken cancellationToken = default) =>
         this.Mediator.Send(query, cancellationToken);
 
-    [HttpGet("{id}/file")]
-    public async Task<IActionResult> Download(BookId id, CancellationToken cancellationToken = default)
+    [HttpGet("{id}/editions/{editionId}/file")]
+    public async Task<IActionResult> Download(BookId id, EditionId editionId, CancellationToken cancellationToken = default)
     {
-        var (stream, fileName) = await this.Mediator.Send(new DownloadBookQuery(id), cancellationToken);
+        var (stream, fileName) = await this.Mediator.Send(new DownloadBookQuery(id, editionId), cancellationToken);
 
         return File(stream, "application/octet-stream", fileName);
     }

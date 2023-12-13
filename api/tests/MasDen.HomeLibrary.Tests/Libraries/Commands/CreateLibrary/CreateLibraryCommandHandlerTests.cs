@@ -1,5 +1,4 @@
-﻿using MasDen.HomeLibrary.Domain.Entities;
-using MasDen.HomeLibrary.Infrastructure.Persistence;
+﻿using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MasDen.HomeLibrary.Libraries.Commands.CreateLibrary;
 using MasDen.HomeLibrary.TestInfrastructure.Fakers;
 
@@ -16,7 +15,7 @@ public class CreateLibraryCommandHandlerTests
         var command = new CreateLibraryCommand(library.Path);
 
         var libraryDataStoreMock = new Mock<ILibraryDataStore>();
-        libraryDataStoreMock.Setup(x => x.CreateAsync(It.IsAny<Library>())).ReturnsAsync(library.Id);
+        libraryDataStoreMock.Setup(x => x.CreateAsync(It.IsAny<string>())).ReturnsAsync(library.Id);
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(x => x.Library).Returns(libraryDataStoreMock.Object);
@@ -30,6 +29,6 @@ public class CreateLibraryCommandHandlerTests
         dto.Id.Should().Be(library.Id);
         dto.Path.Should().Be(library.Path);
 
-        libraryDataStoreMock.Verify(x => x.CreateAsync(It.Is<Library>(a => a.Path == command.Path)), Times.Once);
+        libraryDataStoreMock.Verify(x => x.CreateAsync(command.Path), Times.Once);
     }
 }

@@ -59,7 +59,7 @@ internal class DataObject<T> : IDataObject<T>
         CommandDefinition command = this.connectionWrapper.CreateCommand(
             $"SELECT * FROM {GetTableName()}" + (string.IsNullOrWhiteSpace(where) ? "" : $" WHERE {where}"),
             param,
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
         return await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QuerySingleOrDefaultAsync<T>(command));
     }
@@ -67,7 +67,7 @@ internal class DataObject<T> : IDataObject<T>
     public async Task<(IReadOnlyCollection<T> entities, long total)> QueryPageAsync(string sql, dynamic param, CancellationToken cancellationToken = default)
     {
         IDbConnection? connection = this.CreateConnection();
-        CommandDefinition command = new(sql, param as object, cancellationToken: cancellationToken);
+        CommandDefinition command = this.connectionWrapper.CreateCommand(sql, param as object, cancellationToken: cancellationToken);
 
         var reader = await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryMultipleAsync(command));
 
@@ -77,15 +77,23 @@ internal class DataObject<T> : IDataObject<T>
         return (entities.ToList(), total.TotalCount);
     }
 
-    public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(string sql, Func<TFirst, TSecond, TThird, TReturn> map, dynamic param, string splitOn = "Id", CancellationToken cancellationToken = default)
-    {
-        IDbConnection? connection = this.CreateConnection();
-        CommandDefinition command = new(sql, param as object, cancellationToken: cancellationToken);
+	public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TReturn>(string sql, Func<TFirst, TSecond, TReturn> map, dynamic param, string splitOn = "Id", CancellationToken cancellationToken = default)
+	{
+		IDbConnection? connection = this.CreateConnection();
+		CommandDefinition command = this.connectionWrapper.CreateCommand(sql, param as object, cancellationToken: cancellationToken);
 
-        return await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryAsync<TFirst, TSecond, TThird, TReturn>(command, map, splitOn));
-    }
+		return await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryAsync<TFirst, TSecond, TReturn>(command, map, splitOn));
+	}
 
-    public async Task<int> ExecuteAsync(string sql, dynamic param, CancellationToken cancellationToken = default)
+	public async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(string sql, Func<TFirst, TSecond, TThird, TReturn> map, dynamic param, string splitOn = "Id", CancellationToken cancellationToken = default)
+	{
+		IDbConnection? connection = this.CreateConnection();
+		CommandDefinition command = this.connectionWrapper.CreateCommand(sql, param as object, cancellationToken: cancellationToken);
+
+		return await this.AsyncRetryPolicy.ExecuteAsync(async () => await connection.QueryAsync<TFirst, TSecond, TThird, TReturn>(command, map, splitOn));
+	}
+
+	public async Task<int> ExecuteAsync(string sql, dynamic param, CancellationToken cancellationToken = default)
     {
         CommandDefinition command = this.connectionWrapper.CreateCommand(sql, param, cancellationToken);
 
@@ -94,6 +102,15 @@ internal class DataObject<T> : IDataObject<T>
                 this.CreateConnection().ExecuteAsync(command));
 
         return rows;
+    }
+
+    public async Task<SqlMapper.GridReader> QueryMultipleAsync(string sql, dynamic param, CancellationToken cancellationToken = default)
+    {
+		CommandDefinition command = this.connectionWrapper.CreateCommand(sql, param, cancellationToken);
+
+        return await this.AsyncRetryPolicy
+            .ExecuteAsync(async () => await
+                this.CreateConnection().QueryMultipleAsync(command));
     }
 
     private static string GetTableName() => DataObjectHelpers.GetTableName(typeof(T));

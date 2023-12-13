@@ -9,9 +9,8 @@ public class UnitOfWork : IUnitOfWork
     private readonly IDbConnectionWrapper connectionWrapper;
 
     private IBookDataStore bookDataStore;
-    private IBookFileDataStore bookFileDataStore;
     private ILibraryDataStore libraryDataStore;
-    private IMetadataDataStore metadataDataStore;
+    private IEditionDataStore metadataDataStore;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public UnitOfWork(IDataObjectFactory dataObjectFactory, IDbConnectionWrapper connectionWrapper)
@@ -22,9 +21,8 @@ public class UnitOfWork : IUnitOfWork
     }
 
     public IBookDataStore Book => this.bookDataStore ??= new BookDataStore(this.dataObjectFactory);
-    public IBookFileDataStore BookFile => this.bookFileDataStore ??= new BookFileDataStore(this.dataObjectFactory);
     public ILibraryDataStore Library => this.libraryDataStore ??= new LibraryDataStore(this.dataObjectFactory);
-    public IMetadataDataStore Metadata => this.metadataDataStore ??= new MetadataDataStore(this.dataObjectFactory);
+    public IEditionDataStore Edition => this.metadataDataStore ??= new EditionDataStore(this.dataObjectFactory);
 
     public void BeginTransaction() => this.connectionWrapper.BeginTransaction();
     public void CommitTransaction() => this.connectionWrapper.CommitTransaction();

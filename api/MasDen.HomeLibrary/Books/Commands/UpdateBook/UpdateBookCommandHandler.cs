@@ -1,5 +1,4 @@
-﻿using MasDen.HomeLibrary.Domain.Entities;
-using MasDen.HomeLibrary.Domain.StronglyTypedIds;
+﻿using MasDen.HomeLibrary.Domain;
 using MasDen.HomeLibrary.Infrastructure.Exceptions;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
 using MediatR;
@@ -23,32 +22,19 @@ public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand>
         {
             this.unitOfWork.BeginTransaction();
 
-            if (request.Metadata != null)
+            if (request.Edition != null)
             {
-                var metadata = new Metadata
+                var edition = new Edition
                 {
-                    Id = entity.Metadata != null ? entity.Metadata.Id : MetadataId.Empty,
-                    Isbn = request.Metadata.Isbn,
-                    Pages = request.Metadata.Pages,
-                    Year = request.Metadata.Year,
-                    BookId = entity.Id
+                    Id = request.Edition.Id,
+                    Isbn = request.Edition.Isbn,
+                    Pages = request.Edition.Pages,
+                    Year = request.Edition.Year,
+                    BookId = entity.Id,
+                    Title = request.Title
                 };
 
-                if (metadata.Id == MetadataId.Empty)
-                {
-                    var metadataId = await this.unitOfWork.Metadata.CreateAsync(metadata);
-
-                    metadata = metadata with
-                    {
-                        Id = metadataId
-                    };
-                }
-                else
-                {
-                    await this.unitOfWork.Metadata.UpdateAsync(metadata, cancellationToken);
-                }
-
-                entity.SetMetadata(metadata);
+                await this.unitOfWork.Edition.UpdateAsync(edition, cancellationToken);
             }
 
             await this.unitOfWork.Book.UpdateAsync(entity, cancellationToken);

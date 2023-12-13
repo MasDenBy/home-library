@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
+using MasDen.HomeLibrary.Domain;
 using MasDen.HomeLibrary.Domain.StronglyTypedIds;
 using MasDen.HomeLibrary.Infrastructure.Configuration;
 using MasDen.HomeLibrary.Infrastructure.Persistence;
@@ -24,9 +25,9 @@ public static class ServiceCollectionExtensions
 
         SqlMapperExtensions.TableNameMapper = entityType => DataObjectHelpers.GetTableName(entityType);
         SqlMapper.AddTypeHandler(new BookId.DapperTypeHandler());
-        SqlMapper.AddTypeHandler(new BookFileId.DapperTypeHandler());
         SqlMapper.AddTypeHandler(new LibraryId.DapperTypeHandler());
-        SqlMapper.AddTypeHandler(new MetadataId.DapperTypeHandler());
+        SqlMapper.AddTypeHandler(new EditionId.DapperTypeHandler());
+        SqlMapper.AddTypeHandler(new Isbn.DapperTypeHandler());
 
         return services;
     }
